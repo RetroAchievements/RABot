@@ -27,6 +27,7 @@ module.exports = class ApiTestCommand extends commando.Command {
         /**
          * everyone
          */
+        return true;
     }
 
     async run(msg, args) {
