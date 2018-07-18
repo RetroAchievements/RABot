@@ -33,10 +33,6 @@ module.exports = class ApiTestCommand extends commando.Command {
     async run(msg, args) {
         msg.channel.send('hey there!')
             .then(message => {
-                // delete message after 7 seconds
-                // setTimeout(() => {
-                //     message.delete();
-                // }, 7000);
             })
             .catch(() => {
             });
