@@ -15,7 +15,7 @@ const client = new CommandoClient({
 client.registry
     .registerDefaultTypes()
     .registerGroups([
-        ['util', 'Needed for \'help\' command'],
+        ['util', 'Utilities'],
         ['helper', 'Helping you to help others'],
     ])
     .registerDefaultCommands({
