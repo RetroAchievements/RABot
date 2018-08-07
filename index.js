@@ -17,6 +17,7 @@ client.registry
     .registerGroups([
         ['util', 'Utilities'],
         ['helper', 'Helping you to help others'],
+        ['single', 'Single (and simple) commands'],
     ])
     .registerDefaultCommands({
         ping: false,
