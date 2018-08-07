@@ -45,6 +45,17 @@ client.on('warn', err => console.warn('[WARNING]', err));
 
 client.on('commandError', (command, err) => console.error('[COMMAND ERROR]', command.name, err));
 
+
+const responses = require('./assets/answers/responses.js');
+
+client.on('message', msg => {
+    // TODO: add a 'cooldown' logic
+    if(!msg.author.bot && responses[msg.content])
+        return msg.reply(responses[msg.content]);
+    return;
+});
+
+
 client.login(BOT_TOKEN);
 
 process.on('unhandledRejection', err => {
