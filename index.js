@@ -15,9 +15,8 @@ const client = new CommandoClient({
 client.registry
     .registerDefaultTypes()
     .registerGroups([
-        ['util', 'placeholder'],
+        ['util', 'Needed for \'help\' command'],
         ['helper', 'Helping you to help others'],
-        ['rautils', 'RetroAchievements utilities']
     ])
     .registerDefaultCommands({
         ping: false,

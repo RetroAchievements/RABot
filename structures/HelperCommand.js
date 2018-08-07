@@ -21,8 +21,10 @@ class HelperCommand extends Command {
             response = this.answers[arg] || this.site;
 
         } else if (arg === 'options') {
+            const options = Object.keys(this.pages).concat(Object.keys(this.answers));
+
             response = '**Command:** `' + prefix + this.name + '`' +
-                '\n**Available options:** `' + Object.keys(this.pages).sort().join('`, `') + '`' +
+                '\n**Available options:** `' + options.sort().join('`, `') + '`' +
                 '\n**See also:** <' + this.site + '>';
 
         } else if (this.answers && this.answers[arg]) {
