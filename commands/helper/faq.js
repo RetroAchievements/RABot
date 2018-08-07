@@ -1,6 +1,6 @@
 const HelperCommand = require('../../structures/HelperCommand.js');
 
-const { site, pages } = require('../../assets/answers/faq.js');
+const { site, pages, answers } = require('../../assets/answers/faq.js');
 
 module.exports = class FaqCommand extends HelperCommand {
     constructor(client) {
@@ -19,7 +19,7 @@ module.exports = class FaqCommand extends HelperCommand {
                     default: 'default',
                 }
             ]
-            }, site, pages);
+            }, site, pages, answers);
     }
 
 };
