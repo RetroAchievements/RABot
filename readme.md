@@ -14,6 +14,8 @@ $ npm i
 
 ## Run
 
+Set the `.env` file properly and then:
+
 ```
 $ node index.js
 ```
