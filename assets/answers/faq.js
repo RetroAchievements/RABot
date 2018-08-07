@@ -56,4 +56,8 @@ module.exports = {
         password: resetpassword,
         pw: resetpassword,
     },
+
+    answers: {
+        default: site,
+    },
 }

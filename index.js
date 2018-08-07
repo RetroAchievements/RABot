@@ -1,5 +1,5 @@
 require('dotenv').config({path: __dirname + '/.env'});
-const { BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE } = process.env;
+const { BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE, BOT_NAME } = process.env;
 
 const path = require('path');
 const { CommandoClient } = require('discord.js-commando');
@@ -27,6 +27,7 @@ client.registry
     .registerCommandsIn(path.join(__dirname, 'commands'));
 
 client.on('ready', () => {
+    client.user.setUsername(BOT_NAME || 'RABot');
     console.log(`[READY] Logged in as ${client.user.tag}! (${client.user.id})`);
     client.user.setActivity('if you need help', { type: 'WATCHING' });
 });

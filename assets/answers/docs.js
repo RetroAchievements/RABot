@@ -134,4 +134,8 @@ module.exports = {
 
         ralibretro: ralibretro,
     },
+
+    answers: {
+        default: site,
+    }
 }
