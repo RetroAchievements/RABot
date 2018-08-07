@@ -1,29 +1,52 @@
-const commando = require('discord.js-commando');
-const path = require('path');
-
 require('dotenv').config({path: __dirname + '/.env'});
+const { BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE } = process.env;
 
-const client = new commando.Client({
-    owner: process.env.DISCORD_OWNER_ID,
-    commandPrefix: process.env.DISCORD_BOT_PREFIX,
+const path = require('path');
+const { CommandoClient } = require('discord.js-commando');
+const client = new CommandoClient({
+    commandPrefix: BOT_PREFIX,
+    owner: OWNERS.split(','),
+    invite: INVITE,
+    disableEveryone: true,
+    unknownCommandResponse: false,
+    disabledEvents: ['TYPING_START']
 });
 
 client.registry
+    .registerDefaultTypes()
     .registerGroups([
-        ['community', 'Community'],
-        ['util', 'Util'],
+        ['util', 'placeholder'],
+        ['helper', 'Helping you to help others'],
+        ['rautils', 'RetroAchievements utilities']
     ])
-    .registerDefaults()
-    .registerCommandsIn(path.join(__dirname, 'src/commands'));
-
-client.on('message', message => {
-    if (message.content === 'what is my avatar') {
-        message.reply(message.author.avatarURL);
-    }
-});
+    .registerDefaultCommands({
+        ping: false,
+        prefix: false,
+        commandState: false
+    })
+    .registerCommandsIn(path.join(__dirname, 'commands'));
 
 client.on('ready', () => {
-    console.info('I am ready! Prefix: ' + process.env.DISCORD_BOT_PREFIX);
+    console.log(`[READY] Logged in as ${client.user.tag}! (${client.user.id})`);
+    client.user.setActivity('if you need help', { type: 'WATCHING' });
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client.on('disconnect', event => {
+    console.error(`[DISCONNECT] Disconnected with code ${event.code}.`);
+    process.exit(0);
+});
+
+client.on('commandRun', command => console.log(`[COMMAND] Ran command ${command.groupID}:${command.memberName}.`));
+
+client.on('error', err => console.error('[ERROR]', err));
+
+client.on('warn', err => console.warn('[WARNING]', err));
+
+client.on('commandError', (command, err) => console.error('[COMMAND ERROR]', command.name, err));
+
+client.login(BOT_TOKEN);
+
+process.on('unhandledRejection', err => {
+    console.error('[FATAL] Unhandled Promise Rejection.', err);
+    process.exit(1);
+});
