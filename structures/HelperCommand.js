@@ -7,6 +7,11 @@ class HelperCommand extends Command {
         this.site = site;
         this.pages = pages;
         this.answers = answers;
+
+        const options = Object.keys(this.pages).concat(Object.keys(this.answers));
+        this.helpMessage = this.aliases.length > 0 ? '\n**Aliases:** `' + this.aliases.sort().join('`, `') + '`' : '';
+        this.helpMessage += '\n**Available options:** `' + options.sort().join('`, `') + '`' +
+            '\n**See also:** <' + this.site + '>';
     }
 
 
@@ -20,12 +25,8 @@ class HelperCommand extends Command {
         } else if (arg === 'default') {
             response = this.answers[arg] || this.site;
 
-        } else if (arg === 'options') {
-            const options = Object.keys(this.pages).concat(Object.keys(this.answers));
-
-            response = '**Command:** `' + prefix + this.name + '`' +
-                '\n**Available options:** `' + options.sort().join('`, `') + '`' +
-                '\n**See also:** <' + this.site + '>';
+        } else if (arg === 'help' || arg === 'options') {
+            response = '**Command:** `' + prefix + this.name + '`' + this.helpMessage;
 
         } else if (this.answers && this.answers[arg]) {
             response = this.answers[arg];
