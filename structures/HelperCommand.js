@@ -8,7 +8,8 @@ class HelperCommand extends Command {
         this.pages = pages;
         this.answers = answers;
 
-        const options = Object.keys(this.pages).concat(Object.keys(this.answers));
+        let options = Object.keys(this.pages).concat(Object.keys(this.answers));
+        options.push('help');
         this.helpMessage = this.aliases.length > 0 ? '\n**Aliases:** `' + this.aliases.sort().join('`, `') + '`' : '';
         this.helpMessage += '\n**Available options:** `' + options.sort().join('`, `') + '`' +
             '\n**See also:** <' + this.site + '>';
