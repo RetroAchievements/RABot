@@ -18,6 +18,7 @@ client.registry
         ['util', 'Utilities'],
         ['helper', 'Helping you to help others'],
         ['single', 'Single (and simple) commands'],
+        ['poll', 'Commands for polls'],
     ])
     .registerDefaultCommands({
         ping: false,
