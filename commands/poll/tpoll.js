@@ -65,7 +65,7 @@ module.exports = class PollCommand extends Command {
         pollMsg.push(`__*${msg.author} started a poll*__:`);
         pollMsg.push(`\n:bar_chart: **${question}**\n${options}`);
         //pollMsg.push(`\n:chart_with_upwards_trend: **${question}**\n${options}`);
-        pollMsg.push('\n`Notes:\n- only the first reaction is considered a vote\n- invalid reactions voids the vote`');
+        pollMsg.push('\n`Notes:\n- only the first reaction is considered a vote\n- unlisted reactions voids the vote`');
 
         const sentMsg = await msg.channel.send(pollMsg);
 
