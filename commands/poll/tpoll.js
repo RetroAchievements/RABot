@@ -7,7 +7,7 @@ module.exports = class PollCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'tpoll',
-            group: 'util',
+            group: 'poll',
             memberName: 'tpoll',
             description: 'Create a timed poll.',
             examples: ['`tpoll 60 \'Which option you choose?\' \'option one\' \'option 2\' \'option N\'`'],
@@ -49,7 +49,7 @@ module.exports = class PollCommand extends Command {
         let i;
         let pollMsg = [];
         let voters = [];
-        let milliseconds = seconds * 1000;
+        let milliseconds = seconds <= 0 ? 0 : seconds * 1000;
         let pollResults = new Collection();
         const reactions = allOptions.slice(0, opts.length);
 
@@ -63,17 +63,19 @@ module.exports = class PollCommand extends Command {
         }
 
         pollMsg.push(`__*${msg.author} started a poll*__:`);
-        //pollMsg.push(`\n:bar_chart: **${question}**\n${options}`);
-        pollMsg.push(`\n:chart_with_upwards_trend: **${question}**\n${options}`);
-        pollMsg.push('\n`Note: only the first reaction is considered a vote`');
+        pollMsg.push(`\n:bar_chart: **${question}**\n${options}`);
+        //pollMsg.push(`\n:chart_with_upwards_trend: **${question}**\n${options}`);
+        pollMsg.push('\n`Notes:\n- only the first reaction is considered a vote\n- invalid reactions voids the vote`');
 
         const sentMsg = await msg.channel.send(pollMsg);
 
-        let endTime = sentMsg.createdAt;
-        endTime.setTime(endTime.getTime() + milliseconds);
+        if(milliseconds) {
+            let endTime = sentMsg.createdAt;
+            endTime.setTime(endTime.getTime() + milliseconds);
 
-        pollMsg.push(`:stopwatch: *This poll ends at ${endTime}*`);
-        sentMsg.edit(pollMsg);
+            pollMsg.push(`:stopwatch: *This poll ends at ${endTime}*`);
+            sentMsg.edit(pollMsg);
+        }
 
         for(i = 0; i < opts.length; i++)
             await sentMsg.react(reactions[i]);
