@@ -42,14 +42,14 @@ module.exports = class PollCommand extends Command {
     }
 
     async run(msg, { seconds, question, opts }) {
-        if(opts.length < 2 || opts.length >= 26)
-            return msg.reply('The number of options must be greater than 2 and less than 26');
+        if(opts.length < 2 || opts.length > 10)
+            return msg.reply('The number of options must be greater than 2 and less than 10');
 
         let options = '';
         let i;
         let pollMsg = [];
-        let voters = [];
         let milliseconds = seconds <= 0 ? 0 : seconds * 1000;
+        let voters = [];
         let pollResults = new Collection();
         const reactions = allOptions.slice(0, opts.length);
 
@@ -64,8 +64,9 @@ module.exports = class PollCommand extends Command {
 
         pollMsg.push(`__*${msg.author} started a poll*__:`);
         pollMsg.push(`\n:bar_chart: **${question}**\n${options}`);
-        //pollMsg.push(`\n:chart_with_upwards_trend: **${question}**\n${options}`);
-        pollMsg.push('\n`Notes:\n- only the first reaction is considered a vote\n- unlisted reactions void the vote`');
+
+        if(milliseconds)
+            pollMsg.push('\n`Notes:\n- only the first reaction is considered a vote\n- unlisted reactions void the vote`');
 
         const sentMsg = await msg.channel.send(pollMsg);
 
@@ -79,6 +80,8 @@ module.exports = class PollCommand extends Command {
 
         for(i = 0; i < opts.length; i++)
             await sentMsg.react(reactions[i]);
+
+        if(!milliseconds) return;
 
         const filter = (reaction, user) => {
             // ignore bot's reactions
@@ -115,33 +118,30 @@ module.exports = class PollCommand extends Command {
 
         sentMsg.awaitReactions(filter, { time: milliseconds })
             .then(collected => {
-                let data = [];
                 let pollEndedMsg = [];
-
-                data.push('__**RESULTS:**__\n');
-
-                if(collected.size === 0) {
-                    data.push('No one voted');
-                } else {
-                    pollResults.sort( (v1, v2) => v2 - v1 );
-                    pollResults.forEach( (value, key) => data.push(`${key}: ${value}`));
-                }
 
                 pollMsg[0] = `~~${pollMsg[0]}~~\n:no_entry: **THIS POLL IS ALREADY CLOSED** :no_entry:`;
                 pollMsg.pop(); // removing the message saying when the poll ends
                 pollMsg.pop(); // removing the note about how to vote
                 pollMsg.push('\n`This poll is closed.`');
-                pollMsg = pollMsg.concat(data);
+                pollMsg.push('__**RESULTS:**__\n');
+
+                if(collected.size === 0) {
+                    pollMsg.push('No one voted');
+                } else {
+                    pollResults.sort( (v1, v2) => v2 - v1 );
+                    pollResults.forEach( (value, key) => pollMsg.push(`${key}: ${value}`));
+                }
+
                 sentMsg.edit(pollMsg);
 
                 pollEndedMsg.push('**Your poll has ended.**\n**Click this link to see the results:**');
                 pollEndedMsg.push('<' + sentMsg.url + '>');
                 msg.reply(pollEndedMsg);
             })
-        //.catch(console.error);
         .catch(collected => {
             msg.reply('**`poll` error**: Something went wrong with your poll.');
-            console.log(console.error);
+            console.error(collected);
         });
     }
 
