@@ -11,6 +11,10 @@ module.exports = class PollCommand extends Command {
             memberName: 'tpoll',
             description: 'Create a timed poll.',
             examples: ['`tpoll 60 \'Which option you choose?\' \'option one\' \'option 2\' \'option N\'`'],
+            throttling: {
+                usages: 1,
+                duration: 30,
+            },
             argsSingleQuotes: true,
             argsPromptLimit: 0,
             args: [
