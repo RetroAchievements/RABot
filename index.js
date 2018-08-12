@@ -19,6 +19,7 @@ client.registry
         ['helper', 'Helping you to help others'],
         ['single', 'Single (and simple) commands'],
         ['poll', 'Commands for polls'],
+        ['rautil', 'RetroAchievements utilities'],
     ])
     .registerDefaultCommands({
         ping: false,
