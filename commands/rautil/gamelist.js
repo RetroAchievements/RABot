@@ -6,10 +6,10 @@ module.exports = class GameListCommand extends HelperCommand {
     constructor(client) {
         super(client, {
             name: 'gamelist',
-            group: 'rautil',
             aliases: ['gl'],
+            group: 'rautil',
             memberName: 'gamelist',
-            description: 'Link to supported games.',
+            description: 'Link to the list of supported games.',
             examples: ['`gl nes`', '`gl megadrive`', '`gl arcade`'],
             args: [
                 {   
