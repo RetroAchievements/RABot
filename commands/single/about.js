@@ -7,12 +7,12 @@ module.exports = class PanicCommand extends Command {
             aliases: ['rabot'],
             group: 'single',
             memberName: 'about',
-            description: 'Show info about me!'
+            description: 'Show info about me.'
         });
     }
 
     async run(msg) {
-        const response = ":robot:- `Hi! I'm the official RetroAchievements bot.`\n" +
+        const response = "\n:robot:- `Hi! I'm the official RetroAchievements bot.`\n" +
             "I am powered by Discord.js/Commando.\n" +
             "If you know these nerdy stuff and would like to improve me, check my code in\n" +
             "<https://github.com/RetroAchievements/RABot>\n" +
