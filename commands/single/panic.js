@@ -11,7 +11,9 @@ module.exports = class PanicCommand extends Command {
     }
 
     async run(msg) {
-        const response = "😱\n**OH MY GOD!!! SOMETHING IS WRONG WITH THE SITE?!?! THE SITE IS DOWN?!?**!\n\nDon't panic mate. The problem will be solved at some point.\n\nWhile you can't earn cheevos, why not doing something in real life or maybe just chatting on " +
+        const response = "😱\n**OH MY GOD!!! SOMETHING IS WRONG WITH THE SITE?!?! THE SITE IS DOWN?!?**" +
+            "\nDon't panic mate. The problem will be solved at some point." +
+            "\nWhile you can't earn cheevos, why not doing something in real life or maybe just chatting on " +
             this.client.channels.get('464947132017803284');
 
         try {
