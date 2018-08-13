@@ -4,3 +4,4 @@
 npm-debug.log
 settings.sqlite3
 /commands/tests
+/commands/.tests
