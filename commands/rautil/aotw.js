@@ -48,7 +48,7 @@ module.exports = class AotwCommand extends Command {
                             response += `( ${$(this).find('img').attr('title')} )`;
                             if(++i >= 10) {
                                 response += '\n```\n';
-                                return false;
+                                return false; // this breaks the .each() loop
                             }
                         }
                     });
