@@ -37,6 +37,8 @@ module.exports = {
     site: site,
 
     pages: {
+        all: site,
+        
         megadrive: megadrive,
         md: megadrive,
         smd: megadrive,
