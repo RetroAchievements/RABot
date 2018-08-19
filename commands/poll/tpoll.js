@@ -3,7 +3,7 @@ const { Collection } = require('discord.js');
 
 const allOptions = Object.values(require('../../assets/json/emoji-alphabet.json'));
 
-module.exports = class PollCommand extends Command {
+module.exports = class TimedPollCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'tpoll',
