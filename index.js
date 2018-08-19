@@ -52,6 +52,7 @@ const responses = require('./assets/answers/responses.js');
 
 client.on('message', msg => {
     // TODO: add a 'cooldown' logic
+    // https://anidiots.guide/examples/miscellaneous-examples#command-cooldown
     if(!msg.author.bot && responses[msg.content])
         return msg.reply(responses[msg.content]);
     return;
