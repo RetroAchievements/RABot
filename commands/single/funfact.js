@@ -8,7 +8,7 @@ module.exports = class FunFactCommand extends Command {
             aliases: ['ffact', 'funf'],
             group: 'single',
             memberName: 'funfact',
-            description: 'Responds with a retrogaming fun fact.'
+            description: 'Responds with a retrogaming fun fact.',
             throttling: {
                 usages: 5,
                 duration: 60,
