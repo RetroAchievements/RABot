@@ -7,7 +7,7 @@ module.exports = class HexCommand extends Command {
             group: 'rautil',
             memberName: 'hex',
             description: 'Converts an integer from decimal to hexadecimal (or vice-versa).',
-            examples: ['`hex 16`, `hex 0xaf 0x10`, `hex 4096 14 64'],
+            examples: ['`hex 16`, `hex 0xaf 0x10`, `hex 4096 14 64`'],
             argsPromptLimit: 0,
             args: [
                 {
