@@ -9,6 +9,10 @@ module.exports = class FunFactCommand extends Command {
             group: 'single',
             memberName: 'funfact',
             description: 'Responds with a retrogaming fun fact.'
+            throttling: {
+                usages: 5,
+                duration: 60,
+            },
         });
     }
 
