@@ -8,17 +8,41 @@ module.exports = class AotwCommand extends Command {
             name: 'aotw',
             group: 'rautil',
             memberName: 'aotw',
-            description: 'Show the current Achievement of the Week and the recent 10 winners.',
-            examples: ['`aotw`'],
+            description: 'Show the current Achievement of the Week and the recent winners.',
+            examples: ['`aotw`, `aotw 2018-05-29`'],
             throttling: {
-                usages: 1,
+                usages: 2,
                 duration: 120,
             },
+            argsPromptLimit: 0,
+            args: [
+                {
+                    key: 'date',
+                    type: 'string',
+                    prompt: '',
+                    default: '0',
+                    validate: date => {
+                        const errMsg = '**Invalid date!**\n'
+                        const myDate = new Date(date);
+
+                        // is it a valid date?
+                        if(myDate instanceof Date && !isNaN(myDate)) {
+                            // future?
+                            if(Date.now() - myDate > 0)
+                                return true;
+                            return `${errMsg}It must be something before now.`;
+                        }
+                        return `${errMsg}Try something like \`2018-06-27\`.`
+                    }, // end of validate
+                },
+            ], // end of list of args
         });
     }
 
-    async run(msg) {
+    async run(msg, { date }) {
         const site = 'https://retroachievements.org';
+        const max = 15;
+        const since = new Date(date);
         let aotwUrl = site;
 
         const sentMsg = await msg.reply(':hourglass: Getting AotW info, please wait...');
@@ -35,26 +59,32 @@ module.exports = class AotwCommand extends Command {
                 .then(res => res.text())
                 .then(body => {
                     const $ = cheerio.load(body);
-                    let i = 0;
+                    let winDate
                     let response = `:trophy: __**Achievement of the Week**__ :trophy:\n${aotwUrl}`;
-                    response += `\n\n**Recent Hardcore Winners** (max 10):\n`;
-                    response += '```md';
+                    response += `\n\n**Recent Winners** (max ${max}):\n`;
+                    response += '```md\n';
 
-                    $('#recentwinners').find('tr')
-                    .each(function() {
-                        // XXX: not sure if it'll work with RAWeb v2
-                        if( $(this).find('span.hardcore').text() ) {
-                            response += `\n[${$(this).find('small').text()}]`;
-                            response += `( ${$(this).find('img').attr('title')} )`;
-                            if(++i >= 10) {
-                                response += '\n```\n';
-                                return false; // this breaks the .each() loop
-                            }
-                        }
-                    });
-                    sentMsg.edit(response);
+                    const winners = $('#recentwinners').find('tr').map( (i, element) => ({
+                        user: $(element).find('td:nth-of-type(2)').text().trim(),
+                        hardcore: $(element).find('td:nth-of-type(3)').text().trim(),
+                        date: $(element).find('td:nth-of-type(4)').text().trim(),
+                    })).get();
+
+                    for(let i = 1; i <= max && i < winners.length; i++) {
+                        winDate = new Date(winners[i].date);
+                        if(!date || winDate - since < 0)
+                            break
+
+                        response += `\n[${winners[i].date}]`;
+                        response += `( ${winners[i].user} ) `;
+                        response += winners[i].hardcore.includes('ardcore') ? '<hardcore> +1' : '+0.5';
+                    }
+                    response += '\n```\n';
+
+                    return sentMsg.edit(response);
                 })
             });
+        // TODO: I think I'm supposed to .catch() something here, no?
     }
 
 };
