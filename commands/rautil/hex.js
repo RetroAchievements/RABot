@@ -26,12 +26,11 @@ module.exports = class HexCommand extends Command {
 
         for(let i = 0; i < numbers.length; i++) {
             num = parseInt(numbers[i]);
-            response += `\n${num} = `;
 
             if(!isNaN(num))
-                response += `0x${num.toString(16)}`;
+                response += `\n${num} = 0x${num.toString(16)}`;
             else
-                response += 'NaN';
+                response += `\n${numbers[i]} = NaN`;
         }
 
         response += '```';
