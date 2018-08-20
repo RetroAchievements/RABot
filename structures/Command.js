@@ -6,7 +6,7 @@ class DefaultCommand extends Command {
 
         this.argsPromptLimit = info.argsPromptLimit || 0;
         this.argsSingleQuotes = info.argsSingleQuotes || false;
-        this.throttling = info.throttling || { usages: 2, duration: 5 };
+        this.throttling = info.throttling || { usages: 3, duration: 10 };
     }
 }
 
