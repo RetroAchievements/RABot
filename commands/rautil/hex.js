@@ -43,7 +43,7 @@ module.exports = class HexCommand extends Command {
         }
 
         response += '```';
-        response += outOfRangeFlag ? '**Note**: use numbers between 0 and 4294967295 (which is 0xffffffff)' : '';
+        response += outOfRangeFlag ? '**Note**: use numbers between 0 and 4294967295 (which is `0xffffffff`)' : '';
                 
         return msg.reply(response);
     }
