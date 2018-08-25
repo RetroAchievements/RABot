@@ -1,6 +1,6 @@
 const one = "**1.** Don't be a dick.";
 const two = "**2.** Do NOT use this server to share copyrighted material or info about where they can be downloaded. Just use your favorite web search engine.";
-const three = "**3.** *Try to keep the channels on-topic*. Need help?: #help-me. General chat about retrogames: #ra-general. Off-topic and casual chatting: #casual. More info about channels: #about-us";
+const three = "**3.** Try to keep the channels on-topic. Off-topic and casual chatting: #casual. More info about channels: #about-us";
 const four = "**4.** When in doubt, ask a @mod.";
 
 const coc = "**Complete Version**: <http://docs.retroachievements.org/Users-Code-of-Conduct/>";
