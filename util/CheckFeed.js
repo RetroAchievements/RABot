@@ -108,8 +108,8 @@ async function checkGlobalFeed() {
             } else {
                 counterMap.set(user, counterMap.get(user) + 1);
 
-                // wait for 10 rss feeds before reporting the same user
-                if(counterMap.get(user) > 10)
+                // wait for 20 rss feeds before reporting the same user
+                if(counterMap.get(user) > 20)
                     counterMap.delete(user);
             }
 
