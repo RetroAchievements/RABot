@@ -1,5 +1,6 @@
 require('dotenv').config({path: __dirname + '/.env'});
 const { BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE, BOT_NAME } = process.env;
+const NEWS_ROLES = process.env.NEWS_ROLES.split(',');
 
 const checkFeed = require('./util/CheckFeed.js');
 
@@ -36,6 +37,8 @@ client.on('ready', () => {
     client.user.setActivity('if you need help', { type: 'WATCHING' });
     checkFeed(client.channels);
 });
+
+client.on('guildMemberAdd', member => member.setRoles(NEWS_ROLES).catch(console.error));
 
 client.on('disconnect', event => {
     console.error(`[DISCONNECT] Disconnected with code ${event.code}.`);
