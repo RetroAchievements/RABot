@@ -18,6 +18,7 @@ module.exports = class CommunityNewsCommand extends SelfRoleCommand {
                     key: 'action',
                     type: 'string',
                     prompt: '',
+                    default: 'show',
                 },
             ],
         }, COMMUNITY_NEWS);

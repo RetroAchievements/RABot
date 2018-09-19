@@ -18,6 +18,7 @@ module.exports = class AchievementNewsCommand extends SelfRoleCommand {
                     key: 'action',
                     type: 'string',
                     prompt: '',
+                    default: 'show',
                 },
             ],
         }, ACHIEVEMENT_NEWS);

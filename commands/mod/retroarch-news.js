@@ -18,6 +18,7 @@ module.exports = class RetroarchNewsCommand extends SelfRoleCommand {
                     key: 'action',
                     type: 'string',
                     prompt: '',
+                    default: 'show',
                 },
             ],
         }, RETROARCH_NEWS);
