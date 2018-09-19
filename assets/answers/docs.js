@@ -34,6 +34,10 @@ const contribute = "How-to-contribute-if-you-are-not-a-developer";
 const softcore = "Why-you-shouldn't-use-the-load-state-feature";
 const about = "About";
 const ralibretro = "RALibretro";
+const devcoc = "Developers-Code-of-Conduct";
+const badconcepts = "Developers-Code-of-Conduct#unwelcome-concepts";
+const beadev = "How-to-Become-an-Achievement-Developer";
+const revision = "Achievement-Set-Revisions";
 
 
 module.exports = {
@@ -111,6 +115,7 @@ module.exports = {
         bonusset: bonus,
 
         hacks: hacks,
+        hack: hacks,
 
         lazy: lazy,
         lazydev: lazy,
@@ -133,6 +138,14 @@ module.exports = {
         about: about,
 
         ralibretro: ralibretro,
+        
+        devcoc: devcoc,
+
+        badconcepts: badconcepts,
+
+        beadev: beadev,
+        
+        revision: revision
     },
 
     answers: {
