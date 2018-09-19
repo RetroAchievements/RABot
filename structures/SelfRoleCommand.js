@@ -11,21 +11,25 @@ class SelfRoleCommand extends Command {
     async run(msg, { action } ) {
         let roleName = msg.guild.roles.get(this.roleid);
 
-        if(action.toLower() === "add") {
+        // adding the role
+        if(action.toLowerCase() === "add") {
             if(msg.member.roles.has(this.roleid)) {
                 msg.reply(`you already have the \`${roleName}\` role.`);
             } else {
                 msg.member.addRole(this.roleid)
-                    .then(msg.reply(`the \`${roleName}\` role has been added to you`)
-                    .catch(msg.reply);
+                    .catch(console.error);
+                msg.reply(`the \`${roleName}\` role has been added to you`);
             }
-        } else if(action.toLower() === "remove") {
+        // removing the role
+        } else if(action.toLowerCase() === "remove") {
             if(msg.member.roles.has(this.roleid)) {
                 msg.member.removeRole(this.roleid)
-                    .then(msg.reply(`the \`${roleName}\` role has been removed from you`)
-                    .catch(msg.reply);
+                    .catch(console.error);
+                msg.reply(`the \`${roleName}\` role has been removed from you`);
             } else {
                 msg.reply(`you don't have the \`${roleName}\` role.`);
+            }
+        // invalid action
         } else {
             msg.reply(`invalid option: \`${action}\``);
         }

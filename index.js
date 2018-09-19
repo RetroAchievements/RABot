@@ -23,6 +23,7 @@ client.registry
         ['single', 'Single (and simple) commands'],
         ['poll', 'Commands for polls'],
         ['rautil', 'RetroAchievements utilities'],
+        ['mod', 'Moderation utilities'],
     ])
     .registerDefaultCommands({
         ping: false,
