@@ -1,10 +1,9 @@
-const site = 'https://github.com/RetroAchievements';
+const site = 'https://github.com/RetroAchievements/';
 
 const rabot = 'RABot';
 const raintegration = 'RAIntegration';
 const raweb = 'RAWeb';
 const raemus = 'RAEmus';
-const raintegration;
 const ralibretro = 'RALibretro';
 const rcheevos = 'rcheevos';
 const guides = 'guides';
@@ -18,7 +17,6 @@ module.exports = {
         raintegration: raintegration,
         raweb: raweb,
         raemus: raemus,
-        raintegration: raintegration,
         ralibretro: ralibretro,
         rcheevos: rcheevos,
         guides: guides,

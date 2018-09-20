@@ -1,6 +1,6 @@
 const HelperCommand = require('../../structures/HelperCommand.js');
 
-const { site, pages, answers } = require('../../assets/answers/faq.js');
+const { site, pages, answers } = require('../../assets/answers/repositories.js');
 
 module.exports = class RepoCommand extends HelperCommand {
     constructor(client) {
