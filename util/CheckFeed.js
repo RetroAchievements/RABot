@@ -1,5 +1,4 @@
 require('dotenv').config({path: __dirname + '/.env'});
-const { BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE, BOT_NAME } = process.env;
 const {
     CHEEVO_WARNING_NUM,
     CHEEVO_SUSPICIOUS_NUM,
