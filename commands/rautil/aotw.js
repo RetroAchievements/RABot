@@ -41,7 +41,7 @@ module.exports = class AotwCommand extends Command {
 
     async run(msg, { date }) {
         const site = 'https://retroachievements.org';
-        const max = 15;
+        const max = 20;
         const since = new Date(date);
         let aotwUrl = site;
 
