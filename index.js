@@ -3,6 +3,7 @@ const { BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE, BOT_NAME } = process.env;
 const NEWS_ROLES = process.env.NEWS_ROLES.split(',');
 
 const checkFeed = require('./util/CheckFeed.js');
+const { getGameList } = require('./util/GetGameList.js');
 
 const path = require('path');
 const { CommandoClient } = require('discord.js-commando');
@@ -37,6 +38,7 @@ client.on('ready', () => {
     console.log(`[READY] Logged in as ${client.user.tag}! (${client.user.id})`);
     client.user.setActivity('if you need help', { type: 'WATCHING' });
     checkFeed(client.channels);
+    getGameList();
 });
 
 client.on('guildMemberAdd', member => member.setRoles(NEWS_ROLES).catch(console.error));
