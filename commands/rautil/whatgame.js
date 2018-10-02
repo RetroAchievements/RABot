@@ -59,7 +59,7 @@ module.exports = class WhatGameCommand extends Command {
 
         let regex;
         try {
-            regex = new RegExp( term, 'i' ).catch(console.error);
+            regex = new RegExp( term, 'i' );
         } catch( err ) {
             return msg.reply( `invalid Regular Expression: \`${term}\`` );
         }
