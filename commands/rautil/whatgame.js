@@ -39,7 +39,7 @@ module.exports = class WhatGameCommand extends Command {
         // picking a random game globally
         if( terms == '~NOARGS~' ) {
             console.log( consoleAliases );
-            return msg.say( this.pickGame( gamelist.games ) );
+            return msg.reply( this.pickGame( gamelist.games ) );
         }
 
         let games;
@@ -54,14 +54,19 @@ module.exports = class WhatGameCommand extends Command {
             offset = index[ consoleName ][0];
             length = index[ consoleName ][1];
             games = gamelist.games.slice( offset, offset + length );
-            return msg.say( this.pickGame( games ) );
+            return msg.reply( this.pickGame( games ) );
         }
 
-        let regex = new RegExp( term, 'i' );
+        let regex;
+        try {
+            regex = new RegExp( term, 'i' ).catch(console.error);
+        } catch( err ) {
+            return msg.reply( `invalid Regular Expression: \`${term}\`` );
+        }
         games = gamelist.games;
         games = games.filter( entry => entry[1].match( regex ) );
 
-        return msg.say( this.pickGame( games ) );
+        return msg.reply( this.pickGame( games ) );
     }
 
 };
