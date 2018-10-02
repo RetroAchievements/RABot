@@ -1,5 +1,5 @@
 const Command = require('../../structures/Command.js');
-const { gamelist } = require('../../util/GetGameList.js');
+const { gamelist, consoleAliases } = require('../../util/GetGameList.js');
 // TODO: a command for owners only where the gamelist can be updated.
 
 const gameURL = 'https://retroachievements.org/game';
@@ -38,6 +38,7 @@ module.exports = class WhatGameCommand extends Command {
     run(msg, { terms }) {
         // picking a random game globally
         if( terms == '~NOARGS~' ) {
+            console.log( consoleAliases );
             return msg.say( this.pickGame( gamelist.games ) );
         }
 
@@ -45,12 +46,13 @@ module.exports = class WhatGameCommand extends Command {
         let term = terms.toLowerCase();
         let offset;
         let length;
-        const index = gamelist.index;
 
         // if the search term is a console name, pick a random game from that console
-        if( index.hasOwnProperty( term ) ) {
-            offset = index[ term ][0];
-            length = index[ term ][1];
+        if( consoleAliases.hasOwnProperty( term ) ) {
+            const index = gamelist.index;
+            const consoleName = consoleAliases[ term ];
+            offset = index[ consoleName ][0];
+            length = index[ consoleName ][1];
             games = gamelist.games.slice( offset, offset + length );
             return msg.say( this.pickGame( games ) );
         }

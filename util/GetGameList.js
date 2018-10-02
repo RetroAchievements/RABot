@@ -43,6 +43,55 @@ const consoles = {
     //31: "zx81",
 };
 
+const consoleAliases = {
+    md: consoles['1'],
+    megadrive: consoles['1'],
+    genesis: consoles['1'],
+
+    n64: consoles['2'],
+
+    snes: consoles['3'],
+
+    gb: consoles['4'],
+    gameboy: consoles['4'],
+
+    gba: consoles['5'],
+    gameboyadvance: consoles['5'],
+
+    gbc: consoles['6'],
+    gameboycolor: consoles['6'],
+
+    nes: consoles['7'],
+
+    pcengine: consoles['8'],
+    tg16: consoles['8'],
+    turbografx: consoles['8'],
+    supergrafx: consoles['8'],
+
+    mastersystem: consoles['11'],
+    sms: consoles['11'],
+
+    atarilynx: consoles['13'],
+    lynx: consoles['13'],
+
+    ngp: consoles['14'],
+    ngpc: consoles['14'],
+    neogeopocket: consoles['14'],
+    neogeopocketcolor: consoles['14'],
+
+    gamegear: consoles['15'],
+    gg: consoles['15'],
+
+    atari2600: consoles['25'],
+    atari: consoles['25'],
+    vcs: consoles['25'],
+
+    arcade: consoles['27'],
+
+    virtualboy: consoles['28'],
+    vb: consoles['28']
+};
+
 
 
 function loadGameLists() {
@@ -88,6 +137,7 @@ function getGameList() {
 }
 
 module.exports.gamelist = gamelist;
+module.exports.consoleAliases = consoleAliases;
 module.exports.getGameList = getGameList;
 
 
