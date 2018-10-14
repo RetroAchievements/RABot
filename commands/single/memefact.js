@@ -1,13 +1,13 @@
 const RandomFactCommand = require('../../structures/RandomFactCommand.js');
 
-module.exports = class FunFactCommand extends RandomFactCommand {
+module.exports = class MemeFactCommand extends RandomFactCommand {
     constructor(client) {
         super(client, {
-            name: 'funfact',
-            aliases: ['ffact', 'funf'],
+            name: 'memefact',
+            aliases: ['meme'],
             group: 'single',
-            memberName: 'funfact',
-            description: 'Responds with a retrogaming fun fact.',
+            memberName: 'memefact',
+            description: 'Responds with a RetroAchievements meme fact.',
             args: [
                 {
                     key: 'number',
@@ -16,7 +16,7 @@ module.exports = class FunFactCommand extends RandomFactCommand {
                     default: '~NOARGS~'
                 }
             ]
-        }, '../assets/json/funfacts.json' );
+        }, '../assets/json/memefacts.json' );
 
     }
 };
