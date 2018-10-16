@@ -2,6 +2,7 @@ const site = 'https://docs.retroachievements.org/';
 const radocs = "index.html";
 const dev = "Developer-docs";
 const devstart = "Getting-Started-as-an-Achievement-Developer";
+const meminspector = "Memory-Inspector-Overview";
 const logic = "Achievement-Logic-Features";
 const delta = "Achievement-Logic-Features#delta-values";
 const hitcounts = "Achievement-Logic-Features#hit-counts";
@@ -50,6 +51,8 @@ module.exports = {
         devstart: devstart,
         jrdev: devstart,
         startdev: devstart,
+
+        meminspector: meminspector,
 
         logic: logic,
 

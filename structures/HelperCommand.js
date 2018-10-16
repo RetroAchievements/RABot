@@ -17,7 +17,7 @@ class HelperCommand extends Command {
 
 
     run(msg, { arg }) {
-        let response = this.pages[arg];
+        let response = this.pages[arg.toLowerCase()];
         const prefix = msg.guild ? msg.guild.commandPrefix : '';
 
         if(response) {
