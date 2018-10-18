@@ -2,8 +2,12 @@ require('dotenv').config({path: __dirname + '/.env'});
 const { BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE, BOT_NAME } = process.env;
 const NEWS_ROLES = process.env.NEWS_ROLES.split(',');
 
+const responses = require('./assets/answers/responses.js');
 const checkFeed = require('./util/CheckFeed.js');
 const { getGameList } = require('./util/GetGameList.js');
+
+const regexRule2 = new RegExp('(' + require('./assets/json/badwordsRule2.json').join('|') + ')', 'i');
+
 
 const path = require('path');
 const { CommandoClient } = require('discord.js-commando');
@@ -56,16 +60,28 @@ client.on('warn', err => console.warn('[WARNING]', err));
 
 client.on('commandError', (command, err) => console.error('[COMMAND ERROR]', command.name, err));
 
+client.on('message', async (msg) => {
+    if(msg.author.bot) return;
 
-const responses = require('./assets/answers/responses.js');
-
-client.on('message', msg => {
     // TODO: add a 'cooldown' logic
     // https://anidiots.guide/examples/miscellaneous-examples#command-cooldown
     const content = msg.content.toLowerCase();
-    if(!msg.author.bot && responses[content])
+    if(responses[content])
         return msg.reply(responses[content]);
-    return;
+
+    // checking for Rule 2 badwords
+    if(content.length > 7 && content.match(regexRule2)) {
+        try {
+            await msg.react('🇷');
+            await msg.react('🇺');
+            await msg.react('🇱');
+            await msg.react('🇪');
+            await msg.react('2⃣');
+        }
+        catch (error) {
+            console.error('[ERROR] Failed to react with "RULE2".');
+        }
+    }
 });
 
 
