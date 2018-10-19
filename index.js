@@ -70,7 +70,7 @@ client.on('message', async (msg) => {
         return msg.reply(responses[content]);
 
     // checking for Rule 2 badwords
-    if(content.length > 7 && content.match(regexRule2)) {
+    if(content.length >= 7 && content.match(regexRule2)) {
         try {
             await msg.react('🇷');
             await msg.react('🇺');
