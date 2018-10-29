@@ -2,7 +2,7 @@ const Command = require('./Command.js');
 
 let facts;
 
-module.exports = class FunFactCommand extends Command {
+module.exports = class RandomFactCommand extends Command {
     constructor(client, info, factsFile) {
         super(client, info);
         this.throttling = { usages: 5, duration: 60, };
