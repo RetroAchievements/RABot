@@ -66,6 +66,7 @@ client.on('message', async (msg) => {
     // TODO: add a 'cooldown' logic
     // https://anidiots.guide/examples/miscellaneous-examples#command-cooldown
     const content = msg.content.toLowerCase();
+    if(content.length <= 3) return;
     if(responses[content])
         return msg.reply(responses[content]);
 
