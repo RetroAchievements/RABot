@@ -1,6 +1,5 @@
 // inspiration: https://github.com/dragonfire535/xiao/blob/master/commands/info/channel.js
 const Command = require('../../structures/Command');
-const { RichEmbed } = require('discord.js');
 
 module.exports = class TopicCommand extends Command {
     constructor(client) {
@@ -14,11 +13,8 @@ module.exports = class TopicCommand extends Command {
     }
 
     run(msg) {
-        const channel = msg.channel;
-        const embed = new MessageEmbed()
-            .setColor(0x00AE86)
-            .setTitle('#' + channel.type === 'dm' ? `@${channel.recipient.username}` : channel.name)
-            .addField('topic', channel.topic || '`None`');
-        return msg.embed(embed);
+        const channel = msg.channel.type === 'dm' ? `@${msg.channel.recipient.username}` : msg.channel;
+        const topic = channel.topic || ' ';
+        return msg.say(channel + "'s topic:\n**```" + topic + "```**");
     }
 };
