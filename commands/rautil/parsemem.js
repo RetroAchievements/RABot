@@ -103,16 +103,16 @@ module.exports = class ParseMemCommand extends Command {
                 hits =    parsedReq[9] || '0';
 
                 lMemory = lSize ? lMemory : lMemory.toString(16);
-                lMemory = '0x' + lMemory.padStart(8, '0');
+                lMemory = '0x' + lMemory.padStart(6, '0');
                 rMemVal = rSize ? rMemVal : rMemVal.toString(16);
-                rMemVal = '0x' + rMemVal.padStart(8, '0');
+                rMemVal = '0x' + rMemVal.padStart(6, '0');
 
                 if( lType !== 'd' )
                     lType = lSize == '' ? 'v' : 'm';
                 if( rType !== 'd' )
                     rType = rSize == '' ? 'v' : 'm';
 
-                res += '\n' + reqNum.toString().padStart(2, ' ') + ': ';
+                res += '\n' + reqNum.toString().padStart(2, ' ') + ':';
                 res += specialFlags[flag].padEnd(10, ' ');
                 res += memTypes[lType].padEnd(6, ' ');
                 res += memSize[lSize].padEnd(7, ' ');
