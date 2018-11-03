@@ -78,7 +78,7 @@ module.exports = class ParseMemCommand extends Command {
         let parsedReq;
         let reqNum, flag, lType, lSize, lMemory, cmp, rType, rSize, rMemVal, hits;
         let countLines = 0;
-        let res = '';
+        let res = '\n';
 
         for( let i = 0; i < groups.length; i++ ) {
             res += i == 0 ? '__**Core Group**__:' : `__**Alt Group ${i}**__:`;
