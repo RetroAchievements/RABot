@@ -24,7 +24,8 @@ const memSize = {
     '0xx': '32-bit', // needs to be before the 16bits below to make the RegEx work
     '0x ': '16-bit',
     '0x' : '16-bit',
-    '': ''
+    'h'  : '',       // this means hex notation for values
+    ''   : ''
 };
 
 const memTypes = {
@@ -102,15 +103,17 @@ module.exports = class ParseMemCommand extends Command {
                 rMemVal = parsedReq[8] || '';
                 hits =    parsedReq[9] || '0';
 
-                lMemory = lSize ? lMemory : lMemory.toString(16);
+                if( lSize == '' )
+                    lMemory = parseInt(lMemory).toString(16);
                 lMemory = '0x' + lMemory.padStart(6, '0');
-                rMemVal = rSize ? rMemVal : rMemVal.toString(16);
+                if( rSize == '' )
+                    rMemVal = parseInt(rMemVal).toString(16);
                 rMemVal = '0x' + rMemVal.padStart(6, '0');
 
                 if( lType !== 'd' )
-                    lType = lSize == '' ? 'v' : 'm';
+                    lType = ( lSize == '' || lSize == 'h' ) ? 'v' : 'm';
                 if( rType !== 'd' )
-                    rType = rSize == '' ? 'v' : 'm';
+                    rType = ( rSize == '' || rSize == 'h' ) ? 'v' : 'm';
 
                 res += '\n' + reqNum.toString().padStart(2, ' ') + ':';
                 res += specialFlags[flag].padEnd(10, ' ');
