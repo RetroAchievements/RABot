@@ -7,7 +7,7 @@ const checkFeed = require('./util/CheckFeed.js');
 const { getGameList } = require('./util/GetGameList.js');
 
 const regexRule2 = new RegExp('(' + require('./assets/json/badwordsRule2.json').join('|') + ')', 'i');
-
+const talkedRecently = new Set();
 
 const path = require('path');
 const { CommandoClient } = require('discord.js-commando');
@@ -62,13 +62,19 @@ client.on('commandError', (command, err) => console.error('[COMMAND ERROR]', com
 
 client.on('message', async (msg) => {
     if(msg.author.bot) return;
+    if(msg.content.length <= 3) return;
 
-    // TODO: add a 'cooldown' logic
-    // https://anidiots.guide/examples/miscellaneous-examples#command-cooldown
     const content = msg.content.toLowerCase();
-    if(content.length <= 3) return;
-    if(responses[content])
+    if(responses[content]) {
+        if( talkedRecently.has(msg.author.id) )
+            return;
+        talkedRecently.add(msg.author.id);
+        setTimeout( () => {
+            talkedRecently.delete(msg.author.id);
+        }, 10000);
+
         return msg.reply(responses[content]);
+    }
 
     // checking for Rule 2 badwords
     if(content.length >= 7 && content.match(regexRule2)) {
