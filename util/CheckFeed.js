@@ -4,6 +4,7 @@ const {
     CHEEVO_SUSPICIOUS_NUM,
     CHANNEL_MASTERY,
     CHANNEL_UNLOCKS,
+    CHANNEL_TICKETS,
     GLOBAL_FEED_INTERVAL,
     NEWS_FEED_INTERVAL
 } = process.env
@@ -20,6 +21,11 @@ const newsFeed = `${raorg}/rss-news`;
 //              then capture (2) the game title. 'i' for case insensitive matching.
 const regexEarned = /^([^ ]+) earned .* \([0-9]+\) in (.*)$/i;
 
+// regexTicket: 
+// TODO: improve this regex
+//const regexTicket = /^([^ ]+) (opened|closed) a ticket for (.*) in (.*)$/i;
+const regexTicket = /org\/userpic\/([^'"]+).*org\/user\/([^'"]+).* (opened|closed) a ticket for .*org\/achievement\/([0-9]+)['"]>([^<]+).* in .*>(.*)</is;
+
 // regexCompleted:  capture (1) the userpic filename, then capture (2) the user name
 //                  followed by " completed ", then capture (3) the game ID, then
 //                  capture (4) the game title, then capture (5) the console name.
@@ -27,7 +33,8 @@ const regexEarned = /^([^ ]+) earned .* \([0-9]+\) in (.*)$/i;
 const regexCompleted = /org\/userpic\/([^'"]+).*org\/user\/([^'"]+).* completed .*org\/game\/([0-9]+)['"]>([^<]+).*\(([ a-zA-Z0-9]+)\)/is;
 
 let lastMastery = new Date('2018');
-let masteryChannel, unlocksChannel;
+let lastTicketActivity = new Date('2018');
+let masteryChannel, unlocksChannel, ticketsChannel;
 let counterMap = new Map();
 
 
@@ -81,6 +88,35 @@ async function checkGlobalFeed() {
                 masteryChannel.send(msg);
             }
         }
+
+        // checking for ticket activity
+        if(pubDate.getTime() > lastTicketActivity.getTime()) {
+            lastTicketActivity = pubDate;
+            parsedString = items[i].content.match(regexTicket);
+            if(parsedString) {
+                // TODO: use an optmized regex
+                const userPic = parsedString[1];
+                const user = parsedString[2];
+                const ticketActivity = parsedString[3];
+                //const isClosed = ticketActivity == "closed";
+                const cheevoId = parsedString[4]
+                const cheevoName = parsedString[5]
+                const gameName = parsedString[6];
+
+                // announce ticket activity
+                // TODO: add some cosmetic to differentiate opening/closing?
+                //       yes! color!!
+                msg = new RichEmbed()
+                    .setTitle('Ticket ' + ticketActivity.toUpperCase() )
+                    .setURL(`${raorg}/ticketmanager.php?a=${cheevoId}`) // TODO: gonna change in v2
+                    .setColor( ticketActivity == "closed" ? 'BLUE' : 'RED' )
+                    .setThumbnail(`${raorg}/UserPic/${userPic}`)
+                    .setDescription(`**${user}** ${ticketActivity} a ticket for **${cheevoName}** in **${gameName}**.`)
+
+                ticketsChannel.send(msg);
+            }
+        }
+
     }
 
     // The math below is a trick to get only one decimal number. Reference:
@@ -119,8 +155,9 @@ async function checkGlobalFeed() {
 module.exports = (channels) => {
     masteryChannel = channels.get(CHANNEL_MASTERY);
     unlocksChannel = channels.get(CHANNEL_UNLOCKS);
+    ticketsChannel = channels.get(CHANNEL_TICKETS);
 
-    if(!masteryChannel || !unlocksChannel) {
+    if( !masteryChannel || !unlocksChannel || !ticketsChannel ) {
         console.log('invalid channels')
     } else {
         setInterval( checkGlobalFeed, GLOBAL_FEED_INTERVAL * 1000 );
