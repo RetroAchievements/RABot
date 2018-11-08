@@ -86,6 +86,7 @@ async function checkGlobalFeed() {
                     .setDescription(`Let's hear a round of applause for **${user}**'s mastery of **${game}** for **${system}**!\n\nCongratulate the player:\n${raorg}/user/${user}\nTry the game:\n${raorg}/game/${gameid}`)
 
                 masteryChannel.send(msg);
+                continue; // if it's a mastery item, no need to check further
             }
         }
 
@@ -98,14 +99,11 @@ async function checkGlobalFeed() {
                 const userPic = parsedString[1];
                 const user = parsedString[2];
                 const ticketActivity = parsedString[3];
-                //const isClosed = ticketActivity == "closed";
                 const cheevoId = parsedString[4]
                 const cheevoName = parsedString[5]
                 const gameName = parsedString[6];
 
                 // announce ticket activity
-                // TODO: add some cosmetic to differentiate opening/closing?
-                //       yes! color!!
                 msg = new RichEmbed()
                     .setTitle('Ticket ' + ticketActivity.toUpperCase() )
                     .setURL(`${raorg}/ticketmanager.php?a=${cheevoId}`) // TODO: gonna change in v2
