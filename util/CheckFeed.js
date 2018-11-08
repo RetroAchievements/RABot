@@ -97,7 +97,7 @@ async function checkGlobalFeed() {
             // avoiding reporting the same user in a short period of time
             if(!counterMap.has(user)) {
                 msg = new RichEmbed()
-                    .setTitle(value.length >= CHEEVO_SUSPICIOUS_NUM ? '__**IMPRESSIVE!!!**__' : '__Wow!__')
+                    .setTitle(value.length >= CHEEVO_SUSPICIOUS_NUM ? 'IMPRESSIVE!!!' : 'wow!')
                     .setURL(`${userHistoryUrl}${user}`)
                     .setThumbnail(`${raorg}/UserPic/${user}.png`)
                     .setDescription(`**${user}** earned **${value.length}** achievements in less than ${timeIntervalMin} minutes\n**Game**: "${userCheevoGames.get(user).join('", "')}"`);
