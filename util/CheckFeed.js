@@ -4,6 +4,7 @@ const {
     CHEEVO_SUSPICIOUS_NUM,
     CHANNEL_MASTERY,
     CHANNEL_UNLOCKS,
+    CHANNEL_OBSTINATE,
     CHANNEL_TICKETS,
     GLOBAL_FEED_INTERVAL,
     NEWS_FEED_INTERVAL
@@ -32,10 +33,10 @@ const regexTicket = /org\/userpic\/([^'"]+).*org\/user\/([^'"]+).* (opened|close
 //                  'i' for case insensitive matching and 's' for including newlines.
 const regexCompleted = /org\/userpic\/([^'"]+).*org\/user\/([^'"]+).* completed .*org\/game\/([0-9]+)['"]>([^<]+).*\(([ a-zA-Z0-9]+)\)/is;
 
-let lastMastery = new Date('2018');
-let lastTicketActivity = new Date('2018');
-let masteryChannel, unlocksChannel, ticketsChannel;
+let lastActivity = new Date('2018');
+let masteryChannel, unlocksChannel, obstinateChannel, ticketsChannel;
 let counterMap = new Map();
+let obstinateWinners = new Map();
 
 
 async function checkGlobalFeed() {
@@ -45,8 +46,10 @@ async function checkGlobalFeed() {
     const oldestTime = new Date(items[items.length - 1].pubDate);
     let userCheevoTimes = new Map();
     let userCheevoGames = new Map();
+    let checkObstinateUsers = [];
     let parsedString, user, game, system, msg;
 
+    // going through the feed from the oldest to the newest
     for(let i = items.length - 1; i >= 0; i--) {
         const pubDate = new Date(items[i].pubDate);
 
@@ -64,58 +67,69 @@ async function checkGlobalFeed() {
                 if(!userCheevoGames.get(user).includes(game))
                     userCheevoGames.get(user).push(game);
             }
-            continue; // if it's an 'earned' item, no need to check for mastery
+        }
+
+        // no need to check mastery/ticket activity again
+        if(pubDate.getTime() < lastActivity.getTime())
+            continue;
+
+        // checking obstinacy
+        parsedString = items[i].title.match(regexEarned);
+        if(parsedString) {
+            user = parsedString[1];
+            if( !obstinateWinners.has(user) )
+                obstinateWinners.set(user, 0);
+
+            checkObstinateUsers.push(user);
+
+            // it's an "earned" entry, so no need to check for tickets/mastery
+            continue; 
         }
 
         // checking for mastery
-        if(pubDate.getTime() > lastMastery.getTime()) {
-            lastMastery = pubDate;
-            parsedString = items[i].content.match(regexCompleted);
-            if(parsedString) {
-                const userPic = parsedString[1];
-                const user = parsedString[2];
-                const gameid = parsedString[3]
-                const game = parsedString[4];
-                const system = parsedString[5];
+        parsedString = items[i].content.match(regexCompleted);
+        if(parsedString) {
+            const userPic = parsedString[1];
+            const user = parsedString[2];
+            const gameid = parsedString[3]
+            const game = parsedString[4];
+            const system = parsedString[5];
 
-                // announce mastery
-                msg = new RichEmbed()
-                    .setTitle('Mastery!')
-                    .setURL(`${raorg}/user/${user}`)
-                    .setThumbnail(`${raorg}/UserPic/${userPic}`)
-                    .setDescription(`Let's hear a round of applause for **${user}**'s mastery of **${game}** for **${system}**!\n\nCongratulate the player:\n${raorg}/user/${user}\nTry the game:\n${raorg}/game/${gameid}`)
+            // announce mastery
+            msg = new RichEmbed()
+                .setTitle('Mastery!')
+                .setURL(`${raorg}/user/${user}`)
+                .setThumbnail(`${raorg}/UserPic/${userPic}`)
+                .setDescription(`Let's hear a round of applause for **${user}**'s mastery of **${game}** for **${system}**!\n\nCongratulate the player:\n${raorg}/user/${user}\nTry the game:\n${raorg}/game/${gameid}`)
 
-                masteryChannel.send(msg);
-                continue; // if it's a mastery item, no need to check further
-            }
+            masteryChannel.send(msg);
+            continue; // if it's a mastery item, no need to check further
         }
 
         // checking for ticket activity
-        if(pubDate.getTime() > lastTicketActivity.getTime()) {
-            lastTicketActivity = pubDate;
-            parsedString = items[i].content.match(regexTicket);
-            if(parsedString) {
-                // TODO: use an optmized regex
-                const userPic = parsedString[1];
-                const user = parsedString[2];
-                const ticketActivity = parsedString[3];
-                const cheevoId = parsedString[4]
-                const cheevoName = parsedString[5]
-                const gameName = parsedString[6];
+        parsedString = items[i].content.match(regexTicket);
+        if(parsedString) {
+            // TODO: use an optmized regex
+            const userPic = parsedString[1];
+            const user = parsedString[2];
+            const ticketActivity = parsedString[3];
+            const cheevoId = parsedString[4]
+            const cheevoName = parsedString[5]
+            const gameName = parsedString[6];
 
-                // announce ticket activity
-                msg = new RichEmbed()
-                    .setTitle('Ticket ' + ticketActivity.toUpperCase() )
-                    .setURL(`${raorg}/ticketmanager.php?a=${cheevoId}`) // TODO: gonna change in v2
-                    .setColor( ticketActivity == "closed" ? 'BLUE' : 'RED' )
-                    .setThumbnail(`${raorg}/UserPic/${userPic}`)
-                    .setDescription(`**${user}** ${ticketActivity} a ticket for **${cheevoName}** in **${gameName}**.`)
+            // announce ticket activity
+            msg = new RichEmbed()
+                .setTitle('Ticket ' + ticketActivity.toUpperCase() )
+                .setURL(`${raorg}/ticketmanager.php?a=${cheevoId}`) // TODO: gonna change in v2
+                .setColor( ticketActivity == "closed" ? 'BLUE' : 'RED' )
+                .setThumbnail(`${raorg}/UserPic/${userPic}`)
+                .setDescription(`**${user}** ${ticketActivity} a ticket for **${cheevoName}** in **${gameName}**.`)
 
-                ticketsChannel.send(msg);
-            }
+            ticketsChannel.send(msg);
         }
 
     }
+    lastActivity = new Date(newestTime);
 
     // The math below is a trick to get only one decimal number. Reference:
     // https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
@@ -145,7 +159,25 @@ async function checkGlobalFeed() {
                 if(counterMap.get(user) > 20)
                     counterMap.delete(user);
             }
+        }
+    });
 
+    // announcing obstinate winners
+    obstinateWinners.forEach( (value, obstinateUser, map) => {
+        if( checkObstinateUsers.includes( obstinateUser ) )
+            map.set(obstinateUser, value + 1);
+        else
+            map.delete( obstinateUser );
+
+
+        if(value >= CHEEVO_WARNING_NUM) {
+            msg = new RichEmbed()
+                .setTitle('Yay! This is a very obstinate player!')
+                .setURL(`${userHistoryUrl}${obstinateUser}`)
+                .setThumbnail(`${raorg}/UserPic/${obstinateUser}.png`)
+                .setDescription(`I check the RSS feed every ${GLOBAL_FEED_INTERVAL} seconds, and **${obstinateUser}** is earning achievements in **${value}** consecutive feeds.`);
+
+            obstinateChannel.send(msg);
         }
     });
 }
@@ -153,9 +185,10 @@ async function checkGlobalFeed() {
 module.exports = (channels) => {
     masteryChannel = channels.get(CHANNEL_MASTERY);
     unlocksChannel = channels.get(CHANNEL_UNLOCKS);
+    obstinateChannel = channels.get(CHANNEL_OBSTINATE);
     ticketsChannel = channels.get(CHANNEL_TICKETS);
 
-    if( !masteryChannel || !unlocksChannel || !ticketsChannel ) {
+    if( !masteryChannel || !unlocksChannel || !obstinateChannel || !ticketsChannel ) {
         console.log('invalid channels')
     } else {
         setInterval( checkGlobalFeed, GLOBAL_FEED_INTERVAL * 1000 );
