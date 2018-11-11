@@ -4,7 +4,6 @@ const {
     CHEEVO_SUSPICIOUS_NUM,
     CHANNEL_MASTERY,
     CHANNEL_UNLOCKS,
-    CHANNEL_OBSTINATE,
     CHANNEL_TICKETS,
     GLOBAL_FEED_INTERVAL,
     NEWS_FEED_INTERVAL
@@ -34,9 +33,8 @@ const regexTicket = /org\/userpic\/([^'"]+).*org\/user\/([^'"]+).* (opened|close
 const regexCompleted = /org\/userpic\/([^'"]+).*org\/user\/([^'"]+).* completed .*org\/game\/([0-9]+)['"]>([^<]+).*\(([ a-zA-Z0-9]+)\)/is;
 
 let lastActivity = new Date('2018');
-let masteryChannel, unlocksChannel, obstinateChannel, ticketsChannel;
+let masteryChannel, unlocksChannel, ticketsChannel;
 let counterMap = new Map();
-let obstinateWinners = new Map();
 
 
 async function checkGlobalFeed() {
@@ -46,10 +44,8 @@ async function checkGlobalFeed() {
     const oldestTime = new Date(items[items.length - 1].pubDate);
     let userCheevoTimes = new Map();
     let userCheevoGames = new Map();
-    let checkObstinateUsers = [];
     let parsedString, user, game, system, msg;
 
-    // going through the feed from the oldest to the newest
     for(let i = items.length - 1; i >= 0; i--) {
         const pubDate = new Date(items[i].pubDate);
 
@@ -67,24 +63,12 @@ async function checkGlobalFeed() {
                 if(!userCheevoGames.get(user).includes(game))
                     userCheevoGames.get(user).push(game);
             }
+            continue; // if it's an 'earned' item, no need to check for mastery
         }
 
         // no need to check mastery/ticket activity again
         if(pubDate.getTime() < lastActivity.getTime())
             continue;
-
-        // checking obstinacy
-        parsedString = items[i].title.match(regexEarned);
-        if(parsedString) {
-            user = parsedString[1];
-            if( !obstinateWinners.has(user) )
-                obstinateWinners.set(user, 0);
-
-            checkObstinateUsers.push(user);
-
-            // it's an "earned" entry, so no need to check for tickets/mastery
-            continue; 
-        }
 
         // checking for mastery
         parsedString = items[i].content.match(regexCompleted);
@@ -159,25 +143,7 @@ async function checkGlobalFeed() {
                 if(counterMap.get(user) > 20)
                     counterMap.delete(user);
             }
-        }
-    });
 
-    // announcing obstinate winners
-    obstinateWinners.forEach( (value, obstinateUser, map) => {
-        if( checkObstinateUsers.includes( obstinateUser ) )
-            map.set(obstinateUser, value + 1);
-        else
-            map.delete( obstinateUser );
-
-
-        if(value >= CHEEVO_WARNING_NUM) {
-            msg = new RichEmbed()
-                .setTitle('Yay! This is a very obstinate player!')
-                .setURL(`${userHistoryUrl}${obstinateUser}`)
-                .setThumbnail(`${raorg}/UserPic/${obstinateUser}.png`)
-                .setDescription(`I check the RSS feed every ${GLOBAL_FEED_INTERVAL} seconds, and **${obstinateUser}** is earning achievements in **${value}** consecutive feeds.`);
-
-            obstinateChannel.send(msg);
         }
     });
 }
@@ -185,12 +151,12 @@ async function checkGlobalFeed() {
 module.exports = (channels) => {
     masteryChannel = channels.get(CHANNEL_MASTERY);
     unlocksChannel = channels.get(CHANNEL_UNLOCKS);
-    obstinateChannel = channels.get(CHANNEL_OBSTINATE);
     ticketsChannel = channels.get(CHANNEL_TICKETS);
 
-    if( !masteryChannel || !unlocksChannel || !obstinateChannel || !ticketsChannel ) {
+    if( !masteryChannel || !unlocksChannel || !ticketsChannel ) {
         console.log('invalid channels')
     } else {
         setInterval( checkGlobalFeed, GLOBAL_FEED_INTERVAL * 1000 );
     }
 }
+
