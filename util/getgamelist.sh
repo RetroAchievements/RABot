@@ -44,8 +44,9 @@ CONSOLE_NAME[28]=virtualboy
 CONSOLE_NAME[29]=msx
 CONSOLE_NAME[30]=commodore64
 CONSOLE_NAME[31]=zx81
+CONSOLE_NAME[51]=atari7800
 
-SUPPORTED_SYSTEMS=(megadrive n64 snes gb gba gbc nes pcengine mastersystem atarilynx ngp gamegear atari2600 arcade virtualboy)
+SUPPORTED_SYSTEMS=(megadrive n64 snes gb gba gbc nes pcengine mastersystem atarilynx ngp gamegear atari2600 arcade virtualboy atari7800)
 
 
 # functions ###################################################################
