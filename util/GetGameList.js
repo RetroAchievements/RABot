@@ -41,6 +41,7 @@ const consoles = {
     //29: "msx",
     //30: "commodore64",
     //31: "zx81",
+    51: "atari7800",
 };
 
 const consoleAliases = {
@@ -89,9 +90,10 @@ const consoleAliases = {
     arcade: consoles['27'],
 
     virtualboy: consoles['28'],
-    vb: consoles['28']
-};
+    vb: consoles['28'],
 
+    atari7800: consoles['51']
+};
 
 
 function loadGameLists() {
@@ -132,8 +134,8 @@ function getAllGameLists() {
 function getGameList() {
     loadGameLists();
 
-    // update once a day
-    setInterval( getAllGameLists, 1000 * 60 * 60 * 24 );
+    // update twice a day
+    setInterval( getAllGameLists, 1000 * 60 * 60 * 12 );
 }
 
 module.exports.gamelist = gamelist;
