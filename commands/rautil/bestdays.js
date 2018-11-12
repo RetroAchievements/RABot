@@ -31,7 +31,7 @@ module.exports = class BestDaysCommand extends Command {
         const sentMsg = await msg.reply(':hourglass: Getting info, please wait...');
         const bestDaysInfo = await bestDays( user, days );
         if( !bestDaysInfo )
-            sentMsg.edit(`There's no info for \`${user}\``);
+            return sentMsg.edit(`There's no info for \`${user}\``);
 
         let response = `:trophy: __**${user}'s best days**__ :trophy:\n`;
         response += '```md\n';
