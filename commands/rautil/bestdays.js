@@ -1,7 +1,7 @@
 const Command = require('../../structures/Command.js');
 const fetch = require('node-fetch');
 const cheerio = require('cheerio');
-const { bestDays } = require('../../util/Utils.js');
+const { bestDays, bestScoreComment } = require('../../util/Utils.js');
 
 module.exports = class BestDaysCommand extends Command {
     constructor(client) {
@@ -36,7 +36,7 @@ module.exports = class BestDaysCommand extends Command {
         let response = `:trophy: __**${user}'s best days**__ :trophy:\n`;
         response += '```md\n';
 
-        response += "[   date    ] (cheevos) < score >"
+        response += "[   date    ]( cheevos )< score >"
         for(let i = 0; i <= days && i < bestDaysInfo.date.length; i++) {
             response += `\n ${bestDaysInfo.date[i]}   `;
             response += bestDaysInfo.cheevos[i].padEnd(11, ' ');

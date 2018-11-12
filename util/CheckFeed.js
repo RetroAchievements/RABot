@@ -5,6 +5,7 @@ const {
     CHANNEL_MASTERY,
     CHANNEL_UNLOCKS,
     CHANNEL_TICKETS,
+    CHANNEL_CHEATING,
     GLOBAL_FEED_INTERVAL,
     NEWS_FEED_INTERVAL
 } = process.env
@@ -35,7 +36,7 @@ const regexTicket = /org\/userpic\/([^'"]+).*org\/user\/([^'"]+).* (opened|close
 const regexCompleted = /org\/userpic\/([^'"]+).*org\/user\/([^'"]+).* completed .*org\/game\/([0-9]+)['"]>([^<]+).*\(([ a-zA-Z0-9]+)\)/is;
 
 let lastActivity = new Date('2018');
-let masteryChannel, unlocksChannel, ticketsChannel;
+let masteryChannel, unlocksChannel, ticketsChannel, cheatingChannel;
 let counterMap = new Map();
 
 
@@ -88,11 +89,14 @@ async function checkGlobalFeed() {
                 .setThumbnail(`${raorg}/UserPic/${userPic}`)
                 .setDescription(`Let's hear a round of applause for **${user}**'s mastery of **${game}** for **${system}**!\n\nCongratulate the player:\n${raorg}/user/${user}\nTry the game:\n${raorg}/game/${gameid}`)
 
-            const botComment = await bestScoreComment( user );
-            if( botComment )
-                msg.addField( "RABot's comment", botComment );
-
             masteryChannel.send(msg);
+
+            const botComment = await bestScoreComment( user );
+            if( botComment ) {
+                msg.addField( "RABot's comment", botComment );
+                cheatingChannel.send(msg);
+            }
+
             continue; // if it's a mastery item, no need to check further
         }
 
@@ -129,7 +133,10 @@ async function checkGlobalFeed() {
     const userHistoryUrl = `${raorg}/historyexamine.php?d=${unixTime}&u=`;
 
     // announcing multiple unlocks
-    userCheevoTimes.forEach( (value, user) => {
+    for( let keyValue of userCheevoTimes ) {
+        user = keyValue[0];
+        value = keyValue[1];
+
         if(value.length >= CHEEVO_WARNING_NUM) {
 
             // avoiding reporting the same user in a short period of time
@@ -140,11 +147,14 @@ async function checkGlobalFeed() {
                     .setThumbnail(`${raorg}/UserPic/${user}.png`)
                     .setDescription(`**${user}** earned **${value.length}** achievements in less than ${timeIntervalMin} minutes\n**Game**: "${userCheevoGames.get(user).join('", "')}"`);
 
-                const botComment = await bestScoreComment( user );
-                if( botComment )
-                    msg.addField( "RABot's comment", botComment );
-
                 unlocksChannel.send(msg);
+
+                const botComment = await bestScoreComment( user );
+                if( botComment ) {
+                    msg.addField( "RABot's comment", botComment );
+                    cheatingChannel.send(msg);
+                }
+
                 counterMap.set(user, 1);
             } else {
                 counterMap.set(user, counterMap.get(user) + 1);
@@ -153,17 +163,17 @@ async function checkGlobalFeed() {
                 if(counterMap.get(user) > 20)
                     counterMap.delete(user);
             }
-
         }
-    });
+    }
 }
 
 module.exports = (channels) => {
     masteryChannel = channels.get(CHANNEL_MASTERY);
     unlocksChannel = channels.get(CHANNEL_UNLOCKS);
     ticketsChannel = channels.get(CHANNEL_TICKETS);
+    cheatingChannel = channels.get(CHANNEL_CHEATING);
 
-    if( !masteryChannel || !unlocksChannel || !ticketsChannel ) {
+    if( !masteryChannel || !unlocksChannel || !ticketsChannel || !cheatingChannel ) {
         console.log('invalid channels')
     } else {
         setInterval( checkGlobalFeed, GLOBAL_FEED_INTERVAL * 1000 );

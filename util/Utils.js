@@ -12,7 +12,7 @@ module.exports = class Utils {
             return false;
 
         const url = 'https://retroachievements.org/history.php?u=' + user;
-        let dates = [];
+        let date = [];
         let cheevos = [];
         let score = [];
 
@@ -50,15 +50,16 @@ module.exports = class Utils {
         const bestScore = bestDay.score[0];
         let scoreComment = false;
 
-        if( bestScore >= 3000 ) {
+        if( bestScore >= 3500 ) {
+            scoreComment = `**Best score in a day**: ${bestScore}\n`;
             if( bestScore >= 10000 )
-                scoreComment = "**GASP! This user has a ridiculously unreal score for a single day!!!**";
+                scoreComment += "**GASP! This user has a ridiculously unreal score for a single day!!!**";
             else if( bestScore >= 6000 )
-                scoreComment = "**WOW!** This user seems to play retrogames all day long!";
+                scoreComment += "**WOW!** This user seems to play retrogames all day long!";
             else if( bestScore >= 5000 )
-                scoreComment = "That's a pretty dedicated retrogamer";
-            else // the ">= 3000" case
-                scoreComment = "That's a good retrogamer!";
+                scoreComment += "That's a pretty dedicated retrogamer";
+            else // the ">= 3500" case
+                scoreComment += "That's a good retrogamer!";
         }
         return scoreComment;
     }
