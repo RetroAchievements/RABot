@@ -1,7 +1,7 @@
 const Command = require('../../structures/Command.js');
 const fetch = require('node-fetch');
 const cheerio = require('cheerio');
-const { bestdays } = require('../../util/Utils.js');
+const { bestDays } = require('../../util/Utils.js');
 
 module.exports = class BestDaysCommand extends Command {
     constructor(client) {
@@ -9,7 +9,7 @@ module.exports = class BestDaysCommand extends Command {
             name: 'bestdays',
             group: 'rautil',
             memberName: 'bestdays',
-            description: 'Get the "best days" info from a player',
+            description: 'Get the info about the "best RA days" of an user',
             examples: ['`bestdays RA_username`'],
             throttling: {
                 usages: 2,
@@ -29,34 +29,23 @@ module.exports = class BestDaysCommand extends Command {
     async run( msg, { user } ) {
         const days = 3;
         const sentMsg = await msg.reply(':hourglass: Getting info, please wait...');
-        const bestDays = await bestdays( user, days );
-        if( !bestDays )
+        const bestDaysInfo = await bestDays( user, days );
+        if( !bestDaysInfo )
             sentMsg.edit(`There's no info for \`${user}\``);
 
         let response = `:trophy: __**${user}'s best days**__ :trophy:\n`;
         response += '```md\n';
 
-        for(let i = 1; i <= days && i < bestDays.length; i++) {
-            response += `\n[${bestDays.date[i]}]`;
-            response += `( ${bestDays.cheevos[i]} ) `;
-            response += `< ${bestDays.score[i]} >`;
+        for(let i = 1; i <= days && i < bestDaysInfo.length; i++) {
+            response += `\n[${bestDaysInfo.date[i]}]`;
+            response += `( ${bestDaysInfo.cheevos[i]} ) `;
+            response += `< ${bestDaysInfo.score[i]} >`;
         }
         response += '\n```';
 
-        let scoreComment = '';
-        const bestScore = bestDays.score[0];
-
-        if( bestScore >= 3000 ) {
-            if( bestScore >= 10000 )
-                scoreComment = "**Completely unreal score!!!**";
-            else if( bestScore >= 6000 )
-                scoreComment = "**WOW!** This user seems to play retrogames all day long!";
-            else if( bestScore >= 5000 )
-                scoreComment = "That's a pretty dedicated retrogamer";
-            else // the ">= 3000" case
-                scoreComment = "That's good retrogamer!";
-        }
-        response += scoreComment;
+        const botComment = await bestScoreComment( user );
+        if( botComment )
+            response += scoreComment;
 
         return sentMsg.edit( response );
     }
