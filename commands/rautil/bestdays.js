@@ -36,10 +36,11 @@ module.exports = class BestDaysCommand extends Command {
         let response = `:trophy: __**${user}'s best days**__ :trophy:\n`;
         response += '```md\n';
 
-        for(let i = 1; i <= days && i < bestDaysInfo.length; i++) {
-            response += `\n[${bestDaysInfo.date[i]}]`;
-            response += `( ${bestDaysInfo.cheevos[i]} ) `;
-            response += `< ${bestDaysInfo.score[i]} >`;
+        response += "[   date    ] (cheevos) < score >"
+        for(let i = 0; i <= days && i < bestDaysInfo.date.length; i++) {
+            response += `\n ${bestDaysInfo.date[i]}   `;
+            response += bestDaysInfo.cheevos[i].padEnd(11, ' ');
+            response += bestDaysInfo.score[i];
         }
         response += '\n```';
 
