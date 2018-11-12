@@ -52,7 +52,7 @@ module.exports = class Utils {
 
         if( bestScore >= 3000 ) {
             if( bestScore >= 10000 )
-                scoreComment = "**This user has a really unreal score in a single day!!!**";
+                scoreComment = "**GASP! This user has a ridiculously unreal score for a single day!!!**";
             else if( bestScore >= 6000 )
                 scoreComment = "**WOW!** This user seems to play retrogames all day long!";
             else if( bestScore >= 5000 )
