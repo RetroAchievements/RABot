@@ -11,6 +11,8 @@ const {
 
 const { RichEmbed } = require('discord.js');
 const Parser = require('rss-parser');
+const { bestScoreComment } = require('./Utils.js');
+
 const parser = new Parser();
 const raorg = 'https://retroachievements.org';
 const globalFeed = `${raorg}/rss-activity`;
@@ -86,6 +88,10 @@ async function checkGlobalFeed() {
                 .setThumbnail(`${raorg}/UserPic/${userPic}`)
                 .setDescription(`Let's hear a round of applause for **${user}**'s mastery of **${game}** for **${system}**!\n\nCongratulate the player:\n${raorg}/user/${user}\nTry the game:\n${raorg}/game/${gameid}`)
 
+            const botComment = await bestScoreComment( user );
+            if( botComment )
+                msg.addField( "RABot's comment", botComment );
+
             masteryChannel.send(msg);
             continue; // if it's a mastery item, no need to check further
         }
@@ -134,6 +140,10 @@ async function checkGlobalFeed() {
                     .setThumbnail(`${raorg}/UserPic/${user}.png`)
                     .setDescription(`**${user}** earned **${value.length}** achievements in less than ${timeIntervalMin} minutes\n**Game**: "${userCheevoGames.get(user).join('", "')}"`);
 
+                const botComment = await bestScoreComment( user );
+                if( botComment )
+                    msg.addField( "RABot's comment", botComment );
+
                 unlocksChannel.send(msg);
                 counterMap.set(user, 1);
             } else {
@@ -159,4 +169,3 @@ module.exports = (channels) => {
         setInterval( checkGlobalFeed, GLOBAL_FEED_INTERVAL * 1000 );
     }
 }
-
