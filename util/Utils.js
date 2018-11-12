@@ -7,7 +7,7 @@ module.exports = class Utils {
         return /^[a-z0-9]{2,20}$/i.test(user);
     }
 
-    static async bestdays( user, days ) {
+    static async bestDays( user, days ) {
         if( !Utils.isValidUsername( user ) )
             return false;
 
@@ -42,9 +42,25 @@ module.exports = class Utils {
         };
     }
 
-    static async bestScoreInADay( user ) {
-        const bestDay = Utils.bestdays( user, 1 );
-        return !bestDay ? false : bestDay.score[0];
+    static async bestScoreComment( user ) {
+        const bestDay = await Utils.bestDays( user, 1 );
+        if( !bestDay )
+            return false
+
+        const bestScore = bestDay.score[0];
+        let scoreComment = false;
+
+        if( bestScore >= 3000 ) {
+            if( bestScore >= 10000 )
+                scoreComment = "**This user has a really unreal score in a single day!!!**";
+            else if( bestScore >= 6000 )
+                scoreComment = "**WOW!** This user seems to play retrogames all day long!";
+            else if( bestScore >= 5000 )
+                scoreComment = "That's a pretty dedicated retrogamer";
+            else // the ">= 3000" case
+                scoreComment = "That's a good retrogamer!";
+        }
+        return scoreComment;
     }
 
 };
