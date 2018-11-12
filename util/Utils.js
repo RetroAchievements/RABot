@@ -35,7 +35,16 @@ module.exports = class Utils {
             score.push( bestDays[i].score );
         }
 
-        return [ date, cheevos, score ];
+        return {
+            'date': date,
+            'cheevos': cheevos,
+            'score': score
+        };
+    }
+
+    static async bestScoreInADay( user ) {
+        const bestDay = Utils.bestdays( user, 1 );
+        return !bestDay ? false : bestDay.score[0];
     }
 
 };
