@@ -21,15 +21,43 @@ module.exports = class BestDaysCommand extends Command {
                     key: 'user',
                     type: 'string',
                     prompt: '',
-                    //default: '~NOARGS~',
                 },
             ],
         });
     }
 
-    async run(msg, { user }) {
+    async run( msg, { user } ) {
+        const days = 3;
         const sentMsg = await msg.reply(':hourglass: Getting info, please wait...');
-        const response = await bestdays( user );
+        const bestDays = await bestdays( user, days );
+        if( !bestDays )
+            sentMsg.edit(`There's no info for \`${user}\``);
+
+        let response = `:trophy: __**${user}'s best days**__ :trophy:\n`;
+        response += '```md\n';
+
+        for(let i = 1; i <= days && i < bestDays.length; i++) {
+            response += `\n[${bestDays.date[i]}]`;
+            response += `( ${bestDays.cheevos[i]} ) `;
+            response += `< ${bestDays.score[i]} >`;
+        }
+        response += '\n```';
+
+        let scoreComment = '';
+        const bestScore = bestDays.score[0];
+
+        if( bestScore >= 3000 ) {
+            if( bestScore >= 10000 )
+                scoreComment = "**Completely unreal score!!!**";
+            else if( bestScore >= 6000 )
+                scoreComment = "**WOW!** This user seems to play retrogames all day long!";
+            else if( bestScore >= 5000 )
+                scoreComment = "That's a pretty dedicated retrogamer";
+            else // the ">= 3000" case
+                scoreComment = "That's good retrogamer!";
+        }
+        response += scoreComment;
+
         return sentMsg.edit( response );
     }
 
