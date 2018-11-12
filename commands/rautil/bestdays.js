@@ -43,8 +43,8 @@ module.exports = class BestDaysCommand extends Command {
         }
         response += '\n```';
 
-        const botComment = await bestScoreComment( user );
-        if( botComment )
+        const scoreComment = await bestScoreComment( user );
+        if( scoreComment )
             response += scoreComment;
 
         return sentMsg.edit( response );
