@@ -1,0 +1,26 @@
+const Command = require('../../structures/Command');
+
+module.exports = class PanicCommand extends Command {
+    constructor(client) {
+        super(client, {
+            name: 'psx',
+            group: 'single',
+            memberName: 'psx',
+            description: 'Is psx coming?'
+        });
+    }
+
+    async run(msg) {
+        const response = "Psx will come when it's fully developed: If you'd like to help accelerate new features coming to RA.org here are the programming languages we use for development. If you or someone you know can program effectively in some of these languages and would like to help, let us know. 
+" +
+			"\n" +
+            "\nRcheevos is C. Raintegration and the emulators are C/C++. The server is PHP. The interface between the server and raintegration is JSON (potentially changing in the future). Basic qualifications are C/C++. Prefer experience using the WinAPI and GDI (for raintegration).";
+
+        try {
+            await msg.react('🎮');
+            return msg.reply(response);
+        } catch (err) {
+            return msg.reply(response);
+        }
+    }
+};
