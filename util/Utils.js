@@ -64,4 +64,23 @@ module.exports = class Utils {
         return scoreComment;
     }
 
+
+    static async googleGameId( terms ) {
+        const regex = /retroachievements\.org\/game\/([0-9]+)/i;
+        const site = 'retroachievements.org/game'
+        let searchURL = 'https://www.google.com/search?q=site:' + site;
+        let parseGameUrl;
+        let gameid;
+
+        terms.forEach(term => searchURL += `+${term}`);
+
+        const res = await fetch(encodeURI(searchURL))
+        const $ = cheerio.load( await res.text() );
+
+        parseGameUrl = $('h3.r').toString().match(regex);
+        gameid = parseGameUrl ? parseGameUrl[1] : 0;
+
+        return gameid;
+    }
+
 };
