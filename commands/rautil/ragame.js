@@ -8,7 +8,7 @@ module.exports = class RAGameCommand extends GoogleCommand {
     constructor(client) {
         super(client, {
             name: 'ragame',
-            aliases: ['rgame', 'rg'],
+            aliases: ['rgame', 'game'],
             group: 'rautil',
             memberName: 'ragame',
             description: 'Google for a game at RetroAchievements.org and show the link.',
