@@ -5,7 +5,7 @@ module.exports = class MemeFactCommand extends RandomFactCommand {
         super(client, {
             name: 'memefact',
             aliases: ['meme'],
-            group: 'single',
+            group: 'random',
             memberName: 'memefact',
             description: 'Responds with a RetroAchievements meme fact.',
             args: [

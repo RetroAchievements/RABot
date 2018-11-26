@@ -7,7 +7,7 @@ module.exports = class WhatGameCommand extends RandomGameCommand {
         super(client, {
             name: 'whatgame',
             aliases: ['wg', 'randomgame'],
-            group: 'rautil',
+            group: 'random',
             memberName: 'whatgame',
             description: 'Responds with a random game that has achievements.',
             examples: ['`whatgame`', '`whatgame nes`', '`whatgame "street fighter"`', '`whatgame megadrive`'],

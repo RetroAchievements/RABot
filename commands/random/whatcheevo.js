@@ -11,7 +11,7 @@ module.exports = class WhatCheevoCommand extends RandomGameCommand {
         super(client, {
             name: 'whatcheevo',
             aliases: ['wa', 'whatachievement', 'whatach'],
-            group: 'rautil',
+            group: 'random',
             memberName: 'whatcheevo',
             description: 'Responds with a random achievement.',
             examples: ['`whatcheevo`', '`wa nes`', '`whatachievement "street fighter"`', '`whatach megadrive`'],

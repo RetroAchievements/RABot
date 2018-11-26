@@ -29,6 +29,7 @@ client.registry
         ['poll', 'Commands for polls'],
         ['rautil', 'RetroAchievements utilities'],
         ['mod', 'Moderation utilities'],
+        ['random', 'Random stuff'],
     ])
     .registerDefaultCommands({
         ping: false,

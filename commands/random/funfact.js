@@ -5,7 +5,7 @@ module.exports = class FunFactCommand extends RandomFactCommand {
         super(client, {
             name: 'funfact',
             aliases: ['ffact', 'funf'],
-            group: 'single',
+            group: 'random',
             memberName: 'funfact',
             description: 'Responds with a retrogaming fun fact.',
             args: [
