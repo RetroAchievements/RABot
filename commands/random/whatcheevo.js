@@ -33,7 +33,7 @@ module.exports = class WhatCheevoCommand extends RandomGameCommand {
         let chosenGame = this.getRandomGame( terms );
 
         if( !chosenGame || ! chosenGame instanceof Array || chosenGame.length == 0 )
-            return msg.reply( "Didn't find anything... :frowning:" );
+            return sentMest.edit( "Didn't find anything... :frowning:" );
 
         sentMsg.edit(`:hourglass: picking a random achievement from "${chosenGame[1]}" set, please wait...`);
 
