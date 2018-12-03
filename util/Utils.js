@@ -83,4 +83,14 @@ module.exports = class Utils {
         return gameid;
     }
 
+
+    static shorten( text, maxLength = 2000 ) {
+        return text.length > maxLength ? `${text.substr(0, maxLength - 3)}...` : text;
+    }
+
+
+    static randomRange(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
 };

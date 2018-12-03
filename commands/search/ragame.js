@@ -9,7 +9,7 @@ module.exports = class RAGameCommand extends GoogleCommand {
         super(client, {
             name: 'ragame',
             aliases: ['rgame', 'game'],
-            group: 'rautil',
+            group: 'search',
             memberName: 'ragame',
             description: 'Google for a game at RetroAchievements.org and show the link.',
             examples: ['`ragame street fighter mega drive`', '`ragame final fight arcade`' ],

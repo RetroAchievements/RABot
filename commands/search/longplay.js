@@ -15,7 +15,7 @@ module.exports = class LongPlayCommand extends Command {
         super(client, {
             name: 'longplay',
             aliases: ['lplay', 'lp'],
-            group: 'rautil',
+            group: 'search',
             memberName: 'longplay',
             description: 'Search for a longplay video on youtube and post the link.',
             examples: ['`longplay street fighter mega drive`', '`longplay final fight arcade`' ],

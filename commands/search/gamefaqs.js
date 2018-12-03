@@ -9,7 +9,7 @@ module.exports = class GamefaqsCommand extends GoogleCommand {
         super(client, {
             name: 'gamefaqs',
             aliases: ['gamefaq', 'gfaqs', 'gfaq', 'gf'],
-            group: 'rautil',
+            group: 'search',
             memberName: 'gamefaqs',
             description: 'Google for a game at GameFAQs and show the link.',
             examples: ['`gamefaqs street fighter mega drive`', '`gamefaqs final fight arcade`' ],

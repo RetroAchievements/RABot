@@ -28,6 +28,7 @@ client.registry
         ['single', 'Single (and simple) commands'],
         ['poll', 'Commands for polls'],
         ['rautil', 'RetroAchievements utilities'],
+        ['search', 'Search for things'],
         ['mod', 'Moderation utilities'],
         ['random', 'Random stuff'],
     ])

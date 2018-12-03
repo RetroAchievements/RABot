@@ -12,11 +12,13 @@ If you are used to those technologies and would like to contribute, PRs are welc
 
 node.js
 
+
 ### Install
 
 ```
 $ npm i
 ```
+
 
 ### Run
 
@@ -25,3 +27,9 @@ Set the `.env` file properly and then:
 ```
 $ node index.js
 ```
+
+### Inspiration
+
+Many inspiration for RABot was obtained from the [Xiao bot's code](https://github.com/dragonfire535/xiao).
+
+

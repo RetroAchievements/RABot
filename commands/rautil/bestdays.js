@@ -1,6 +1,4 @@
 const Command = require('../../structures/Command.js');
-const fetch = require('node-fetch');
-const cheerio = require('cheerio');
 const { bestDays, bestScoreComment } = require('../../util/Utils.js');
 
 module.exports = class BestDaysCommand extends Command {
