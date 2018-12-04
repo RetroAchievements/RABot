@@ -1,3 +1,7 @@
+/*
+ * The inspiration for this came from Xiao bot's code:
+ * https://github.com/dragonfire535/xiao
+ */
 const Command = require('../../structures/Command.js');
 const { MessageEmbed } = require('discord.js');
 const fetch = require('node-fetch');
