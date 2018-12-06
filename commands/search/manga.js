@@ -69,7 +69,6 @@ module.exports = class MangaCommand extends Command {
                 '```' +
                 `**Status**: ${manga.status}` +
                 `\n**Year**: ${manga.startDate.year}` +
-                `\n**Episodes**: ${manga.episodes}` +
                 `\n**Chapters/Volumes**: ${manga.chapters || '???'}/${manga.volumes || '???'}` +
                 `\n**Average Score**: ${manga.meanScore}/100` +
                 `\n**Source**: https://anilist.co/manga/${manga.id}`
