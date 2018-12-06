@@ -65,7 +65,7 @@ module.exports = class MangaCommand extends Command {
                 `__**${manga.title.userPreferred}**__` +
                 '\n**Description**:' +
                 '```' +
-                `${shorten(manga.description.replace(/(<br>)+/g, '\n'))}` +
+                `${manga.description ? shorten(manga.description.replace(/(<br>)+/g, '\n')) : 'No description.'}` +
                 '```' +
                 `**Status**: ${manga.status}` +
                 `\n**Year**: ${manga.startDate.year}` +

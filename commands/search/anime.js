@@ -65,7 +65,7 @@ module.exports = class AnimeCommand extends Command {
                 `__**${anime.title.userPreferred}**__` +
                 '\n**Description**:' +
                 '```' +
-                `${shorten(anime.description.replace(/(<br>)+/g, '\n'))}` +
+                `${anime.description ? shorten(anime.description.replace(/(<br>)+/g, '\n')) : 'No description.'}` +
                 '```' +
                 `**Status**: ${anime.status}` +
                 `\n**Episodes**: ${anime.episodes}` +
