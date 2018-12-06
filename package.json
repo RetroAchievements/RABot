@@ -13,6 +13,7 @@
         "moment": "^2.22.2",
         "node-fetch": "^2.2.0",
         "node-opus": "^0.2.9",
+        "node-superfetch": "^0.1.9",
         "redis": "^2.8.0",
         "request": "^2.87.0",
         "rss-parser": "^3.4.3",
