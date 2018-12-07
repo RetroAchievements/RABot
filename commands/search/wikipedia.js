@@ -30,7 +30,19 @@ module.exports = class WikipediaCommand extends Command {
         const sentMsg = await msg.reply(':hourglass: Getting wikipedia info, please wait...');
 
         try {
-            const params = [
+            let params = [
+                `search=${encodeURI(query)}`,
+                'action=opensearch',
+                'format=json',
+                'limit=1',
+                'namespace=0'
+            ];
+
+            let res = await fetch('https://en.wikipedia.org/w/api.php?' + params.join('&'));
+            let body = await res.json();
+            query = body[1][0];
+
+            params = [
                 `titles=${encodeURI(query)}`,
                 'action=query',
                 'prop=extracts|pageimages',
@@ -42,15 +54,15 @@ module.exports = class WikipediaCommand extends Command {
                 'formatversion=2'
             ];
 
-            const res = await fetch('https://en.wikipedia.org/w/api.php?' + params.join('&'));
-            const body = await res.json();
+            res = await fetch('https://en.wikipedia.org/w/api.php?' + params.join('&'));
+            body = await res.json();
             const data = body.query.pages[0];
 
             if (data.missing)
                 return sentMsg.edit("Didn't find anything... :frowning:");
 
             return sentMsg.edit(
-                `__**From:**__ <https://en.wikipedia.org/wiki/${encodeURIComponent(query).replace(/\)/g, '%29')}>` +
+                `__**From:**__ <https://en.wikipedia.org/wiki/${encodeURIComponent(data.title).replace(/\)/g, '%29')}>` +
                 '```' +
                 shorten(data.extract.replace(/\n/g, '\n\n'), 1000) +
                 '```'
