@@ -3,6 +3,7 @@ const { MessageEmbed } = require('discord.js');
 const request = require('node-superfetch');
 const { stripIndents } = require('common-tags');
 const { verify } = require('../../util/Utils');
+const { CHANNEL_BOTGAMES } = process.env;
 
 module.exports = class AkinatorCommand extends Command {
     constructor(client) {
@@ -12,16 +13,19 @@ module.exports = class AkinatorCommand extends Command {
             group: 'games',
             memberName: 'akinator',
             description: 'Think about a real or fictional character, I will try to guess who it is.',
-            clientPermissions: ['EMBED_LINKS']
+            clientPermissions: ['EMBED_LINKS'],
+            guildOnly: true,
+            throttling: { usages: 1, duration: 60 },
         });
 
         this.sessions = new Map();
     }
 
     async run(msg) {
-        // TODO: permitir apenas no canal #botgames
+        if (msg.channel.id !== CHANNEL_BOTGAMES)
+            return msg.reply(`This command is only available to be used in ${this.client.channels.get(CHANNEL_BOTGAMES)}`);
         if (this.sessions.has(msg.channel.id))
-            return msg.reply('Only one game may be occuring per channel.');
+            return msg.reply('Only one game may be occuring.');
 
         await msg.reply("**Let's start the akinator game!**");
         try {
