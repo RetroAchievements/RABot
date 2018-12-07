@@ -119,5 +119,4 @@ module.exports = class Utils {
 
         return false;
     }
-
 };
