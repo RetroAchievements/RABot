@@ -31,6 +31,7 @@ client.registry
         ['search', 'Search for things'],
         ['mod', 'Moderation utilities'],
         ['random', 'Random stuff'],
+        ['games', 'Play some games with the bot'],
     ])
     .registerDefaultCommands({
         ping: false,
