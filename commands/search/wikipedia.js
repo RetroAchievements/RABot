@@ -42,6 +42,9 @@ module.exports = class WikipediaCommand extends Command {
             let body = await res.json();
             query = body[1][0];
 
+            if (!query)
+                return sentMsg.edit("Didn't find anything... :frowning:");
+
             params = [
                 `titles=${encodeURI(query)}`,
                 'action=query',
