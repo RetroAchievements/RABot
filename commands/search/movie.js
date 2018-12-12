@@ -1,6 +1,6 @@
 const Command = require('../../structures/Command.js');
-const { MessageEmbed } = require('discord.js');
 const fetch = require('node-fetch');
+const { RichEmbed } = require('discord.js');
 const { shorten } = require('../../util/Utils.js');
 const { TMDB_KEY } = process.env;
 
@@ -42,19 +42,20 @@ module.exports = class MovieCommand extends Command {
             res = await fetch(`https://api.themoviedb.org/3/movie/${body.results[0].id}?api_key=${TMDB_KEY}`);
             body = await res.json();
 
-            return sentMsg.edit(
-                `:cinema: __**${body.title}**__ :cinema:` +
-                `\n**Description**:` +
-                '```' +
-                (body.overview ? shorten(body.overview) : 'No description available.') +
-                '```' +
-                '**Runtime**: ' + (body.runtime ? `${body.runtime} mins.` : '???') +
-                '\n**Release Date**: ' + (body.release_date || '???') +
-                '\n**Genres**: ' + (body.genres.length ? body.genres.map(genre => genre.name).join(', ') : '???') +
-                '\n**Production Companies**: ' +
-                (body.production_companies.length ? body.production_companies.map(c => c.name).join(', ') : '???') +
-                `\n**Source**: https://www.themoviedb.org/movie/${body.id}`
-            );
+            const response = new RichEmbed()
+                .setColor(0x00D474)
+                .setTitle(body.title)
+                .setURL(`https://www.themoviedb.org/movie/${body.id}`)
+                .setAuthor('TMDB', 'https://i.imgur.com/3K3QMv9.png', 'https://www.themoviedb.org/')
+                .setDescription(body.overview ? shorten(body.overview) : 'No description available.')
+                .setThumbnail(body.poster_path ? `https://image.tmdb.org/t/p/w500${body.poster_path}` : null)
+                .addField('Runtime', body.runtime ? `${body.runtime} mins.` : '???', true)
+                .addField('Release Date', body.release_date || '???', true)
+                .addField('Genres', body.genres.length ? body.genres.map(genre => genre.name).join(', ') : '???')
+                .addField('Production Companies',
+                        body.production_companies.length ? body.production_companies.map(c => c.name).join(', ') : '???');
+
+            return sentMsg.edit(response);
         } catch (err) {
             return sentMsg.edit(`**Whoops! Something went wrong!**\n\`${err.message}\``);
         }

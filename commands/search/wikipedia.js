@@ -3,8 +3,8 @@
  * https://github.com/dragonfire535/xiao
  */
 const Command = require('../../structures/Command.js');
-const { MessageEmbed } = require('discord.js');
 const fetch = require('node-fetch');
+const { RichEmbed } = require('discord.js');
 const { shorten } = require('../../util/Utils.js');
 
 module.exports = class WikipediaCommand extends Command {
@@ -27,7 +27,7 @@ module.exports = class WikipediaCommand extends Command {
     }
 
     async run(msg, { query }) {
-        const sentMsg = await msg.reply(':hourglass: Getting wikipedia info, please wait...');
+        const sentMsg = await msg.reply(':hourglass: Getting info, please wait...');
 
         try {
             let params = [
@@ -64,12 +64,15 @@ module.exports = class WikipediaCommand extends Command {
             if (data.missing)
                 return sentMsg.edit("Didn't find anything... :frowning:");
 
-            return sentMsg.edit(
-                `__**From:**__ <https://en.wikipedia.org/wiki/${encodeURIComponent(data.title).replace(/\)/g, '%29')}>` +
-                '```' +
-                shorten(data.extract.replace(/\n/g, '\n\n'), 1000) +
-                '```'
-            );
+            const response = new RichEmbed()
+                .setColor(0xE7E7E7)
+                .setTitle(data.title)
+                .setAuthor('Wikipedia', 'https://i.imgur.com/Z7NJBK2.png', 'https://www.wikipedia.org/')
+                .setThumbnail(data.thumbnail ? data.thumbnail.source : null)
+                .setURL(`https://en.wikipedia.org/wiki/${encodeURIComponent(data.title).replace(/\)/g, '%29')}`)
+                .setDescription(shorten(data.extract.replace(/\n/g, '\n\n'), 1000));
+
+            return sentMsg.edit(response);
         } catch (err) {
             return sentMsg.edit(`**Whoops! Something went wrong!**\n\`${err.message}\``);
         }

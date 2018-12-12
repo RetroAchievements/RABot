@@ -4,6 +4,7 @@
  */
 const Command = require('../../structures/Command');
 const request = require('node-superfetch');
+const { RichEmbed } = require('discord.js');
 const { stripIndents } = require('common-tags');
 const { shorten } = require('../../util/Utils');
 
@@ -61,18 +62,19 @@ module.exports = class MangaCommand extends Command {
 
             const manga = await this.fetchAnime(id);
 
-            return sentMsg.edit(
-                `__**${manga.title.userPreferred}**__` +
-                '\n**Description**:' +
-                '```' +
-                `${manga.description ? shorten(manga.description.replace(/(<br>)+/g, '\n')) : 'No description.'}` +
-                '```' +
-                `**Status**: ${manga.status}` +
-                `\n**Year**: ${manga.startDate.year}` +
-                `\n**Chapters/Volumes**: ${manga.chapters || '???'}/${manga.volumes || '???'}` +
-                `\n**Average Score**: ${manga.meanScore}/100` +
-                `\n**Source**: https://anilist.co/manga/${manga.id}`
-            );
+            const response = new RichEmbed()
+                .setColor(0x02A9FF)
+                .setAuthor('AniList', 'https://i.imgur.com/iUIRC7v.png', 'https://anilist.co/')
+                .setURL(`https://anilist.co/manga/${manga.id}`)
+                .setThumbnail(manga.coverImage.large || null)
+                .setTitle(manga.title.userPreferred)
+                .setDescription(manga.description ? shorten(manga.description.replace(/( *<br> *)+/g, '\n')) : 'No description.')
+                .addField('Status', manga.status, true)
+                .addField('Chapters / Volumes', `${manga.chapters || '???'}/${manga.volumes || '???'}`, true)
+                .addField('Year', manga.startDate.year, true)
+                .addField('Average Score', `${manga.meanScore}/100`, true);
+
+            return sentMsg.edit(response);
         } catch (err) {
             return msg.reply(`Oh no, an error occurred: \`${err.message}\`. Try again later!`);
         }

@@ -4,6 +4,7 @@
  */
 const Command = require('../../structures/Command');
 const request = require('node-superfetch');
+const { RichEmbed } = require('discord.js');
 const { stripIndents } = require('common-tags');
 const { shorten } = require('../../util/Utils');
 
@@ -61,18 +62,19 @@ module.exports = class AnimeCommand extends Command {
 
             const anime = await this.fetchAnime(id);
 
-            return sentMsg.edit(
-                `__**${anime.title.userPreferred}**__` +
-                '\n**Description**:' +
-                '```' +
-                `${anime.description ? shorten(anime.description.replace(/(<br>)+/g, '\n')) : 'No description.'}` +
-                '```' +
-                `**Status**: ${anime.status}` +
-                `\n**Episodes**: ${anime.episodes}` +
-                `\n**Season**: ${anime.season} ${anime.startDate.year}` +
-                `\n**Average Score**: ${anime.meanScore}/100` +
-                `\n**Source**: https://anilist.co/anime/${anime.id}`
-            );
+            const response = new RichEmbed()
+                .setColor(0x02A9FF)
+                .setAuthor('AniList', 'https://i.imgur.com/iUIRC7v.png', 'https://anilist.co/')
+                .setURL(`https://anilist.co/anime/${anime.id}`)
+                .setThumbnail(anime.coverImage.large || null)
+                .setTitle(anime.title.userPreferred)
+                .setDescription(anime.description ? shorten(anime.description.replace(/(<br>)+/g, '\n')) : 'No description.')
+                .addField('Status', anime.status, true)
+                .addField('Episodes', anime.episodes, true)
+                .addField('Season', `${anime.season} ${anime.startDate.year}`, true)
+                .addField('Average Score', `${anime.meanScore}/100`, true);
+
+            return sentMsg.edit(response);
         } catch (err) {
             return msg.reply(`Oh no, an error occurred: \`${err.message}\`. Try again later!`);
         }
