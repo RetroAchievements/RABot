@@ -37,19 +37,28 @@ async run( msg, { system, game } ) {
         const searchTerm = game.replace(/[][}{|\\^~` <>"#%&]/g, '');
 
         const games = $("table")
-            .find(`a[name*='${searchTerm}' i]`)
+            .find(`a[name='${searchTerm}' i]`) // trying the exact match first
             .map( (i, elem) => $(elem).attr("name") )
             .get();
 
-        if( games.length < 1 )
-            return sentMsg.edit("Didn't find anything... :frowning:");
+        if( games.length < 1 ) { 
+            if( searchTerm.length < 3 || searchTerm.length > 100 )
+                return sentMsg.edit("Didn't find anything... :frowning:\nTry to give a more specific game name.");
+            games = $("table")
+                .find(`a[name*='${searchTerm}' i]`)
+                .map( (i, elem) => $(elem).attr("name") )
+                .get();
+
+            if( games.length < 1 )
+                return sentMsg.edit("Didn't find anything... :frowning:");
+        }
 
         let choice = 0;
         if( games.length > 1 ) {
             choice = whichOption( games );
             if( choice < 0 ) {
                 if( choice == -2 )
-                    return msg.reply(`**Try to give a more specific game name}>**`);
+                    return msg.reply(`**Try to give a more specific game name**`);
                 return;
             }
         }
@@ -78,7 +87,7 @@ async run( msg, { system, game } ) {
             choice = whichOption( maps );
             if( choice < 0 ) {
                 if( choice == -2 )
-                    return msg.reply(`**Try checking here**: <${gameMapsUrl}>`);
+                    return msg.reply(`**Try to check here**: <${gameMapsUrl}>`);
                 return;
             }
         }
