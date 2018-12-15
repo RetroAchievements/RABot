@@ -168,7 +168,7 @@ module.exports = class VGMapsCommand extends Command {
             const choice = parseInt(res.content);
             return res.author.id === msg.author.id &&
                 !isNaN(choice) &&
-                choice >= 0 &&
+                choice > 0 &&
                 choice < array.length + 1;
         };
 
