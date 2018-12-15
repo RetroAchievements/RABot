@@ -53,7 +53,7 @@ module.exports = class VGMapsCommand extends Command {
                         const value = sys.toLowerCase();
                         if(vgmapsConsole[value] || Object.keys(vgmapsConsole).find(key => vgmapsConsole[key].toLowerCase() === value))
                             return true;
-                        return 'Invalid console system, please enter a valid one.';
+                        return 'Invalid console system, please enter a valid one.\n**Options**: ${consoleList}.';
                     },
                     parse: sys => {
                         const value = sys.toLowerCase();
