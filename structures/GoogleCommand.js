@@ -23,7 +23,7 @@ class GoogleCommand extends Command {
             .then(res => res.text())
             .then(body => {
                 const $ = cheerio.load(body);
-                response = $('h3.r').toString().match(this.regex);
+                response = unescape( $('h3.r').toString().match(this.regex) );
                 response = response ? `https://${response}` : "Didn't find anything... :frowning:";
                 return sentMsg.edit(msg.author + ', ' + response);
             })
