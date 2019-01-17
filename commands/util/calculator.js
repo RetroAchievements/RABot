@@ -22,7 +22,7 @@ module.exports = class CalculatorCommand extends Command {
 
     run(msg, { expression }) {
         try {
-            return msg.reply('`' + mathjs.eval( expression ) + '`');
+            return msg.say('`' + expression + '` = `' + mathjs.eval( expression ) + '`');
         } catch (err) {
             return msg.reply(`Oh no, an error occurred: \`${err.message}\`! :frowning:`);
         }
