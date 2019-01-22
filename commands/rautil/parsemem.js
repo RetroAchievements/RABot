@@ -1,5 +1,7 @@
 const Command = require('../../structures/Command.js');
 
+const maxChars = 6;
+
 const specialFlags = {
     'r': 'ResetIf',
     'p': 'PauseIf',
@@ -35,15 +37,27 @@ const memTypes = {
     '' : ''
 };
 
-const operandRegex = '(d)?(' + Object.keys(memSize).join('|') + ')?([0-9a-f]*)';
-const memRegex = new RegExp('(?:([' + Object.keys(specialFlags).join('') + ']):)?' + operandRegex + '(<=|>=|<|>|=|!=)' + operandRegex + '(?:[(.](\\d+)[).])?', 'i');
+
+const operandRegex = 
+  '(d)?(' +
+  Object.keys(memSize).join('|') + 
+  ')?([0-9a-z]*)';
+
+const memRegex = new RegExp(
+  '(?:([' +
+  Object.keys(specialFlags).join('') +
+  ']):)?' +
+  operandRegex +
+  '(<=|>=|<|>|=|!=)' +
+  operandRegex +
+  '(?:[(.](\\d+)[).])?', 'i');
 
 
 module.exports = class ParseMemCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'parsemem',
-            aliases: ['pmem', 'mem'],
+            aliases: ['mem'],
             group: 'rautil',
             memberName: 'parsemem',
             description: 'Parse a "MemAddr" string and show the respective logic.',
@@ -74,7 +88,8 @@ module.exports = class ParseMemCommand extends Command {
     }
 
     parsemem( mem ) {
-        const groups = mem.split(/(?<!0x)S/);
+        // const groups = mem.split(/(?<!0x)S/); // <-- pure JavaScript doesn't support lookbehind RegEx
+        const groups = mem.split(/(^(?!0x$).).+S/); // https://stackoverflow.com/a/7376273/6354514
         let reqs;
         let parsedReq;
         let reqNum, flag, lType, lSize, lMemory, cmp, rType, rSize, rMemVal, hits;
@@ -103,12 +118,16 @@ module.exports = class ParseMemCommand extends Command {
                 rMemVal = parsedReq[8] || '';
                 hits =    parsedReq[9] || '0';
 
-                if( lSize == '' )
-                    lMemory = parseInt(lMemory).toString(16);
-                lMemory = '0x' + lMemory.padStart(6, '0');
-                if( rSize == '' )
-                    rMemVal = parseInt(rMemVal).toString(16);
-                rMemVal = '0x' + rMemVal.padStart(6, '0');
+                if( lSize == '' ) {
+                    num = parseInt(lMemory).toString(16);
+                    if(!isNaN(num)) lMemory = num;
+                }
+                lMemory = '0x' + lMemory.substring(0, maxChars+2).padStart(maxChars, '0');
+                if( rSize == '' ){
+                    num = parseInt(rMemVal).toString(16);
+                    if(!isNaN(num)) rMemVal = num;
+                }
+                rMemVal = '0x' + rMemVal.substring(0, maxChars+2).padStart(maxChars, '0');
 
                 if( lType !== 'd' )
                     lType = ( lSize == '' || lSize == 'h' ) ? 'v' : 'm';
