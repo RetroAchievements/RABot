@@ -2,14 +2,14 @@ const Command = require('../../structures/Command.js');
 
 const maxChars = 6;
 
-const finishleveln = '0xhlevel=N.1._0xhlevel=N+1_0xhlevel>d0xhlevel_R:0xhlevel<d0xhlevel';
+const finishleveln = '0xhlevel=n.1._0xhlevel=n+1_0xhlevel>d0xhlevel_R:0xhlevel<d0xhlevel';
 const templates = {
-  finishlevel: finishleveln,
-  finishlevelbeforetime: finishleveln + '_0xhtime>=T',
-  finishlevelnodeath: finishleveln + '_0xhscreen=LVLINTRO.1._R:0xhlife<d0xhlife',
-  finishlevelwithitem: finishleveln + '_0xhitem=TRUE',
-  collectitem: '0xhitem=FALSE.1._0xhitem=TRUE_R:0xhlevel!=0xhlevel',
-  changevalue: 'd:0xhaddress=v1.N._0xhaddress=v2.N._P:0xhaddress=0xhaddress'
+    finishlevel: finishleveln,
+    finishlevelbeforetime: finishleveln + '_0xhtime>=t',
+    finishlevelnodeath: finishleveln + '_0xhscreen=lvlintro.1._R:0xhlife<d0xhlife',
+    finishlevelwithitem: finishleveln + '_0xhitem=true',
+    collectitem: '0xhitem=false.1._0xhitem=true_R:0xhlevel!=0xhlevel',
+    changevalue: 'd:0xhaddress=v1.n._0xhaddress=v2.n._P:0xhaddress=0xhaddress'
 }
 
 const specialFlags = {
@@ -60,7 +60,9 @@ const memRegex = new RegExp(
   operandRegex +
   '(<=|>=|<|>|=|!=)' +
   operandRegex +
-  '(?:[(.]([0-9a-z]+)[).])?', 'i');
+  '(?:[(.]([0-9a-z]+)[).])?',
+  'i'
+);
 
 
 module.exports = class ParseMemCommand extends Command {
@@ -89,20 +91,28 @@ module.exports = class ParseMemCommand extends Command {
 
     run( msg, { mem } ) {
         let reply;
+        let memLowerCase = mem[0].toLowerCase();
+
         try {
-            reply = this.parsemem( mem.join(' ') );
+            if( memLowerCase === "templates" )
+                reply = '**Templates available**: `' + Object.keys(templates).join('`, `') + '`';
+            else if( Object.keys(templates).includes(mem[0].toLowerCase()) )
+                reply = this.parsemem( templates[mem[0].toLowerCase()] );
+            else
+                reply = this.parsemem( mem.join(' ') );
         } catch(error) {
-            reply = '**Whoops! Something went wrong!**\nCheck your MemAddr string and try again.'
+            reply = `**Whoops!**\n${error.message}\nCheck your MemAddr string and try again.`;
         }
         return msg.reply(reply);
     }
 
     parsemem( mem ) {
-        // const groups = mem.split(/(?<!0x)S/); // <-- pure JavaScript doesn't support lookbehind RegEx
-        const groups = mem.split(/(^(?!0x$).).+S/); // https://stackoverflow.com/a/7376273/6354514
+        const groups = mem.split(/(?<!0x)S/); // <-- pure JavaScript doesn't support lookbehind RegEx
+        //const groups = mem.split(/(^(?!0x$).).+S/); // https://stackoverflow.com/a/7376273/6354514
         let reqs;
         let parsedReq;
         let reqNum, flag, lType, lSize, lMemory, cmp, rType, rSize, rMemVal, hits;
+        let num;
         let countLines = 0;
         let res = '\n';
 
@@ -112,12 +122,15 @@ module.exports = class ParseMemCommand extends Command {
 
             reqs = groups[i].split('_');
             countLines += reqs.length;
-            if( countLines > 20 ) {
+            if( countLines > 20 )
                 return "I'm unable to handle this, it's TOO BIG!";
-            }
+
             for( let j = 0; j < reqs.length; j++ ) {
                 reqNum = j + 1;
                 parsedReq = reqs[j].match(memRegex);
+                if( !parsedReq )
+                    return `invalid "Mem" string: \`${mem}\`\n**Note**: strings for address/value should be lowercased`;
+
                 flag =    parsedReq[1] ? parsedReq[1].toLowerCase() : '';
                 lType =   parsedReq[2] ? parsedReq[2].toLowerCase() : '';
                 lSize =   parsedReq[3] ? parsedReq[3].toLowerCase() : '';
