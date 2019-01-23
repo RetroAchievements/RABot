@@ -41,7 +41,7 @@ const memTypes = {
 const operandRegex = 
   '(d)?(' +
   Object.keys(memSize).join('|') + 
-  ')?([0-9a-z]*)';
+  ')?([0-9a-z+-]*)';
 
 const memRegex = new RegExp(
   '(?:([' +
@@ -50,7 +50,7 @@ const memRegex = new RegExp(
   operandRegex +
   '(<=|>=|<|>|=|!=)' +
   operandRegex +
-  '(?:[(.](\\d+)[).])?', 'i');
+  '(?:[(.]([0-9a-z]+)[).])?', 'i');
 
 
 module.exports = class ParseMemCommand extends Command {
