@@ -2,6 +2,16 @@ const Command = require('../../structures/Command.js');
 
 const maxChars = 6;
 
+const finishleveln = '0xhlevel=N.1._0xhlevel=N+1_0xhlevel>d0xhlevel_R:0xhlevel<d0xhlevel';
+const templates = {
+  finishlevel: finishleveln,
+  finishlevelbeforetime: finishleveln + '_0xhtime>=T',
+  finishlevelnodeath: finishleveln + '_0xhscreen=LVLINTRO.1._R:0xhlife<d0xhlife',
+  finishlevelwithitem: finishleveln + '_0xhitem=TRUE',
+  collectitem: '0xhitem=FALSE.1._0xhitem=TRUE_R:0xhlevel!=0xhlevel',
+  changevalue: 'd:0xhaddress=v1.N._0xhaddress=v2.N._P:0xhaddress=0xhaddress'
+}
+
 const specialFlags = {
     'r': 'ResetIf',
     'p': 'PauseIf',
