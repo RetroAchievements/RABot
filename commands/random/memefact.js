@@ -1,6 +1,11 @@
-const RandomFactCommand = require('../../structures/RandomFactCommand.js');
+const Command = require('../../structures/Command.js');
+const { CHANNEL_MEME } = process.env;
+const { RichEmbed } = require('discord.js');
 
-module.exports = class MemeFactCommand extends RandomFactCommand {
+const maxMsgs = 50;
+
+
+module.exports = class MemeFactCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'memefact',
@@ -12,11 +17,34 @@ module.exports = class MemeFactCommand extends RandomFactCommand {
                 {
                     key: 'number',
                     prompt: '',
-                    type: 'string',
-                    default: '~NOARGS~'
+                    type: 'integer',
+                    default: '-1'
                 }
             ]
-        }, '../assets/json/memefacts.json' );
-
+        });
     }
+
+    async run(msg, { number }) {
+        const memeChannel = msg.guild.channels.get(CHANNEL_MEME);
+        if (!memeChannel)
+            return msg.channel.send('It appears that you do not have a meme-board channel.');
+
+        const memes = await memeChannel.fetchMessages({ limit: maxMsgs });
+        const count = memes.size;
+        if (count < 1)
+            return msg.reply(`It appears that there isn't any meme on the ${memeChannel}.`);
+
+        let originalMemeEmbed;
+        let memeEmbed;
+        if(number < 1 || number > count) {
+            originalMemeEmbed = memes.random().embeds[0];
+            memeEmbed = new RichEmbed(originalMemeEmbed).addField('-', `random meme | see more in ${memeChannel}`);
+        } else {
+            originalMemeEmbed = memes.array()[count-number].embeds[0];
+            memeEmbed = new RichEmbed(originalMemeEmbed).addField('-', `meme #${number} | see more in ${memeChannel}`);
+        }
+
+        return msg.embed(memeEmbed);
+    }
+
 };
