@@ -1,9 +1,8 @@
 // TODO: assure bot has permissions to manage messages in the meme-board channel
-const { CHANNEL_MEME, ROLE_MOD } = process.env;
+const { CHANNEL_MEME, ROLE_MOD, MAX_MEMES } = process.env;
 const { RichEmbed } = require('discord.js');
 
 const minimumReactions = 5;
-const maxMsgs = 100;
 
 const modEmoji = '🚫';
 const memoji = '🤖';
@@ -28,8 +27,8 @@ async function addMeme(reaction, user) {
     if (!memeChannel)
         return message.channel.send(`It appears that you do not have a meme-board channel.`); 
 
-    // fetch maxMsgs messages from the memeboard channel.
-    const fetch = await memeChannel.fetchMessages({ limit: maxMsgs }); 
+    // fetch MAX_MEMES messages from the memeboard channel.
+    const fetch = await memeChannel.fetchMessages({ limit: MAX_MEMES }); 
 
     // check the messages within the fetch object to see if the message
     // that was reacted to is already in the meme-board
@@ -119,7 +118,7 @@ async function removeMeme(reaction, user) {
     if (!memeChannel)
         return message.channel.send(`It appears that you do not have a meme-board channel.`); 
 
-    const fetchedMessages = await memeChannel.fetchMessages({ limit: maxMsgs });
+    const fetchedMessages = await memeChannel.fetchMessages({ limit: MAX_MEMES });
     const memes = fetchedMessages.find(m => m.embeds[0].footer.text.startsWith(memoji) && m.embeds[0].footer.text.endsWith(reaction.message.id));
     if (memes) {
         const memeCounter = memeRegex.exec(memes.embeds[0].footer.text);

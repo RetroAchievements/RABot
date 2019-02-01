@@ -1,8 +1,6 @@
 const Command = require('../../structures/Command.js');
-const { CHANNEL_MEME } = process.env;
+const { CHANNEL_MEME, MAX_MEMES } = process.env;
 const { RichEmbed } = require('discord.js');
-
-const maxMsgs = 50;
 
 
 module.exports = class MemeFactCommand extends Command {
@@ -29,7 +27,7 @@ module.exports = class MemeFactCommand extends Command {
         if (!memeChannel)
             return msg.channel.send('It appears that you do not have a meme-board channel.');
 
-        const memes = await memeChannel.fetchMessages({ limit: maxMsgs });
+        const memes = await memeChannel.fetchMessages({ limit: MAX_MEMES });
         const count = memes.size;
         if (count < 1)
             return msg.reply(`It appears that there isn't any meme on the ${memeChannel}.`);
