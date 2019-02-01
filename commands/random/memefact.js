@@ -11,6 +11,7 @@ module.exports = class MemeFactCommand extends Command {
             group: 'random',
             memberName: 'memefact',
             description: 'Responds with a RetroAchievements meme fact.',
+            guildOnly: true,
             args: [
                 {
                     key: 'number',
