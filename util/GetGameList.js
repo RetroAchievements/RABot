@@ -41,6 +41,8 @@ const consoles = {
     //29: "msx",
     //30: "commodore64",
     //31: "zx81",
+    44: "coleco",
+    47: "pc88",
     51: "atari7800",
 };
 
@@ -91,6 +93,12 @@ const consoleAliases = {
 
     virtualboy: consoles['28'],
     vb: consoles['28'],
+
+    coleco: consoles['44'],
+    colecovision: consoles['44'],
+
+    pc88: consoles['47'],
+    pc8800: consoles['47'],
 
     atari7800: consoles['51']
 };
