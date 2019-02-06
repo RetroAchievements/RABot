@@ -35,7 +35,7 @@ CONSOLE_NAME[19]=wii
 CONSOLE_NAME[20]=wiiu
 CONSOLE_NAME[21]=ps2
 CONSOLE_NAME[22]=xbox
-CONSOLE_NAME[23]=skynet
+CONSOLE_NAME[23]=events # not an actual console
 CONSOLE_NAME[24]=xone
 CONSOLE_NAME[25]=atari2600
 CONSOLE_NAME[26]=dos
@@ -44,9 +44,11 @@ CONSOLE_NAME[28]=virtualboy
 CONSOLE_NAME[29]=msx
 CONSOLE_NAME[30]=commodore64
 CONSOLE_NAME[31]=zx81
+CONSOLE_NAME[44]=coleco
+CONSOLE_NAME[47]=pc88
 CONSOLE_NAME[51]=atari7800
 
-SUPPORTED_SYSTEMS=(megadrive n64 snes gb gba gbc nes pcengine mastersystem atarilynx ngp gamegear atari2600 arcade virtualboy atari7800)
+SUPPORTED_SYSTEMS=(megadrive n64 snes gb gba gbc nes pcengine mastersystem atarilynx ngp gamegear atari2600 arcade virtualboy coleco pc88 atari7800)
 
 
 # functions ###################################################################
@@ -80,4 +82,3 @@ function main() {
 
 
 [[ "$0" == "$BASH_SOURCE" ]] && main "$@"
-
