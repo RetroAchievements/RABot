@@ -143,12 +143,12 @@ module.exports = class ParseMemCommand extends Command {
 
                 if( lSize == '' ) {
                     num = parseInt(lMemory).toString(16);
-                    if(!isNaN(num)) lMemory = num;
+                    if(!isNaN('0x' + num)) lMemory = num;
                 }
                 lMemory = '0x' + lMemory.substring(0, maxChars+2).padStart(maxChars, '0');
                 if( rSize == '' ){
                     num = parseInt(rMemVal).toString(16);
-                    if(!isNaN(num)) rMemVal = num;
+                    if(!isNaN('0x' + num)) rMemVal = num;
                 }
                 rMemVal = '0x' + rMemVal.substring(0, maxChars+2).padStart(maxChars, '0');
 
