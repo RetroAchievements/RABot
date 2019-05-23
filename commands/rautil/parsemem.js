@@ -18,6 +18,7 @@ const specialFlags = {
     'a': 'AddSource',
     'b': 'SubSource',
     'c': 'AddHits',
+    'n': 'AddNext',
     '' : ''
 };
 
@@ -42,6 +43,7 @@ const memSize = {
 
 const memTypes = {
     'd': 'Delta',
+    'p': 'Prior',
     'm': 'Mem',
     'v': 'Value',
     '' : ''
