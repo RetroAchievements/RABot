@@ -18,7 +18,7 @@ const specialFlags = {
     'a': 'AddSource',
     'b': 'SubSource',
     'c': 'AddHits',
-    'n': 'AddNext',
+    'n': 'AndNext',
     '' : ''
 };
 
