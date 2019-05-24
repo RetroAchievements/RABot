@@ -51,7 +51,7 @@ const memTypes = {
 
 
 const operandRegex = 
-  '(d)?(' +
+  '(d|p)?(' +
   Object.keys(memSize).join('|') + 
   ')?([0-9a-z+-]*)';
 
@@ -154,9 +154,9 @@ module.exports = class ParseMemCommand extends Command {
                 }
                 rMemVal = '0x' + rMemVal.substring(0, maxChars+2).padStart(maxChars, '0');
 
-                if( lType !== 'd' )
+                if( lType !== 'd' && lType !== 'p')
                     lType = ( lSize == '' || lSize == 'h' ) ? 'v' : 'm';
-                if( rType !== 'd' )
+                if( rType !== 'd' && rType !== 'p')
                     rType = ( rSize == '' || rSize == 'h' ) ? 'v' : 'm';
 
                 res += '\n' + reqNum.toString().padStart(2, ' ') + ':';
