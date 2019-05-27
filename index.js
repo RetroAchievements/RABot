@@ -5,7 +5,7 @@ const NEWS_ROLES = process.env.NEWS_ROLES.split(',');
 const Discord = require('discord.js');
 
 const responses = require('./assets/answers/responses.js');
-const checkFeed = require('./util/CheckFeed.js');
+//const checkFeed = require('./util/CheckFeed.js');
 const { getGameList } = require('./util/GetGameList.js');
 const { addMeme, removeMeme } = require('./util/MemeBoard.js');
 
@@ -47,7 +47,7 @@ client.once('ready', () => {
     client.user.setUsername(BOT_NAME || 'RABot');
     console.log(`[READY] Logged in as ${client.user.tag}! (${client.user.id})`);
     client.user.setActivity('if you need help', { type: 'WATCHING' });
-    checkFeed(client.channels);
+//    checkFeed(client.channels);
     getGameList();
 });
 
