@@ -19,6 +19,8 @@ const specialFlags = {
     'b': 'SubSource',
     'c': 'AddHits',
     'n': 'AndNext',
+    'm': 'Measured',
+    'i': 'AddAddress',
     '' : ''
 };
 
@@ -34,6 +36,7 @@ const memSize = {
     '0xl': 'Lower4',
     '0xu': 'Upper4',
     '0xh': '8-bit',
+    '0xw': '24-bit',
     '0xx': '32-bit', // needs to be before the 16bits below to make the RegEx work
     '0x ': '16-bit',
     '0x' : '16-bit',
