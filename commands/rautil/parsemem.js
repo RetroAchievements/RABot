@@ -134,7 +134,7 @@ module.exports = class ParseMemCommand extends Command {
                 reqNum = j + 1;
                 parsedReq = reqs[j].match(memRegex);
                 if( !parsedReq )
-                    return `invalid "Mem" string: \`${mem}\`\n**Note**: strings for address/value should be lowercased`;
+                    return `invalid "Mem" string: \`${mem}\`\nI've failed to parse this: \`${reqs[j]}\`\n**Note**: strings for address/value should be lowercased`;
 
                 flag =    parsedReq[1] ? parsedReq[1].toLowerCase() : '';
                 lType =   parsedReq[2] ? parsedReq[2].toLowerCase() : '';
