@@ -63,7 +63,7 @@ const memRegex = new RegExp(
   Object.keys(specialFlags).join('') +
   ']):)?' +
   operandRegex +
-  '(<=|>=|<|>|=|!=)' +
+  '(<=|>=|<|>|=|!=)?' +
   operandRegex +
   '(?:[(.]([0-9a-z]+)[).])?',
   'i'
@@ -140,7 +140,7 @@ module.exports = class ParseMemCommand extends Command {
                 lType =   parsedReq[2] ? parsedReq[2].toLowerCase() : '';
                 lSize =   parsedReq[3] ? parsedReq[3].toLowerCase() : '';
                 lMemory = parsedReq[4] || '';
-                cmp =     parsedReq[5] || '';
+                cmp =     parsedReq[5] || '=';
                 rType =   parsedReq[6] ? parsedReq[6].toLowerCase() : '';
                 rSize =   parsedReq[7] ? parsedReq[7].toLowerCase() : '';
                 rMemVal = parsedReq[8] || '';
