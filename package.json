@@ -25,10 +25,12 @@
         "uws": "^8.14.1",
         "youtube-search": "^1.1.4"
     },
-    "devDependencies": {},
+    "devDependencies": {
+        "nodemon": "^2.0.2"
+    },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev":"nodemon index.js"
+        "dev": "nodemon index.js"
     },
     "author": "luchaos",
     "license": "ISC"
