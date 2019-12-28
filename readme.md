@@ -24,9 +24,19 @@ $ npm i
 
 Set the `.env` file properly and then:
 
+#### Production
 ```
 $ node index.js
 ```
+
+#### Development
+
+To run the bot for development which includes hot-reload, please use the following command:
+
+```
+$ npm run dev
+```
+
 
 ### Inspiration
 
