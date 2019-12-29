@@ -3,13 +3,20 @@ const { BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE, BOT_NAME } = process.env;
 const NEWS_ROLES = process.env.NEWS_ROLES.split(',');
 
 const Discord = require('discord.js');
-
+const logger = require('pino')({
+    useLevelLabels:true,
+    timestamp:()=>{
+        return `,"time":"${new Date()}"`
+    }
+});
 const responses = require('./assets/answers/responses.js');
 //const checkFeed = require('./util/CheckFeed.js');
 const { getGameList } = require('./util/GetGameList.js');
 const { addMeme, removeMeme } = require('./util/MemeBoard.js');
 
-const regexRule2 = new RegExp('(' + require('./assets/json/badwordsRule2.json').join('|') + ')', 'i');
+const badwordsRule2JSON = require('./assets/json/badwordsRule2.json');
+
+const regexRule2 = new RegExp('(' + badwordsRule2JSON.join('|') + ')', 'i');
 const talkedRecently = new Set();
 
 const path = require('path');
@@ -45,26 +52,25 @@ client.registry
 
 client.once('ready', () => {
     client.user.setUsername(BOT_NAME || 'RABot');
-    console.log(`[READY] Logged in as ${client.user.tag}! (${client.user.id})`);
+    logger.info(`[READY] Logged in as ${client.user.tag}! (${client.user.id})`);
     client.user.setActivity('if you need help', { type: 'WATCHING' });
-//    checkFeed(client.channels);
     getGameList();
 });
 
-client.on('guildMemberAdd', member => member.setRoles(NEWS_ROLES).catch(console.error));
+client.on('guildMemberAdd', member => member.setRoles(NEWS_ROLES).catch(logger.error));
 
 client.on('disconnect', event => {
-    console.error(`[DISCONNECT] Disconnected with code ${event.code}.`);
+    logger.error(`[DISCONNECT] Disconnected with code ${event.code}.`);
     process.exit(0);
 });
 
-client.on('commandRun', command => console.log(`[COMMAND] Ran command ${command.groupID}:${command.memberName}.`));
+client.on('commandRun', command => logger.info(`[COMMAND] Ran command ${command.groupID}:${command.memberName}.`));
 
-client.on('error', err => console.error('[ERROR]', err));
+client.on('error', err => logger.error('[ERROR]', err));
 
-client.on('warn', err => console.warn('[WARNING]', err));
+client.on('warn', err => logger.warn('[WARNING]', err));
 
-client.on('commandError', (command, err) => console.error('[COMMAND ERROR]', command.name, err));
+client.on('commandError', (command, err) => logger.error('[COMMAND ERROR]', command.name, err));
 
 client.on('message', async (msg) => {
     if(msg.author.bot) return;
@@ -92,7 +98,7 @@ client.on('message', async (msg) => {
             await msg.react('2⃣');
         }
         catch (error) {
-            console.error('[ERROR] Failed to react with "RULE2".');
+            logger.error('[ERROR] Failed to react with "RULE2".');
         }
     }
 });
@@ -137,6 +143,6 @@ client.on('messageReactionRemove', (reaction, user) => removeMeme(reaction, user
 client.login(BOT_TOKEN);
 
 process.on('unhandledRejection', err => {
-    console.error('[FATAL] Unhandled Promise Rejection.', err);
+    logger.error('[FATAL] Unhandled Promise Rejection.', err);
     process.exit(1);
 });
