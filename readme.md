@@ -19,10 +19,11 @@ node.js
 $ npm i
 ```
 
-Fetch game lists
+Fetch game lists and add a badwords file
 
 ```
 $ bash util/getgamelist.sh
+$ echo "[]" > assets/json/badwordsRule2.json
 ```
 
 ### Run
