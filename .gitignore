@@ -1,7 +1,9 @@
+/assets/json/badwordsRule2.json
+/assets/json/gl-*
+/commands/tests
+/commands/.tests
 /node_modules
 /storage
 .env
 npm-debug.log
 settings.sqlite3
-/commands/tests
-/commands/.tests

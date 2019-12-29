@@ -19,6 +19,11 @@ node.js
 $ npm i
 ```
 
+Fetch game lists
+
+```
+$ bash util/getgamelist.sh
+```
 
 ### Run
 
