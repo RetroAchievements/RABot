@@ -66,11 +66,11 @@ client.on('disconnect', event => {
 
 client.on('commandRun', command => logger.info(`[COMMAND] Ran command ${command.groupID}:${command.memberName}.`));
 
-client.on('error', err => logger.error('[ERROR]', err));
+client.on('error', err => logger.error(err));
 
-client.on('warn', err => logger.warn('[WARNING]', err));
+client.on('warn', err => logger.warn(err));
 
-client.on('commandError', (command, err) => logger.error('[COMMAND ERROR]', command.name, err));
+client.on('commandError', (command, err) => logger.error({command:command.name, err}));
 
 client.on('message', async (msg) => {
     if(msg.author.bot) return;
@@ -143,6 +143,6 @@ client.on('messageReactionRemove', (reaction, user) => removeMeme(reaction, user
 client.login(BOT_TOKEN);
 
 process.on('unhandledRejection', err => {
-    logger.error('[FATAL] Unhandled Promise Rejection.', err);
+    logger.error(err);
     process.exit(1);
 });
