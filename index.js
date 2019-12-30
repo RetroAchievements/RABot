@@ -57,7 +57,7 @@ client.once('ready', () => {
     getGameList();
 });
 
-client.on('guildMemberAdd', member => member.setRoles(NEWS_ROLES).catch(logger.error));
+client.on('guildMemberAdd', member => member.setRoles(NEWS_ROLES).catch(err => {logger.error(err)}));
 
 client.on('disconnect', event => {
     logger.error(`[DISCONNECT] Disconnected with code ${event.code}.`);
@@ -98,7 +98,7 @@ client.on('message', async (msg) => {
             await msg.react('2⃣');
         }
         catch (error) {
-            logger.error('[ERROR] Failed to react with "RULE2".');
+            logger.error({error,msg:'[ERROR] Failed to react with "RULE2".'});
         }
     }
 });

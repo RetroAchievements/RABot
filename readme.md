@@ -6,21 +6,21 @@ The code is written in JavaScript and is powered by [discord.js library](https:/
 
 If you are used to those technologies and would like to contribute, PRs are welcome! 
 
-## Nerdy info
+## Documentation / FAQ 
 
-### Requirements
+### :memo: Requirements
 
-node.js
+- node.js
 
 
-### Install
-
+### Install:wrench::hammer: 
+To install the project run thefollowing command:
 ```
 $ npm i
 ```
 
 
-### Run
+### Run :computer:
 
 Set the `.env` file properly and then:
 
@@ -38,8 +38,8 @@ $ npm run dev
 ```
 
 
-### Inspiration
-
+### :books: Inspiration
 Many inspiration for RABot was obtained from the [Xiao bot's code](https://github.com/dragonfire535/xiao).
 
-
+***
+:information_source: For any issues please raise a [ticket](https://github.com/RetroAchievements/RABot/issues). 
