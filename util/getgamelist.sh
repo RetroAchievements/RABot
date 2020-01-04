@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # getgamelists.sh
 #################
 # Get the lists of all supported games, separated by console.
@@ -10,73 +10,142 @@ scriptdir="$(dirname "$0")"
 scriptdir="$(cd "$scriptdir" && pwd)"
 
 readonly url="https://retroachievements.org/dorequest.php?r=officialgameslist&c="
-readonly gl_path="${scriptdir}/../assets/json"
+readonly glPath="${scriptdir}/../assets/json"
 
-CONSOLE_NAME=()
-CONSOLE_NAME[1]=megadrive
-CONSOLE_NAME[2]=n64
-CONSOLE_NAME[3]=snes
-CONSOLE_NAME[4]=gb
-CONSOLE_NAME[5]=gba
-CONSOLE_NAME[6]=gbc
-CONSOLE_NAME[7]=nes
-CONSOLE_NAME[8]=pcengine
-CONSOLE_NAME[9]=segacd
-CONSOLE_NAME[10]=sega32x
-CONSOLE_NAME[11]=mastersystem
-CONSOLE_NAME[12]=psx
-CONSOLE_NAME[13]=atarilynx
-CONSOLE_NAME[14]=ngp
-CONSOLE_NAME[15]=gamegear
-CONSOLE_NAME[16]=gamecube
-CONSOLE_NAME[17]=jaguar
-CONSOLE_NAME[18]=nds
-CONSOLE_NAME[19]=wii
-CONSOLE_NAME[20]=wiiu
-CONSOLE_NAME[21]=ps2
-CONSOLE_NAME[22]=xbox
-CONSOLE_NAME[23]=events # not an actual console
-CONSOLE_NAME[24]=xone
-CONSOLE_NAME[25]=atari2600
-CONSOLE_NAME[26]=dos
-CONSOLE_NAME[27]=arcade
-CONSOLE_NAME[28]=virtualboy
-CONSOLE_NAME[29]=msx
-CONSOLE_NAME[30]=commodore64
-CONSOLE_NAME[31]=zx81
-CONSOLE_NAME[44]=coleco
-CONSOLE_NAME[47]=pc88
-CONSOLE_NAME[51]=atari7800
+# valid console IDs obtained from isValidConsoleId() function in
+# https://github.com/RetroAchievements/RAWeb/blob/develop/lib/database/release.php
+readonly validConsoleIds=(
+    1 # Mega Drive/Genesis
+    2 # Nintendo 64
+    3 # SNES
+    4 # Game Boy
+    5 # Game Boy Advance
+    6 # Game Boy Color
+    7 # NES
+    8 # PC Engine
+    9 # Sega CD
+    10 # Sega 32X
+    11 # Master System
+    12 # PlayStation
+    13 # Atari Lynx
+    14 # Neo Geo Pocket
+    15 # Game Gear
+    # 16 # GameCube
+    17 # Atari Jaguar
+    18 # Nintendo DS
+    # 19 # Wii
+    # 20 # Wii U
+    # 21 # PlayStation 2
+    # 22 # Xbox
+    # 23 # Unused
+    24 # Pokemon Mini
+    25 # Atari 2600
+    # 26 # DOS
+    27 # Arcade
+    28 # Virtual Boy
+    # 29 # MSX
+    # 30 # Commodore 64
+    # 31 # ZX81
+    # 32 # Oric
+    33 # SG-1000
+    # 34 # VIC-20
+    # 35 # Amiga
+    # 36 # Atari ST
+    # 37 # Amstrad CPC
+    38 # Apple II
+    39 # Sega Saturn
+    # 40 # Dreamcast
+    # 41 # PlayStation Portable
+    # 42 # Philips CD-i
+    # 43 # 3DO Interactive Multiplayer
+    44 # ColecoVision
+    # 45 # Intellivision
+    # 46 # Vectrex
+    47 # PC-8000/8800
+    # 48 # PC-9800
+    # 49 # PC-FX
+    # 50 # Atari 5200
+    51 # Atari 7800
+    # 52 # X68K
+    53 # WonderSwan
+    # 54 # Cassette Vision
+    # 55 # Super Cassette Vision
+    # 100 # Hubs (not an actual console)
+    # 101 # Events (not an actual console)
+)
 
-SUPPORTED_SYSTEMS=(megadrive n64 snes gb gba gbc nes pcengine mastersystem atarilynx ngp gamegear atari2600 arcade virtualboy coleco pc88 atari7800)
+readonly consoleNames=(
+    ZERO            # I know, it's an ugly (and shameless) workaround
+    megadrive       # 1 # Mega Drive/Genesis
+    n64             # 2 # Nintendo 64
+    snes            # 3 # SNES
+    gb              # 4 # Game Boy
+    gba             # 5 # Game Boy Advance
+    gbc             # 6 # Game Boy Color
+    nes             # 7 # NES
+    pcengine        # 8 # PC Engine
+    segacd          # 9 # Sega CD
+    sega32x         # 10 # Sega 32X
+    mastersystem    # 11 # Master System
+    psx             # 12 # PlayStation
+    atarilynx       # 13 # Atari Lynx
+    ngp             # 14 # Neo Geo Pocket
+    gamegear        # 15 # Game Gear
+    gamecube        # # 16 # GameCube
+    jaguar          # 17 # Atari Jaguar
+    nds             # 18 # Nintendo DS
+    wii             # # 19 # Wii
+    wiiu            # # 20 # Wii U
+    ps2             # # 21 # PlayStation 2
+    xbox            # # 22 # Xbox
+    UNUSED          # # 23 # Unused
+    pokemonmini     # 24 # Pokemon Mini
+    atari2600       # 25 # Atari 2600
+    dos             # # 26 # DOS
+    arcade          # 27 # Arcade
+    virtualboy      # 28 # Virtual Boy
+    msx             # # 29 # MSX
+    commodore       # # 30 # Commodore 64
+    zx81            # # 31 # ZX81
+    oric            # # 32 # Oric
+    sg100           # 33 # SG-1000
+    vic20           # # 34 # VIC-20
+    amiga           # # 35 # Amiga
+    atarist         # # 36 # Atari ST
+    amstradcpc      # # 37 # Amstrad CPC
+    apple2          # 38 # Apple II
+    saturn          # 39 # Sega Saturn
+    dreamcast       # # 40 # Dreamcast
+    psp             # # 41 # PlayStation Portable
+    philipscdi      # # 42 # Philips CD-i
+    3do             # # 43 # 3DO Interactive Multiplayer
+    coleco          # 44 # ColecoVision
+    intellivision   # # 45 # Intellivision
+    vectrex         # # 46 # Vectrex
+    pc88            # 47 # PC-8000/8800
+    pc98            # # 48 # PC-9800
+    pcfx            # # 49 # PC-FX
+    atari5200       # # 50 # Atari 5200
+    atari7800       # 51 # Atari 7800
+    x68k            # # 52 # X68K
+    wonderswan      # 53 # WonderSwan
+    cassettevision  # # 54 # Cassette Vision
+    scassettevision # # 55 # Super Cassette Vision
+)
 
 
 # functions ###################################################################
 
-function get_console_id() {
-    local i
-    local match="$1"
-
-    for i in "${!CONSOLE_NAME[@]}"; do
-        if [[ "${CONSOLE_NAME[i]}" == "$match" ]]; then
-            echo -n "$i"
-            return 0
-        fi
-    done
-    return 1
-}
-
-
 function main() {
-    local console
-    local console_id
+    local consoleId
+    local consoleName
     local tmp="$(mktemp)"
 
-    for console in "${SUPPORTED_SYSTEMS[@]}"; do
-        echo "[LOG] getting gamelist for $console"
-        console_id="$(get_console_id $console)" || continue
-        curl -s "${url}${console_id}" > "$tmp"
-        [[ -s "$tmp" ]] && mv "$tmp" "${gl_path}/gl-${CONSOLE_NAME[console_id]}.json"
+    for consoleId in "${validConsoleIds[@]}"; do
+        consoleName="${consoleNames[consoleId]}"
+        echo "[LOG] getting gamelist for $consoleName ($consoleId)"
+        curl -s "${url}${consoleId}" > "$tmp"
+        [[ -s "$tmp" ]] && mv "$tmp" "${glPath}/gl-${consoleName}.json"
     done
 }
 

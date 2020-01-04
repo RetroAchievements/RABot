@@ -18,22 +18,22 @@ const consoles = {
     6: "gbc",
     7: "nes",
     8: "pcengine",
-    //9: "segacd",
-    //10: "sega32x",
+    9: "segacd",
+    10: "sega32x",
     11: "mastersystem",
-    //12: "psx",
+    12: "psx",
     13: "atarilynx",
     14: "ngp",
     15: "gamegear",
     //16: "gamecube",
-    //17: "jaguar",
-    //18: "nds",
+    17: "jaguar",
+    18: "nds",
     //19: "wii",
     //20: "wiiu",
     //21: "ps2",
     //22: "xbox",
     //23: "skynet",
-    //24: "xone",
+    24: "pokemonmini",
     25: "atari2600",
     //26: "dos",
     27: "arcade",
@@ -41,66 +41,29 @@ const consoles = {
     //29: "msx",
     //30: "commodore64",
     //31: "zx81",
+    33: "sg100",
+    //34: // VIC-20
+    //35: // Amiga
+    //36: // Atari ST
+    //37: // Amstrad CPC
+    38: "apple2",
+    39: "saturn",
+    //40: // Dreamcast
+    //41: // PlayStation Portable
+    //42: // Philips CD-i
+    //43: // 3DO Interactive Multiplayer
     44: "coleco",
+    //45: // Intellivision
+    //46: // Vectrex
     47: "pc88",
+    //48: // PC-9800
+    //49: // PC-FX
+    //50: // Atari 5200
     51: "atari7800",
-};
-
-const consoleAliases = {
-    md: consoles['1'],
-    megadrive: consoles['1'],
-    genesis: consoles['1'],
-
-    n64: consoles['2'],
-
-    snes: consoles['3'],
-
-    gb: consoles['4'],
-    gameboy: consoles['4'],
-
-    gba: consoles['5'],
-    gameboyadvance: consoles['5'],
-
-    gbc: consoles['6'],
-    gameboycolor: consoles['6'],
-
-    nes: consoles['7'],
-
-    pcengine: consoles['8'],
-    tg16: consoles['8'],
-    turbografx: consoles['8'],
-    supergrafx: consoles['8'],
-
-    mastersystem: consoles['11'],
-    sms: consoles['11'],
-
-    atarilynx: consoles['13'],
-    lynx: consoles['13'],
-
-    ngp: consoles['14'],
-    ngpc: consoles['14'],
-    neogeopocket: consoles['14'],
-    neogeopocketcolor: consoles['14'],
-
-    gamegear: consoles['15'],
-    gg: consoles['15'],
-
-    atari2600: consoles['25'],
-    atari: consoles['25'],
-    vcs: consoles['25'],
-
-    arcade: consoles['27'],
-
-    virtualboy: consoles['28'],
-    vb: consoles['28'],
-
-    coleco: consoles['44'],
-    colecovision: consoles['44'],
-
-    pc88: consoles['47'],
-    pc8800: consoles['47'],
-
-    atari7800: consoles['51']
+    //52: // X68K
+    53: "wonderswan"
+    //54: // Cassette Vision
+    //55: // Super Cassette Vision
 };
 
 
@@ -147,7 +110,7 @@ function getGameList() {
 }
 
 module.exports.gamelist = gamelist;
-module.exports.consoleAliases = consoleAliases;
+module.exports.consoles = Object.values(consoles);
 module.exports.getGameList = getGameList;
 
 
