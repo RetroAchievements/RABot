@@ -83,8 +83,10 @@ module.exports = class AotwCommand extends Command {
 
                     return sentMsg.edit(response);
                 })
-            });
-        // TODO: I think I'm supposed to .catch() something here, no?
+            })
+        .catch(res => {
+            return sentMsg.edit('Ouch! :frowning2:\nAn error occurred:```' + res + '```Please, contact a @mod.');
+        });
     }
 
 };
