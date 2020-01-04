@@ -57,7 +57,14 @@ client.once('ready', () => {
     getGameList();
 });
 
-client.on('guildMemberAdd', member => member.setRoles(NEWS_ROLES).catch(err => {logger.error(err)}));
+client.on('guildMemberAdd', async (member) => {
+    await member.setRoles(NEWS_ROLES).catch(err => {logger.error(err)});
+    const message = `Hello ${member.displayName}. Welcome to RetroAchievemenets.org community. Please verify your account by sending a direct message to anyone of the @mod team and they will help you with the process`;
+    member.send(message).then((message)=>{
+        logger.info({msg:'Sent message',msgID:message.id})
+    }).catch(error => logger.error(error));
+    }
+);
 
 client.on('disconnect', event => {
     logger.error(`[DISCONNECT] Disconnected with code ${event.code}.`);
