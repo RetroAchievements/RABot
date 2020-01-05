@@ -1,5 +1,5 @@
 const Command = require('./Command.js');
-const { gamelist, consoleAliases } = require('../util/GetGameList.js');
+const { gamelist, consoles } = require('../util/GetGameList.js');
 
 module.exports = class RandomGameCommand extends Command {
     constructor(client, info) {
@@ -26,9 +26,9 @@ module.exports = class RandomGameCommand extends Command {
         let length;
 
         // if the search term is a console name, pick a random game from that console
-        if( consoleAliases.hasOwnProperty( term ) ) {
+        if( consoles.includes( term ) ) {
             const index = gamelist.index;
-            const consoleName = consoleAliases[ term ];
+            const consoleName = term;
             offset = index[ consoleName ][0];
             length = index[ consoleName ][1];
             games = gamelist.games.slice( offset, offset + length );
