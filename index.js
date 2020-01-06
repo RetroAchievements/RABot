@@ -59,7 +59,7 @@ client.once('ready', () => {
 
 client.on('guildMemberAdd', async (member) => {
     await member.setRoles(NEWS_ROLES).catch(err => logger.error(err));
-    const message = `Hello ${member.displayName}. Welcome to RetroAchievemenets Discord server. Please verify your account by sending a message to RAdmin on the website asking to be verified (once verified, you'll have access to more channels).\n<https://retroachievements.org/user/RAdmin>`;
+    const message = `Hello ${member.displayName}. Welcome to the RetroAchievements Discord server. Please verify your account by sending a message to RAdmin on the website asking to be verified (once verified, you'll have access to more channels).\nhttps://retroachievements.org/user/RAdmin`;
     member.send(message)
         .then(message => logger.info({msg: 'Sent message', msgID: message.id}))
         .catch(error => logger.error(error));
