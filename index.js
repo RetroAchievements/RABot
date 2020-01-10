@@ -89,7 +89,7 @@ client.on('message', async (msg) => {
     }
 
     // checking for Rule 2 badwords
-    if(content.length >= 7 && content.match(regexRule2)) {
+    if(regexRule2.length && content.length >= 7 && content.match(regexRule2)) {
         try {
             await msg.react('🇷');
             await msg.react('🇺');
