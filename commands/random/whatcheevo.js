@@ -48,8 +48,10 @@ module.exports = class WhatCheevoCommand extends RandomGameCommand {
                     response = cheevoUrl + cheevos[ Math.floor( Math.random() * cheevos.length ) ].ID;
 
                 return sentMsg.edit( response );
+            })
+            .catch(res => {
+                return sentMsg.edit('Ouch! :frowning2:\nAn error occurred:```' + res + '```Please, contact a @mod.');
             });
-
     }
 
 };

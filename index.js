@@ -57,7 +57,13 @@ client.once('ready', () => {
     getGameList();
 });
 
-client.on('guildMemberAdd', member => member.setRoles(NEWS_ROLES).catch(logger.error));
+client.on('guildMemberAdd', async (member) => {
+    await member.setRoles(NEWS_ROLES).catch(err => logger.error(err));
+    const message = `Hello ${member.displayName}. Welcome to the RetroAchievements Discord server. Please verify your account by sending a message to RAdmin on the website asking to be verified (once verified, you'll have access to more channels).\nhttps://retroachievements.org/user/RAdmin`;
+    member.send(message)
+        .then(message => logger.info({msg: 'Sent message', msgID: message.id}))
+        .catch(error => logger.error(error));
+});
 
 client.on('disconnect', event => {
     logger.error(`[DISCONNECT] Disconnected with code ${event.code}.`);
@@ -66,11 +72,11 @@ client.on('disconnect', event => {
 
 client.on('commandRun', command => logger.info(`[COMMAND] Ran command ${command.groupID}:${command.memberName}.`));
 
-client.on('error', err => logger.error('[ERROR]', err));
+client.on('error', err => logger.error(err));
 
-client.on('warn', err => logger.warn('[WARNING]', err));
+client.on('warn', err => logger.warn(err));
 
-client.on('commandError', (command, err) => logger.error('[COMMAND ERROR]', command.name, err));
+client.on('commandError', (command, err) => logger.error({command:command.name, err}));
 
 client.on('message', async (msg) => {
     if(msg.author.bot) return;
@@ -98,7 +104,7 @@ client.on('message', async (msg) => {
             await msg.react('2⃣');
         }
         catch (error) {
-            logger.error('[ERROR] Failed to react with "RULE2".');
+            logger.error({error,msg:'[ERROR] Failed to react with "RULE2".'});
         }
     }
 });
@@ -143,6 +149,6 @@ client.on('messageReactionRemove', (reaction, user) => removeMeme(reaction, user
 client.login(BOT_TOKEN);
 
 process.on('unhandledRejection', err => {
-    logger.error('[FATAL] Unhandled Promise Rejection.', err);
+    logger.error(err);
     process.exit(1);
 });
