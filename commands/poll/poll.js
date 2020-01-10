@@ -19,7 +19,7 @@ module.exports = class PollCommand extends Command {
                     type: 'string',
                     prompt: '',
                     validate: question => {
-                        if(question.length > 0 && question.length < 200) return true;
+                        if(question.length > 0 && question.length < 400) return true;
                         return 'Invalid question';
                     },
                 },
