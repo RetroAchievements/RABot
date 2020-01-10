@@ -1,6 +1,6 @@
 const Command = require('../../structures/Command.js');
 const fetch = require('node-fetch');
-const cheerio = require('cheerio');
+const {RA_USER, RA_WEB_API_KEY} = process.env;
 
 module.exports = class AotwCommand extends Command {
     constructor(client) {
@@ -39,52 +39,30 @@ module.exports = class AotwCommand extends Command {
         });
     }
 
-    async run(msg, { date }) {
-        const site = 'https://retroachievements.org';
+    async run(msg, {date}) {
         const max = 20;
-        const since = new Date(date);
-        let aotwUrl = site;
-
         const sentMsg = await msg.reply(':hourglass: Getting AotW info, please wait...');
-
-        fetch(site)
+        const apiUrl = 'https://retroachievements.org/API/API_GetAchievementOfTheWeek.php?z=' + RA_USER + '&y=' + RA_WEB_API_KEY;
+        fetch(apiUrl)
             .then(res => res.text())
-            .then(body => {
-                const $ = cheerio.load(body);
-                // XXX: not sure if it'll work with RAWeb v2
-                aotwUrl += $('#aotwbox').find('a').attr('href');
+            .then(res => {
+                const data = JSON.parse(res);
+                const achievement = data.Achievement;
+                const winners = data.Unlocks;
+                const aotwUrl = 'https://retroachievements.org/achievement/' + achievement.ID;
+                let response = `:trophy: __**Achievement of the Week**__ :trophy:\n${aotwUrl}`;
+                response += `\n\n**Recent Winners** (max ${max}):\n`
+                response += '```md\n';
+                for (let i = 1; i <= max && i < winners.length; i++) {
+                    response += `\n[${winners[i].DateAwarded}]`;
+                    response += `( ${winners[i].User} ) `;
+                    response += winners[i].HardcoreMode === '1' ? '<hardcore> +1' : '+0.5'
+                }
+                response += '\n```\n';
+                return sentMsg.edit(response)
             })
-            .then(() => {
-                fetch(aotwUrl)
-                .then(res => res.text())
-                .then(body => {
-                    const $ = cheerio.load(body);
-                    let winDate
-                    let response = `:trophy: __**Achievement of the Week**__ :trophy:\n${aotwUrl}`;
-                    response += `\n\n**Recent Winners** (max ${max}):\n`;
-                    response += '```md\n';
-
-                    const winners = $('#recentwinners').find('tr').map( (i, element) => ({
-                        user: $(element).find('td:nth-of-type(2)').text().trim(),
-                        hardcore: $(element).find('td:nth-of-type(3)').text().trim(),
-                        date: $(element).find('td:nth-of-type(4)').text().trim(),
-                    })).get();
-
-                    for(let i = 1; i <= max && i < winners.length; i++) {
-                        winDate = new Date(winners[i].date);
-                        if(!date || winDate - since < 0)
-                            break
-
-                        response += `\n[${winners[i].date}]`;
-                        response += `( ${winners[i].user} ) `;
-                        response += winners[i].hardcore.includes('ardcore') ? '<hardcore> +1' : '+0.5';
-                    }
-                    response += '\n```\n';
-
-                    return sentMsg.edit(response);
-                })
+            .catch(error => {
+                return sentMsg.delete()
             });
-        // TODO: I think I'm supposed to .catch() something here, no?
     }
-
 };
