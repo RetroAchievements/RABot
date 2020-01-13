@@ -53,7 +53,8 @@ module.exports = class AotwCommand extends Command {
                 let response = `:trophy: __**Achievement of the Week**__ :trophy:\n${aotwUrl}`;
                 response += `\n\n**Recent Winners** (max ${max}):\n`
                 response += '```md\n';
-                for (let i = 1; i <= max && i < winners.length; i++) {
+                winners.reverse();
+                for (let i = 0; i < max && i < winners.length; i++) {
                     response += `\n[${winners[i].DateAwarded}]`;
                     response += `( ${winners[i].User} ) `;
                     response += winners[i].HardcoreMode === '1' ? '<hardcore> +1' : '+0.5'
