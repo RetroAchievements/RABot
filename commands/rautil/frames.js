@@ -8,11 +8,11 @@ module.exports = class FramesCommand extends Command {
             memberName: 'frames',
             description: 'Says how many frames corresponds to a given amount of time or the vice-versa (see Examples below).',
             examples: [
-                '`frames 1h 5min 15s` - info for 1 hour, 5 minutes and 15 seconds considering 30 frames/second (default)',
-                '`frames 500ms 60fps` - info for 500 milliseconds, considering 60 frames/second',
+                '`frames 1h 5min 15s` - info for 1 hour, 5 minutes and 15 seconds considering 60 frames/second (default)',
+                '`frames 500ms 30fps` - info for 500 milliseconds, considering 30 frames/second',
                 '`frames 123.321min 25fps` - info for 123.321 minutes, considering 25 frames/second',
-                '`frames 40` - info for 40 frames, considering 30 frames/second (default)',
-                '`frames 123 60fps` - info for 123 frames, considering 60 frames/second',
+                '`frames 40` - info for 40 frames, considering 60 frames/second (default)',
+                '`frames 123 30fps` - info for 123 frames, considering 30 frames/second',
             ],
             args: [
                 {
@@ -47,7 +47,7 @@ module.exports = class FramesCommand extends Command {
         let fps, frames;
         let hours, minutes, seconds, milliseconds;
 
-        fps = parsedFps ? parseFloat(parsedFps[1]) : 30;
+        fps = parsedFps ? parseFloat(parsedFps[1]) : 60;
         hours        = parseFloat(parsedTime[2] || 0);
         minutes      = parseFloat(parsedTime[4] || 0);
         seconds      = parseFloat(parsedTime[6] || 0);
