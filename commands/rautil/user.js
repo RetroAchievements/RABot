@@ -28,8 +28,8 @@ module.exports = class User extends Command {
     }
 
     async run(msg, { username }) {
-        const u = process.env.USER;
-        const k = process.env.KEY;
+        const u = process.env.RA_USER;
+        const k = process.env.RA_WEB_API_KEY;
         const baseUrl = 'https://retroachievements.org/';
         const url = `${baseUrl}API/API_GetUserSummary.php?z=${u}&y=${k}&u=${username}`;
         await msg.reply(`:hourglass: Getting ${username} info, please wait...`);
@@ -66,7 +66,7 @@ module.exports = class User extends Command {
                             name: ":video_game: Last game played",
                             value: `Name: **${res.RecentlyPlayed[0].Title}**\n
                             Console: **${res.RecentlyPlayed[0].ConsoleName}**\n
-                            Date/Time: **${res.RecentlyPlayed[0].LastPlayed}**'`
+                            Date/Time: **${res.RecentlyPlayed[0].LastPlayed}**`
                           },
                     ],
                     timestamp: new Date(),
