@@ -37,6 +37,7 @@ module.exports = class User extends Command {
         fetch(url)
             .then(res => res.json())
             .then(res => {
+              console.log(res)
                 if(res.ID == null){ 
                   return msg.reply(`Couldn't find any user called ${username} on site. Please try again.`);
                 }
@@ -64,9 +65,9 @@ module.exports = class User extends Command {
                         },
                         {
                             name: ":video_game: Last game played",
-                            value: `Name: **${res.RecentlyPlayed[0].Title}**\n
-                            Console: **${res.RecentlyPlayed[0].ConsoleName}**\n
-                            Date/Time: **${res.RecentlyPlayed[0].LastPlayed}**`
+                            value: `Name: **${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].Title : ''}**\n
+                            Console: **${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].ConsoleName : ''}**\n
+                            Date/Time: **${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].LastPlayed: ''}**`
                           },
                     ],
                     timestamp: new Date(),
