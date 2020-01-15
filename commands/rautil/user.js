@@ -1,4 +1,5 @@
 const Command = require('../../structures/Command.js');
+const { RichEmbed } = require('discord.js');
 const fetch = require('node-fetch');
 
 module.exports = class User extends Command {
@@ -11,7 +12,7 @@ module.exports = class User extends Command {
             examples: ['`!user username`'],
             throttling: {
                 usages: 2,
-                duration: 120,
+                duration: 60,
             },
             argsPromptLimit: 0,
             args: [
@@ -32,54 +33,76 @@ module.exports = class User extends Command {
         const k = process.env.RA_WEB_API_KEY;
         const baseUrl = 'https://retroachievements.org/';
         const url = `${baseUrl}API/API_GetUserSummary.php?z=${u}&y=${k}&u=${username}`;
-        await msg.reply(`:hourglass: Getting ${username} info, please wait...`);
+        const sentMsg = await msg.reply(`:hourglass: Getting ${username} info, please wait...`);
+
+        // permissions magic numbers
+        // https://github.com/RetroAchievements/RAWeb/blob/develop/src/Permissions.php
+        const permissions = {
+            '-2': 'Spam',
+            '-1': 'Banned',
+            '0': 'Unregistered',
+            '1': 'Registered',
+            '2': 'SuperUser',
+            '3': 'Developer',
+            '4': 'Admin',
+            '5': 'Root'
+        }
 
         fetch(url)
             .then(res => res.json())
             .then(res => {
-              console.log(res)
                 if(res.ID == null){ 
-                  return msg.reply(`Couldn't find any user called ${username} on site. Please try again.`);
+                  return sentMsg.edit(`Couldn't find any user called **${username}** on site.`);
                 }
-                return msg.embed({
+
+                const embedFields = [
+                    {
+                      name:`:bust_in_silhouette: Member since`,
+                      value:`**${res.MemberSince}**`
+                    },
+                    {
+                      name:':trophy: Rank | Points',
+                      value:`Rank **${res.Rank}** | **${res.Points}** points`
+                    },
+                    {
+                        name: `:video_game: Last game played (${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].LastPlayed : ''})`,
+                        value: `**${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].Title : ''} (${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].ConsoleName : ''})**`
+                    },
+                    {
+                        name: `:clock4: Last seen in`,
+                        value: `**${res.RichPresenceMsg}**`
+                    },
+                ];
+
+                if (res.Motto) {
+                    embedFields.unshift({
+                        name: ':speech_balloon: Motto',
+                        value: `**${res.Motto}**`
+                    });
+                }
+
+                const richEmbed = new RichEmbed({
                     color: 3447003,
                     author: {
                       name: username,
                       icon_url: `${baseUrl}${res.UserPic}`
                     },
-                    title: `Profile stats for ${username}[${res.Permissions ? 'verified':'not verified'}] `,
+                    title: `Role: ${permissions[res.Permissions]}`,
                     url: `${baseUrl}user/${username}`,
-                    description: `:notepad_spiral: Users motto is '*${res.Motto}*'.`,
-                    fields: [
-                        {
-                          name:`${res.Status == 'Offline' ? ':red_circle:':':green_circle:'} Current status`,
-                          value:`User is **${res.Status}**.`
-                        },
-                        {
-                          name:`:watch: User registration on platform`,
-                          value:`**${res.MemberSince}**`
-                        },
-                        {
-                          name:':trophy: Rank / Points',
-                          value:`User is **${res.Rank}** rank and has **${res.Points}** points`
-                        },
-                        {
-                            name: ":video_game: Last game played",
-                            value: `Name: **${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].Title : ''}**\n
-                            Console: **${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].ConsoleName : ''}**\n
-                            Date/Time: **${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].LastPlayed: ''}**`
-                          },
-                    ],
-                    timestamp: new Date(),
+                    fields: embedFields,
+                    /*
                     footer: {
-                      text: 'More on https://retroacheivements.org'
+                      text: 'More on https://retroachievements.org'
                     },
+                    */
                     // in case there is a attachment needed uncomment the below line
                     // file:``
-                  })
+                });
+
+                return sentMsg.edit(richEmbed);
             })
         .catch(err => {
-            return msg.reply('Ouch! :frowning2:\nAn error occurred:```' + err + '```Please, contact a @mod.');
+            return sentMsg.edit('Ouch! :frowning2:\nAn error occurred:```' + err + '```Please, contact a @mod.');
         });
     }
 
