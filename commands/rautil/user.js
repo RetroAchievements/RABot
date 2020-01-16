@@ -20,6 +20,7 @@ module.exports = class User extends Command {
                     key: 'username',
                     type: 'string',
                     prompt: 'What user would you like to fetch?',
+                    default: '',
                     parse: username => {
                         return username.toLowerCase();
                     },
@@ -32,6 +33,11 @@ module.exports = class User extends Command {
         const u = process.env.RA_USER;
         const k = process.env.RA_WEB_API_KEY;
         const baseUrl = 'https://retroachievements.org/';
+
+        if(username === '') {
+            username = msg.member.nickname || msg.author.username
+        }
+
         const url = `${baseUrl}API/API_GetUserSummary.php?z=${u}&y=${k}&u=${username}`;
         const sentMsg = await msg.reply(`:hourglass: Getting ${username} info, please wait...`);
 
