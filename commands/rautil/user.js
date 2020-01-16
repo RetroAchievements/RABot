@@ -35,11 +35,11 @@ module.exports = class User extends Command {
         const baseUrl = 'https://retroachievements.org/';
 
         if(username === '') {
-            username = msg.member.nickname || msg.author.username
+            username = msg.member ? (msg.member.nickname || msg.author.username) : msg.author.username;
         }
 
         const url = `${baseUrl}API/API_GetUserSummary.php?z=${u}&y=${k}&u=${username}`;
-        const sentMsg = await msg.reply(`:hourglass: Getting ${username} info, please wait...`);
+        const sentMsg = await msg.reply(`:hourglass: Getting ${username}'s info, please wait...`);
 
         // permissions magic numbers
         // https://github.com/RetroAchievements/RAWeb/blob/develop/src/Permissions.php
@@ -61,55 +61,42 @@ module.exports = class User extends Command {
                   return sentMsg.edit(`Couldn't find any user called **${username}** on site.`);
                 }
 
-                const embedFields = [
-                    {
-                      name:`:bust_in_silhouette: Member since`,
-                      value:`**${res.MemberSince}**`
-                    },
-                    {
-                      name:':trophy: Rank | Points',
-                      value:`Rank **${res.Rank}** | **${res.Points}** points`
-                    },
-                    {
-                        name: `:video_game: Last game played (${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].LastPlayed : ''})`,
-                        value: `**${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].Title : ''} (${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].ConsoleName : ''})**`
-                    },
-                    {
-                        name: `:clock4: Last seen in`,
-                        value: `**${res.RichPresenceMsg}**`
-                    },
-                ];
+                const richEmbed = new RichEmbed()
+                    .setColor('#3498DB')
+                    .setTitle(`Role: ${permissions[res.Permissions]}`)
+                    .setURL(`${baseUrl}user/${username}`)
+                    .setAuthor(username, baseUrl + res.UserPic)
 
                 if (res.Motto) {
-                    embedFields.unshift({
-                        name: ':speech_balloon: Motto',
-                        value: `**${res.Motto}**`
-                    });
+                   richEmbed.addField(':speech_balloon: Motto', `**${res.Motto}**`);
                 }
 
-                const richEmbed = new RichEmbed({
-                    color: 3447003,
-                    author: {
-                      name: username,
-                      icon_url: `${baseUrl}${res.UserPic}`
-                    },
-                    title: `Role: ${permissions[res.Permissions]}`,
-                    url: `${baseUrl}user/${username}`,
-                    fields: embedFields,
-                    /*
-                    footer: {
-                      text: 'More on https://retroachievements.org'
-                    },
-                    */
-                    // in case there is a attachment needed uncomment the below line
-                    // file:``
-                });
+                richEmbed
+                    .addField(
+                        ':bust_in_silhouette: Member since',
+                        `**${res.MemberSince}**`
+                    )
+                    .addField(
+                        ':trophy: Rank | Points',
+                        `Rank **${res.Rank}** | **${res.Points}** points`
+                    )
+                    .addField(
+                        `:video_game: Last game played (${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].LastPlayed : ''})`,
+                        `**${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].Title : ''} (${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].ConsoleName : ''})**`
+                    )
+
+                if (res.RichPresenceMsg && res.LastGame) {
+                    richEmbed.addField(
+                        ':clock4: Last seen in',
+                        `**${res.LastGame.Title} (${res.LastGame.ConsoleName})**:\n${res.RichPresenceMsg}`
+                    )
+                }
 
                 return sentMsg.edit(richEmbed);
             })
-        .catch(err => {
-            return sentMsg.edit('Ouch! :frowning2:\nAn error occurred:```' + err + '```Please, contact a @mod.');
-        });
+            .catch(err => {
+                return sentMsg.edit('Ouch! An error occurred! :frowning2:\nPlease, contact a @mod.');
+            });
     }
 
 };
