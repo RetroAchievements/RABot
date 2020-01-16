@@ -51,7 +51,7 @@ module.exports = class AotwCommand extends Command {
                 const winners = data.Unlocks;
                 const aotwUrl = 'https://retroachievements.org/achievement/' + achievement.ID;
                 let response = `:trophy: __**Achievement of the Week**__ :trophy:\n${aotwUrl}`;
-                response += `\n\n**Recent Winners** (max ${max}):\n`
+                response += `\n\n**Recent Winners** (max ${max}, UTC time):\n`
                 response += '```md\n';
                 winners.reverse();
                 for (let i = 0; i < max && i < winners.length; i++) {
