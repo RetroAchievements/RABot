@@ -35,11 +35,11 @@ module.exports = class User extends Command {
         const baseUrl = 'https://retroachievements.org/';
 
         if(username === '') {
-            username = msg.member.nickname || msg.author.username
+            username = msg.member ? (msg.member.nickname || msg.author.username) : msg.author.username;
         }
 
         const url = `${baseUrl}API/API_GetUserSummary.php?z=${u}&y=${k}&u=${username}`;
-        const sentMsg = await msg.reply(`:hourglass: Getting ${username} info, please wait...`);
+        const sentMsg = await msg.reply(`:hourglass: Getting ${username}'s info, please wait...`);
 
         // permissions magic numbers
         // https://github.com/RetroAchievements/RAWeb/blob/develop/src/Permissions.php
@@ -84,16 +84,19 @@ module.exports = class User extends Command {
                         `:video_game: Last game played (${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].LastPlayed : ''})`,
                         `**${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].Title : ''} (${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].ConsoleName : ''})**`
                     )
-                    .addField(
+
+                if (res.RichPresenceMsg && res.LastGame) {
+                    richEmbed.addField(
                         ':clock4: Last seen in',
-                        `**${res.RichPresenceMsg}**`
+                        `**${res.LastGame.Title} (${res.LastGame.ConsoleName})**:\n${res.RichPresenceMsg}`
                     )
+                }
 
                 return sentMsg.edit(richEmbed);
             })
-        .catch(err => {
-            return sentMsg.edit('Ouch! An error occurred! :frowning2:\nPlease, contact a @mod.');
-        });
+            .catch(err => {
+                return sentMsg.edit('Ouch! An error occurred! :frowning2:\nPlease, contact a @mod.');
+            });
     }
 
 };
