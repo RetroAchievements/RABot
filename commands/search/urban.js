@@ -45,7 +45,7 @@ module.exports = class UrbanCommand extends Command {
                 .setURL(data.permalink)
                 .setTitle(data.word)
                 .setDescription(shorten(data.definition.replace(/\[|\]/g, '')))
-                .setFooter(`?? ${data.thumbs_up} ?? ${data.thumbs_down}`)
+                .setFooter(`👍 ${data.thumbs_up} 👎 ${data.thumbs_down}`)
                 .setTimestamp(new Date(data.written_on))
                 .addField('Example', data.example ? shorten(data.example.replace(/\[|\]/g, ''), 1000) : 'None');
             return sentMsg.edit(response);
