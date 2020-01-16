@@ -14,32 +14,10 @@ module.exports = class AotwCommand extends Command {
                 usages: 2,
                 duration: 120,
             },
-            argsPromptLimit: 0,
-            args: [
-                {
-                    key: 'date',
-                    type: 'string',
-                    prompt: '',
-                    default: '0',
-                    validate: date => {
-                        const errMsg = '**Invalid date!**\n'
-                        const myDate = new Date(date);
-
-                        // is it a valid date?
-                        if(myDate instanceof Date && !isNaN(myDate)) {
-                            // future?
-                            if(Date.now() - myDate > 0)
-                                return true;
-                            return `${errMsg}It must be something before now.`;
-                        }
-                        return `${errMsg}Try something like \`2018-06-27\`.`
-                    }, // end of validate
-                },
-            ], // end of list of args
         });
     }
 
-    async run(msg, {date}) {
+    async run(msg) {
         const max = 20;
         const sentMsg = await msg.reply(':hourglass: Getting AotW info, please wait...');
         const apiUrl = 'https://retroachievements.org/API/API_GetAchievementOfTheWeek.php?z=' + RA_USER + '&y=' + RA_WEB_API_KEY;
