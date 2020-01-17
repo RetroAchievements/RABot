@@ -32,15 +32,23 @@ async function addMeme(reaction, user) {
 
     // check the messages within the fetch object to see if the message
     // that was reacted to is already in the meme-board
-    const memes = fetch.find(m => m.embeds[0].footer.text.startsWith(memoji) && m.embeds[0].footer.text.endsWith(message.id)); 
+    const memes = fetch.find(m => {
+        m.embeds[0] &&
+            m.embeds[0].footer &&
+            m.embeds[0].footer.text.startsWith(memoji) &&
+            m.embeds[0].footer.text.endsWith(message.id);
+    });
 
     // if the message is found within the memeboard.
     if (memes) {
         // fetch the ID of the message already on the memeboard.
         const memeMsg = await memeChannel.fetchMessage(memes.id);
 
-        if(deleteMsg)
-            return memeMsg.delete(1000);
+        if(deleteMsg) {
+            return memeMsg.delete(1000)
+                .then(msg => logger.info('Deleted a meme entry'))
+                .catch(logger.error);
+        }
 
         const memeCounter = memeRegex.exec(memes.embeds[0].footer.text);
 
@@ -119,7 +127,13 @@ async function removeMeme(reaction, user) {
         return message.channel.send(`It appears that you do not have a meme-board channel.`); 
 
     const fetchedMessages = await memeChannel.fetchMessages({ limit: MAX_MEMES });
-    const memes = fetchedMessages.find(m => m.embeds[0].footer.text.startsWith(memoji) && m.embeds[0].footer.text.endsWith(reaction.message.id));
+    const memes = fetchedMessages.find(
+        m =>
+            typeof m.embeds[0] &&
+            m.embeds[0].footer &&
+            m.embeds[0].footer.text.startsWith(memoji) &&
+            m.embeds[0].footer.text.endsWith(reaction.message.id)
+    );
     if (memes) {
         const memeCounter = memeRegex.exec(memes.embeds[0].footer.text);
         const foundMeme = memes.embeds[0];
