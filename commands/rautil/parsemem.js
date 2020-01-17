@@ -1,4 +1,5 @@
 const Command = require("../../structures/Command.js");
+const fetch = require("node-fetch");
 
 const maxChars = 6;
 
@@ -94,17 +95,34 @@ module.exports = class ParseMemCommand extends Command {
         });
     }
 
-    run( msg, { mem } ) {
+    async run( msg, { mem } ) {
+        // group2: achievementId
+        const achievementUrlRegex = /^<?(https?:\/\/)?retroachievements\.org\/achievement\/([0-9]+)>?$/i;
+
         let reply;
         let memLowerCase = mem[0].toLowerCase();
+        let achievementId;
 
         try {
-            if( memLowerCase === "templates" )
+            if( achievementId = memLowerCase.match(achievementUrlRegex) ) {
+                achievementId = parseInt(achievementId[2]);
+                const sentMsg = await msg.reply(`:hourglass: Getting MemAddr for achievement ID **${achievementId}**, please wait...`);
+
+                let memAddr = await this.getMemAddr(achievementId);
+
+                if( memAddr ) {
+                    reply = this.parsemem( memAddr );
+                } else {
+                    reply = `**Whoops!**\nI didn't find the MemAddr for achievement ID **${achievementId}**.`;
+                }
+                return sentMsg.edit(reply);
+            } else if( memLowerCase === "templates" ) {
                 reply = "**Templates available**: `" + Object.keys(templates).join("`, `") + "`";
-            else if( Object.keys(templates).includes(mem[0].toLowerCase()) )
+            } else if( Object.keys(templates).includes(mem[0].toLowerCase()) ) {
                 reply = this.parsemem( templates[mem[0].toLowerCase()] );
-            else
+            } else {
                 reply = this.parsemem( mem.join(" ") );
+            }
         } catch(error) {
             reply = `**Whoops!**\n${error.message}\nCheck your MemAddr string and try again.`;
         }
@@ -176,10 +194,42 @@ module.exports = class ParseMemCommand extends Command {
                     res += rMemVal + " ";
                     res += " (" + hits + ")";
                 }
-            }
+            } // end of for looping through requirements in a group
             res += "```";
-        }
+        } // end of for looping through groups in an achievement
         return res;
     }
 
+
+    async getMemAddr( achievementId ) {
+        if( achievementId <= 0 ) {
+            return false;
+        }
+
+        let gameId;
+        let memAddr;
+        const raUser = process.env.RA_USER;
+        const apiKey = process.env.RA_WEB_API_KEY;
+        const raToken = process.env.RA_TOKEN;
+        const baseUrl = "https://retroachievements.org/";
+
+        const achievementUnlocksUrl = `${baseUrl}API/API_GetAchievementUnlocks.php?z=${raUser}&y=${apiKey}&a=${achievementId}`;
+        await fetch(achievementUnlocksUrl)
+            .then(res => res.json())
+            .then(res => {
+                gameId = parseInt(res.Game.ID);
+                if(gameId <= 0) {
+                    return false;
+                }
+            })
+            .catch(err => false);
+
+        const dorequestPatchUrl = `${baseUrl}dorequest.php?r=patch&g=${gameId}&u=${raUser}&t=${raToken}`;
+        await fetch(dorequestPatchUrl)
+            .then(res => res.json())
+            .then(res => memAddr = res.PatchData.Achievements.find(ach => ach.ID == achievementId).MemAddr)
+            .catch(err => false);
+
+        return memAddr;
+    }
 };

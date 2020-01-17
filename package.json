@@ -35,7 +35,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "dev": "nodemon index.js",
-        "pretest": "eslint --ignore-path .gitignore ."
+        "linter": "eslint --ignore-path .gitignore ."
     },
     "author": "luchaos",
     "license": "ISC"
