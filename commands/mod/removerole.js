@@ -33,8 +33,13 @@ module.exports = class PruneCommand extends Command {
   }
 
   async run(msg, { role, user }) {
+    
+    const HIGER_ORDER_ROLES=['mod','staff','patron','admin'];
+
     const allowedMember = msg.guild.members.get(user.id).permissions.has('MANAGE_ROLES');
-    if (allowedMember) {
+
+    // just a double check to besure that not all mods can be removed
+    if (allowedMember && !HIGER_ORDER_ROLES.includes(role.name)) {
       const { guild } = msg;
       const guildRole = guild.roles.find((r) => r.name == role.name);
       const guildMember = guild.members.find((u) => u.id == user.id);
