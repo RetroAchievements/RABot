@@ -47,6 +47,8 @@ $ npm run dev
 
 To have a consistent style of code eslint is used to provide the necessary cehckups for code style rules.
 
+The code follows [Airbnb](https://github.com/airbnb/javascript) Coding style
+
 To run the linter use `npm run linter` command. If there are any errors you can use mostly use `npm run linter -- --fix` command to auto-fix your code.
 
 ### :books: Inspiration
