@@ -3,6 +3,8 @@ const { RichEmbed } = require('discord.js');
 const fetch = require('node-fetch');
 const { RA_USER, RA_TOKEN, RA_WEB_API_KEY, CHANNEL_DEV_CHANNELS } = process.env;
 
+const devChannels = process.env.CHANNEL_DEV_CHANNELS.split(',');
+
 const baseUrl = 'https://retroachievements.org/'
 
 const maxChars = 6;
@@ -122,12 +124,18 @@ module.exports = class ParseMemCommand extends Command {
                 }
 
                 const memAddr = await this.getMemAddr(gameId, achievementId);
-
-                if (memAddr) {
-                    reply = this.parsemem(memAddr);
-                } else {
-                    reply = `**Whoops!**\nI didn't find the MemAddr for achievement ID **${achievementId}**.`;
+                if (!memAddr) {
+                    return sentMsg.edit(`**Whoops!**\nI didn't find the MemAddr for achievement ID **${achievementId}**.`);
                 }
+
+                const addresses = [];
+                reply = await this.parsemem(memAddr, addresses);
+
+                if (addresses.length > 0 && devChannels.includes(msg.channel.id)) {
+                    const codeNotesEmbed = await this.getCodeNotesEmbed(gameId, addresses);
+                    return sentMsg.edit(reply, codeNotesEmbed);
+                }
+
                 return sentMsg.edit(reply);
             } else if( memLowerCase === "templates" ) {
                 reply = '**Templates available**: `' + Object.keys(templates).join('`, `') + '`';
@@ -142,7 +150,8 @@ module.exports = class ParseMemCommand extends Command {
         return msg.reply(reply);
     }
 
-    parsemem( mem ) {
+    async parsemem(mem, addresses) {
+        const collectAddresses = Array.isArray(addresses);
         const groups = mem.split(/(?<!0x)S/); // <-- pure JavaScript doesn't support lookbehind RegEx
         //const groups = mem.split(/(^(?!0x$).).+S/); // https://stackoverflow.com/a/7376273/6354514
         let reqs;
@@ -207,6 +216,15 @@ module.exports = class ParseMemCommand extends Command {
                     res += rMemVal + ' ';
                     res += ' (' + hits + ')';
                 }
+
+                if (collectAddresses) {
+                    if (lType && lType != 'v' && !addresses.includes(lMemory)) {
+                        addresses.push(lMemory);
+                    }
+                    if (lType && rType != 'v' && !addresses.includes(rMemory)) {
+                        addresses.push(rMemory);
+                    }
+                }
             } // end of for looping through requirements in a group
             res += '```';
         } // end of for looping through groups in an achievement
@@ -230,5 +248,37 @@ module.exports = class ParseMemCommand extends Command {
             .then(res => res.json())
             .then(res => res.PatchData.Achievements.find(ach => ach.ID == achievementId).MemAddr)
             .catch(err => null);
+    }
+
+
+    async getCodeNotes(gameId) {
+        const dorequestCodeNotesUrl = `${baseUrl}dorequest.php?r=codenotes2&g=${gameId}&u=${RA_USER}&t=${RA_TOKEN}`;
+        return await fetch(dorequestCodeNotesUrl)
+            .then(res => res.json())
+            .then(res => res.CodeNotes)
+            .catch(err => null);
+    }
+
+
+    async getCodeNotesEmbed(gameId, addresses) {
+        let hasNote = false;
+        const codeNotes = await this.getCodeNotes(gameId);
+        const codeNotesEmbed = new RichEmbed()
+            .setColor('#3498DB')
+            .setTitle('Code Notes')
+            .setURL(`${baseUrl}codenotes.php?g=${gameId}`);
+
+        try {
+            addresses.forEach(addr => {
+                const codeNote = codeNotes.find(note => note.Address == addr);
+                if (codeNote) {
+                    hasNote = true;
+                    codeNotesEmbed.addField(`**${addr}**`, codeNote.Note, true);
+                }
+            });
+            return hasNote ? codeNotesEmbed : undefined;
+        } catch(err) {
+            return undefined;
+        }
     }
 }
