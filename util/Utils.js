@@ -67,7 +67,8 @@ module.exports = class Utils {
     const regex = /retroachievements\.org\/game\/([0-9]+)/i;
     const site = 'retroachievements.org/game';
     let searchURL = `https://www.google.com/search?q=site:${site}`;
-    const parseGameUrl, gameid;
+    const parseGameUrl ='',
+    gameid ='';
 
     terms.forEach((term) => {
       return searchURL += `+${term}`
