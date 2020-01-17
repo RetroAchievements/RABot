@@ -43,7 +43,7 @@ To run the bot for development which includes hot-reload, please use the followi
 $ npm run dev
 ```
 
-## Code style and linting 
+## :bamboo: Code style and linting 
 
 To have a consistent style of code eslint is used to provide the necessary cehckups for code style rules.
 
