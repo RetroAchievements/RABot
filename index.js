@@ -1,84 +1,84 @@
-require('dotenv').config({path: __dirname + '/.env'});
+require("dotenv").config({path: __dirname + "/.env"});
 const { BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE, BOT_NAME } = process.env;
-const NEWS_ROLES = process.env.NEWS_ROLES.split(',');
+const NEWS_ROLES = process.env.NEWS_ROLES.split(",");
 
-const Discord = require('discord.js');
-const logger = require('pino')({
+const Discord = require("discord.js");
+const logger = require("pino")({
     useLevelLabels:true,
     timestamp:()=>{
-        return `,"time":"${new Date()}"`
+        return `,"time":"${new Date()}"`;
     }
 });
-const responses = require('./assets/answers/responses.js');
+const responses = require("./assets/answers/responses.js");
 //const checkFeed = require('./util/CheckFeed.js');
-const { getGameList } = require('./util/GetGameList.js');
-const { addMeme, removeMeme } = require('./util/MemeBoard.js');
+const { getGameList } = require("./util/GetGameList.js");
+const { addMeme, removeMeme } = require("./util/MemeBoard.js");
 
-const badwordsRule2JSON = require('./assets/json/badwordsRule2.json');
+const badwordsRule2JSON = require("./assets/json/badwordsRule2.json");
 
-const regexRule2 = new RegExp('(' + badwordsRule2JSON.join('|') + ')', 'i');
+const regexRule2 = new RegExp("(" + badwordsRule2JSON.join("|") + ")", "i");
 const talkedRecently = new Set();
 
-const path = require('path');
-const { CommandoClient } = require('discord.js-commando');
+const path = require("path");
+const { CommandoClient } = require("discord.js-commando");
 const client = new CommandoClient({
     commandPrefix: BOT_PREFIX,
-    owner: OWNERS.split(','),
+    owner: OWNERS.split(","),
     invite: INVITE,
     disableEveryone: true,
     unknownCommandResponse: false,
-    disabledEvents: ['TYPING_START']
+    disabledEvents: ["TYPING_START"]
 });
 
 client.registry
     .registerDefaultTypes()
     .registerGroups([
-        ['util', 'Utilities'],
-        ['helper', 'Helping you to help others'],
-        ['single', 'Single (and simple) commands'],
-        ['poll', 'Commands for polls'],
-        ['rautil', 'RetroAchievements utilities'],
-        ['search', 'Search for things'],
-        ['mod', 'Moderation utilities'],
-        ['random', 'Random stuff'],
-        ['games', 'Play some games with the bot'],
+        ["util", "Utilities"],
+        ["helper", "Helping you to help others"],
+        ["single", "Single (and simple) commands"],
+        ["poll", "Commands for polls"],
+        ["rautil", "RetroAchievements utilities"],
+        ["search", "Search for things"],
+        ["mod", "Moderation utilities"],
+        ["random", "Random stuff"],
+        ["games", "Play some games with the bot"],
     ])
     .registerDefaultCommands({
         ping: false,
         prefix: false,
         commandState: false
     })
-    .registerCommandsIn(path.join(__dirname, 'commands'));
+    .registerCommandsIn(path.join(__dirname, "commands"));
 
-client.once('ready', () => {
-    client.user.setUsername(BOT_NAME || 'RABot');
+client.once("ready", () => {
+    client.user.setUsername(BOT_NAME || "RABot");
     logger.info(`[READY] Logged in as ${client.user.tag}! (${client.user.id})`);
-    client.user.setActivity('if you need help', { type: 'WATCHING' });
+    client.user.setActivity("if you need help", { type: "WATCHING" });
     getGameList();
 });
 
-client.on('guildMemberAdd', async (member) => {
+client.on("guildMemberAdd", async (member) => {
     await member.setRoles(NEWS_ROLES).catch(err => logger.error(err));
     const message = `Hello ${member.displayName}. Welcome to the RetroAchievements Discord server. Please verify your account by sending a message to RAdmin on the website asking to be verified (once verified, you'll have access to more channels).\nhttps://retroachievements.org/user/RAdmin`;
     member.send(message)
-        .then(message => logger.info({msg: 'Sent message', msgID: message.id}))
+        .then(message => logger.info({msg: "Sent message", msgID: message.id}))
         .catch(error => logger.error(error));
 });
 
-client.on('disconnect', event => {
+client.on("disconnect", event => {
     logger.error(`[DISCONNECT] Disconnected with code ${event.code}.`);
     process.exit(0);
 });
 
-client.on('commandRun', command => logger.info(`[COMMAND] Ran command ${command.groupID}:${command.memberName}.`));
+client.on("commandRun", command => logger.info(`[COMMAND] Ran command ${command.groupID}:${command.memberName}.`));
 
-client.on('error', err => logger.error(err));
+client.on("error", err => logger.error(err));
 
-client.on('warn', err => logger.warn(err));
+client.on("warn", err => logger.warn(err));
 
-client.on('commandError', (command, err) => logger.error({command:command.name, err}));
+client.on("commandError", (command, err) => logger.error({command:command.name, err}));
 
-client.on('message', async (msg) => {
+client.on("message", async (msg) => {
     if(msg.author.bot) return;
     if(msg.content.length <= 3) return;
 
@@ -97,14 +97,14 @@ client.on('message', async (msg) => {
     // checking for Rule 2 badwords
     if(regexRule2.length && content.length >= 7 && content.match(regexRule2)) {
         try {
-            await msg.react('🇷');
-            await msg.react('🇺');
-            await msg.react('🇱');
-            await msg.react('🇪');
-            await msg.react('2⃣');
+            await msg.react("🇷");
+            await msg.react("🇺");
+            await msg.react("🇱");
+            await msg.react("🇪");
+            await msg.react("2⃣");
         }
         catch (error) {
-            logger.error({error,msg:'[ERROR] Failed to react with "RULE2".'});
+            logger.error({error,msg:"[ERROR] Failed to react with \"RULE2\"."});
         }
     }
 });
@@ -115,11 +115,11 @@ client.on('message', async (msg) => {
 // https://discordjs.guide/popular-topics/reactions.html#listening-for-reactions-on-old-messages
 // --- START OF THE WORKAROUND ---
 const events = {
-    MESSAGE_REACTION_ADD: 'messageReactionAdd',
-    MESSAGE_REACTION_REMOVE: 'messageReactionRemove',
+    MESSAGE_REACTION_ADD: "messageReactionAdd",
+    MESSAGE_REACTION_REMOVE: "messageReactionRemove",
 };
 
-client.on('raw', async event => {
+client.on("raw", async event => {
     if (!events.hasOwnProperty(event.t)) return;
 
     const { d: data } = event;
@@ -140,15 +140,15 @@ client.on('raw', async event => {
     client.emit(events[event.t], reaction, user);
 });
 
-client.on('messageReactionAdd', (reaction, user) => addMeme(reaction, user) );
+client.on("messageReactionAdd", (reaction, user) => addMeme(reaction, user) );
 
-client.on('messageReactionRemove', (reaction, user) => removeMeme(reaction, user) );
+client.on("messageReactionRemove", (reaction, user) => removeMeme(reaction, user) );
 // --- END OF THE WORKAROUND ---
 
 
 client.login(BOT_TOKEN);
 
-process.on('unhandledRejection', err => {
+process.on("unhandledRejection", err => {
     logger.error(err);
     process.exit(1);
 });

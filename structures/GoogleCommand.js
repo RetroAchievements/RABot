@@ -1,6 +1,6 @@
-const Command = require('./Command.js');
-const fetch = require('node-fetch');
-const cheerio = require('cheerio');
+const Command = require("./Command.js");
+const fetch = require("node-fetch");
+const cheerio = require("cheerio");
 
 class GoogleCommand extends Command {
     constructor(client, info, site, regex) {
@@ -12,7 +12,7 @@ class GoogleCommand extends Command {
     }
 
     async run(msg, { terms } ) {
-        let searchURL = 'https://www.google.com/search?q=site:' + this.site;
+        let searchURL = "https://www.google.com/search?q=site:" + this.site;
         let response;
 
         terms.forEach(term => searchURL += `+${term}`);
@@ -23,16 +23,16 @@ class GoogleCommand extends Command {
             .then(res => res.text())
             .then(body => {
                 const $ = cheerio.load(body);
-                response = $('h3.r').toString().match(this.regex);
+                response = $("h3.r").toString().match(this.regex);
                 response = response ? `https://${unescape(response)}` : "Didn't find anything... :frowning:";
-                return sentMsg.edit(msg.author + ', ' + response);
+                return sentMsg.edit(msg.author + ", " + response);
             })
             .catch(res => {
-                sentMsg.edit(msg.author + ', **error**: Something went wrong...');
+                sentMsg.edit(msg.author + ", **error**: Something went wrong...");
                 console.error(res);
             });
     }
 
-};
+}
 
 module.exports = GoogleCommand;

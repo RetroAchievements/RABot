@@ -13,4 +13,4 @@ module.exports = {
     coc: coc,
 
     all: `__**RULES**__\n**Simple Version**:\n${one}\n${two}\n${three}\n${four}\n\n${coc}`,
-}
+};

@@ -1,5 +1,5 @@
-const Command = require('./Command.js');
-const { gamelist, consoles } = require('../util/GetGameList.js');
+const Command = require("./Command.js");
+const { gamelist, consoles } = require("../util/GetGameList.js");
 
 module.exports = class RandomGameCommand extends Command {
     constructor(client, info) {
@@ -17,7 +17,7 @@ module.exports = class RandomGameCommand extends Command {
 
     getRandomGame( terms ) {
         // picking a random game globally
-        if( terms == '~NOARGS~' )
+        if( terms == "~NOARGS~" )
             return this.pickGame( gamelist.games );
 
         let games;
@@ -37,7 +37,7 @@ module.exports = class RandomGameCommand extends Command {
 
         let regex;
         try {
-            regex = new RegExp( term, 'i' );
+            regex = new RegExp( term, "i" );
         } catch( err ) {
             return `invalid Regular Expression: \`${term}\``;
         }

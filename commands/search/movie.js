@@ -1,30 +1,30 @@
-const Command = require('../../structures/Command.js');
-const fetch = require('node-fetch');
-const { RichEmbed } = require('discord.js');
-const { shorten } = require('../../util/Utils.js');
+const Command = require("../../structures/Command.js");
+const fetch = require("node-fetch");
+const { RichEmbed } = require("discord.js");
+const { shorten } = require("../../util/Utils.js");
 const { TMDB_KEY } = process.env;
 
 module.exports = class MovieCommand extends Command {
     constructor(client) {
         super(client, {
-            name: 'movie',
-            aliases: ['tmdb', 'imdb'],
-            group: 'search',
-            memberName: 'movie',
-            description: 'Searches TMDB for your query, getting movie results.',
-            clientPermissions: ['EMBED_LINKS'],
+            name: "movie",
+            aliases: ["tmdb", "imdb"],
+            group: "search",
+            memberName: "movie",
+            description: "Searches TMDB for your query, getting movie results.",
+            clientPermissions: ["EMBED_LINKS"],
             args: [
                 {
-                    key: 'query',
-                    prompt: 'What movie would you like to search for?',
-                    type: 'string'
+                    key: "query",
+                    prompt: "What movie would you like to search for?",
+                    type: "string"
                 }
             ]
         });
     }
 
     async run(msg, { query }) {
-        const sentMsg = await msg.reply(':hourglass: Getting wikipedia info, please wait...');
+        const sentMsg = await msg.reply(":hourglass: Getting wikipedia info, please wait...");
 
         try {
             const params = [
@@ -33,7 +33,7 @@ module.exports = class MovieCommand extends Command {
                 `query=${encodeURI(query)}`
             ];
 
-            let res = await fetch('http://api.themoviedb.org/3/search/movie?' + params.join('&'));
+            let res = await fetch("http://api.themoviedb.org/3/search/movie?" + params.join("&"));
             let body = await res.json();
 
             if(!body.results.length)
@@ -46,14 +46,14 @@ module.exports = class MovieCommand extends Command {
                 .setColor(0x00D474)
                 .setTitle(body.title)
                 .setURL(`https://www.themoviedb.org/movie/${body.id}`)
-                .setAuthor('TMDB', 'https://i.imgur.com/3K3QMv9.png', 'https://www.themoviedb.org/')
-                .setDescription(body.overview ? shorten(body.overview) : 'No description available.')
+                .setAuthor("TMDB", "https://i.imgur.com/3K3QMv9.png", "https://www.themoviedb.org/")
+                .setDescription(body.overview ? shorten(body.overview) : "No description available.")
                 .setThumbnail(body.poster_path ? `https://image.tmdb.org/t/p/w500${body.poster_path}` : null)
-                .addField('Runtime', body.runtime ? `${body.runtime} mins.` : '???', true)
-                .addField('Release Date', body.release_date || '???', true)
-                .addField('Genres', body.genres.length ? body.genres.map(genre => genre.name).join(', ') : '???')
-                .addField('Production Companies',
-                        body.production_companies.length ? body.production_companies.map(c => c.name).join(', ') : '???');
+                .addField("Runtime", body.runtime ? `${body.runtime} mins.` : "???", true)
+                .addField("Release Date", body.release_date || "???", true)
+                .addField("Genres", body.genres.length ? body.genres.map(genre => genre.name).join(", ") : "???")
+                .addField("Production Companies",
+                    body.production_companies.length ? body.production_companies.map(c => c.name).join(", ") : "???");
 
             return sentMsg.edit(response);
         } catch (err) {

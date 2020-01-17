@@ -1,7 +1,7 @@
-const fetch = require('node-fetch');
-const cheerio = require('cheerio');
-const yes = ['yes', 'y', 'ye', 'yeah', 'yup', 'yea', 'ya'];
-const no = ['no', 'n', 'nah', 'nope', 'nop'];
+const fetch = require("node-fetch");
+const cheerio = require("cheerio");
+const yes = ["yes", "y", "ye", "yeah", "yup", "yea", "ya"];
+const no = ["no", "n", "nah", "nope", "nop"];
 
 module.exports = class Utils {
 
@@ -13,18 +13,18 @@ module.exports = class Utils {
         if( !Utils.isValidUsername( user ) )
             return false;
 
-        const url = 'https://retroachievements.org/history.php?u=' + user;
+        const url = "https://retroachievements.org/history.php?u=" + user;
         let date = [];
         let cheevos = [];
         let score = [];
 
-        const res = await fetch( url + '&c=' + days)
+        const res = await fetch( url + "&c=" + days);
         const $ = cheerio.load( await res.text() );
 
-        const bestDays = $('table.smalltable').find('tr').map( (i, element) => ({
-            date: $(element).find('td:nth-of-type(1)').text().trim(),
-            achievements: $(element).find('td:nth-of-type(2)').text().trim(),
-            score: $(element).find('td:nth-of-type(3)').text().trim(),
+        const bestDays = $("table.smalltable").find("tr").map( (i, element) => ({
+            date: $(element).find("td:nth-of-type(1)").text().trim(),
+            achievements: $(element).find("td:nth-of-type(2)").text().trim(),
+            score: $(element).find("td:nth-of-type(3)").text().trim(),
         })).get();
 
         if(bestDays.length <= 2) {
@@ -38,16 +38,16 @@ module.exports = class Utils {
         }
 
         return {
-            'date': date,
-            'cheevos': cheevos,
-            'score': score
+            "date": date,
+            "cheevos": cheevos,
+            "score": score
         };
     }
 
     static async bestScoreComment( user ) {
         const bestDay = await Utils.bestDays( user, 1 );
         if( !bestDay )
-            return false
+            return false;
 
         const bestScore = bestDay.score[0];
         let scoreComment = false;
@@ -69,17 +69,17 @@ module.exports = class Utils {
 
     static async googleGameId( terms ) {
         const regex = /retroachievements\.org\/game\/([0-9]+)/i;
-        const site = 'retroachievements.org/game'
-        let searchURL = 'https://www.google.com/search?q=site:' + site;
+        const site = "retroachievements.org/game";
+        let searchURL = "https://www.google.com/search?q=site:" + site;
         let parseGameUrl;
         let gameid;
 
         terms.forEach(term => searchURL += `+${term}`);
 
-        const res = await fetch(encodeURI(searchURL))
+        const res = await fetch(encodeURI(searchURL));
         const $ = cheerio.load( await res.text() );
 
-        parseGameUrl = $('h3.r').toString().match(regex);
+        parseGameUrl = $("h3.r").toString().match(regex);
         gameid = parseGameUrl ? parseGameUrl[1] : 0;
 
         return gameid;
@@ -121,6 +121,6 @@ module.exports = class Utils {
     }
     
     static firstUpperCase(text) {
-		return text.split().map(word => `${word.charAt(0).toUpperCase()}${word.slice(1)}`).join(' ');
-	}
+        return text.split().map(word => `${word.charAt(0).toUpperCase()}${word.slice(1)}`).join(" ");
+    }
 };

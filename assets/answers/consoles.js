@@ -1,5 +1,5 @@
 // TODO: this will change on RAWeb v2
-const site = 'https://retroachievements.org/gameList.php?c='
+const site = "https://retroachievements.org/gameList.php?c=";
 
 const megadrive = 1;
 const n64 = 2;
@@ -91,4 +91,4 @@ module.exports = {
     answers: {
         default: site,
     },
-}
+};

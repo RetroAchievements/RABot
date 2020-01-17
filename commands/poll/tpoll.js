@@ -1,16 +1,16 @@
-const Command = require('../../structures/Command.js');
-const { Collection } = require('discord.js');
+const Command = require("../../structures/Command.js");
+const { Collection } = require("discord.js");
 
-const allOptions = Object.values(require('../../assets/json/emoji-alphabet.json'));
+const allOptions = Object.values(require("../../assets/json/emoji-alphabet.json"));
 
 module.exports = class TimedPollCommand extends Command {
     constructor(client) {
         super(client, {
-            name: 'tpoll',
-            group: 'poll',
-            memberName: 'tpoll',
-            description: 'Create a timed poll.',
-            examples: ['`tpoll 60 \'Which option you choose?\' \'option one\' \'option 2\' \'option N\'`'],
+            name: "tpoll",
+            group: "poll",
+            memberName: "tpoll",
+            description: "Create a timed poll.",
+            examples: ["`tpoll 60 'Which option you choose?' 'option one' 'option 2' 'option N'`"],
             throttling: {
                 usages: 1,
                 duration: 30,
@@ -19,27 +19,27 @@ module.exports = class TimedPollCommand extends Command {
             argsPromptLimit: 0,
             args: [
                 {
-                    key: 'seconds',
-                    type: 'integer',
-                    prompt: '',
+                    key: "seconds",
+                    type: "integer",
+                    prompt: "",
                     min: 0,
                     max: 604800, // 604,800 seconds = 1 week
                 },
                 {
-                    key: 'question',
-                    type: 'string',
-                    prompt: '',
+                    key: "question",
+                    type: "string",
+                    prompt: "",
                     validate: question => {
                         if(question.length > 0 && question.length < 200) return true;
-                        return 'Invalid question';
+                        return "Invalid question";
                     },
                 },
                 {
-                    key: 'opts',
-                    prompt: '',
-                    type: 'string',
+                    key: "opts",
+                    prompt: "",
+                    type: "string",
                     infinite: true,
-                    default: '~NO~OPTS~',
+                    default: "~NO~OPTS~",
                 },
             ],
         });
@@ -47,9 +47,9 @@ module.exports = class TimedPollCommand extends Command {
 
     async run(msg, { seconds, question, opts }) {
         if(opts.length < 2 || opts.length > 10)
-            return msg.reply('The number of options must be greater than 2 and less than 10');
+            return msg.reply("The number of options must be greater than 2 and less than 10");
 
-        let options = '';
+        let options = "";
         let i;
         let pollMsg = [];
         let milliseconds = seconds <= 0 ? 0 : seconds * 1000;
@@ -70,7 +70,7 @@ module.exports = class TimedPollCommand extends Command {
         pollMsg.push(`\n:bar_chart: **${question}**\n${options}`);
 
         if(milliseconds)
-            pollMsg.push('\n`Notes:\n- only the first reaction is considered a vote\n- unlisted reactions void the vote`');
+            pollMsg.push("\n`Notes:\n- only the first reaction is considered a vote\n- unlisted reactions void the vote`");
 
         const sentMsg = await msg.channel.send(pollMsg);
 
@@ -98,14 +98,14 @@ module.exports = class TimedPollCommand extends Command {
                 voters.push(user.id);
             } else {
                 //msg.channel.send(`ignoring ${reaction.emoji.name} from \`${user.username}\`: user already voted`)
-                    //.then(m => m.delete(5000));
+                //.then(m => m.delete(5000));
                 return false;
             }
 
             // do not count invalid reactions
             if (!reactions.includes(reaction.emoji.name)) {
                 //msg.channel.send(`\`${user.username}\` voided the vote with an invalid reaction: ${reaction.emoji.name}`)
-                    //.then(m => m.delete(5000));
+                //.then(m => m.delete(5000));
                 return false;
             }
 
@@ -116,7 +116,7 @@ module.exports = class TimedPollCommand extends Command {
             pollResults.set(reaction.emoji.name, numVotes);
 
             //msg.channel.send(`\`${user.username}\`'s vote: ${reaction.emoji.name}`)
-                //.then(m => m.delete(5000));
+            //.then(m => m.delete(5000));
             return true;
         };
 
@@ -127,11 +127,11 @@ module.exports = class TimedPollCommand extends Command {
                 pollMsg[0] = `~~${pollMsg[0]}~~\n:no_entry: **THIS POLL IS ALREADY CLOSED** :no_entry:`;
                 pollMsg.pop(); // removing the message saying when the poll ends
                 pollMsg.pop(); // removing the note about how to vote
-                pollMsg.push('\n`This poll is closed.`');
-                pollMsg.push('__**RESULTS:**__\n');
+                pollMsg.push("\n`This poll is closed.`");
+                pollMsg.push("__**RESULTS:**__\n");
 
                 if(collected.size === 0) {
-                    pollMsg.push('No one voted');
+                    pollMsg.push("No one voted");
                 } else {
                     pollResults.sort( (v1, v2) => v2 - v1 );
                     pollResults.forEach( (value, key) => pollMsg.push(`${key}: ${value}`));
@@ -139,14 +139,14 @@ module.exports = class TimedPollCommand extends Command {
 
                 sentMsg.edit(pollMsg);
 
-                pollEndedMsg.push('**Your poll has ended.**\n**Click this link to see the results:**');
-                pollEndedMsg.push('<' + sentMsg.url + '>');
+                pollEndedMsg.push("**Your poll has ended.**\n**Click this link to see the results:**");
+                pollEndedMsg.push("<" + sentMsg.url + ">");
                 msg.reply(pollEndedMsg);
             })
-        .catch(collected => {
-            msg.reply('**`poll` error**: Something went wrong with your poll.');
-            console.error(collected);
-        });
+            .catch(collected => {
+                msg.reply("**`poll` error**: Something went wrong with your poll.");
+                console.error(collected);
+            });
     }
 
 };

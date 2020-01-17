@@ -43,6 +43,11 @@ To run the bot for development which includes hot-reload, please use the followi
 $ npm run dev
 ```
 
+## Code style and linting 
+
+To have a consistent style of code eslint is used to provide the necessary cehckups for code style rules.
+
+To run the linter use `npm run linter` command. If there are any errors you can use mostly use `npm run linter -- --fix` command to auto-fix your code.
 
 ### :books: Inspiration
 Many inspiration for RABot was obtained from the [Xiao bot's code](https://github.com/dragonfire535/xiao).

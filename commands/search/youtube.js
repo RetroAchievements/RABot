@@ -1,5 +1,5 @@
-const Command = require('../../structures/Command.js');
-const ytSearch = require('youtube-search');
+const Command = require("../../structures/Command.js");
+const ytSearch = require("youtube-search");
 const { YOUTUBE_API_KEY } = process.env;
 
 const opts = {
@@ -11,21 +11,21 @@ const opts = {
 module.exports = class LongPlayCommand extends Command {
     constructor(client) {
         super(client, {
-            name: 'youtube',
-            aliases: ['yt'],
-            group: 'search',
-            memberName: 'youtube',
-            description: 'Search for a video on youtube and post the first one found.',
-            examples: ['`youtube meleu 10 manobras`', '`yt brujeria la migra`' ],
+            name: "youtube",
+            aliases: ["yt"],
+            group: "search",
+            memberName: "youtube",
+            description: "Search for a video on youtube and post the first one found.",
+            examples: ["`youtube meleu 10 manobras`", "`yt brujeria la migra`" ],
             throttling: {
                 usages: 3,
                 duration: 60,
             },
             args: [
                 {
-                    key: 'terms',
-                    prompt: '',
-                    type: 'string',
+                    key: "terms",
+                    prompt: "",
+                    type: "string",
                     infinite: true,
                 },
             ]
@@ -33,7 +33,7 @@ module.exports = class LongPlayCommand extends Command {
     }
 
     async run(msg, { terms } ) {
-        let searchTerms = terms.join(' ');
+        let searchTerms = terms.join(" ");
         let response;
 
         const sentMsg = await msg.reply(":mag: Searching for your video, please wait...");

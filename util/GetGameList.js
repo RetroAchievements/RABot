@@ -1,4 +1,4 @@
-const { execFile } = require('child_process');
+const { execFile } = require("child_process");
 
 const getGLScript = `${__dirname}/getgamelist.sh`;
 
@@ -92,7 +92,7 @@ function loadGameLists() {
 
 
 function getAllGameLists() {
-    const script = execFile( 'bash', [getGLScript], (err, stdout, stderr) => {
+    const script = execFile( "bash", [getGLScript], (err, stdout, stderr) => {
         if(err) {
             console.error(err);
             return 1;

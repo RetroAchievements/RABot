@@ -1,13 +1,13 @@
-const Command = require('../../structures/Command');
+const Command = require("../../structures/Command");
 
 module.exports = class PanicCommand extends Command {
     constructor(client) {
         super(client, {
-            name: 'about',
-            aliases: ['rabot'],
-            group: 'single',
-            memberName: 'about',
-            description: 'Show info about me.'
+            name: "about",
+            aliases: ["rabot"],
+            group: "single",
+            memberName: "about",
+            description: "Show info about me."
         });
     }
 
@@ -20,7 +20,7 @@ module.exports = class PanicCommand extends Command {
             "<https://github.com/RetroAchievements/RABot/issues>";
 
         try {
-            await msg.react('🤖');
+            await msg.react("🤖");
             return msg.reply(response);
         } catch (err) {
             return msg.reply(response);

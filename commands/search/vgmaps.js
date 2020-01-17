@@ -1,54 +1,54 @@
-const Command = require('../../structures/Command.js');
-const fetch = require('node-fetch');
-const cheerio = require('cheerio');
+const Command = require("../../structures/Command.js");
+const fetch = require("node-fetch");
+const cheerio = require("cheerio");
 
-const url = 'https://www.vgmaps.com/Atlas/';
+const url = "https://www.vgmaps.com/Atlas/";
 
 const vgmapsConsole = {
-    megadrive: 'Genesis',
-    mastersystem: 'MasterSystem',
-    gamegear: 'GameGear',
+    megadrive: "Genesis",
+    mastersystem: "MasterSystem",
+    gamegear: "GameGear",
 
-    nes: 'NES',
-    snes: 'SuperNES',
-    gb: 'GB-GBC',
-    gbc: 'GB-GBC',
-    gba: 'GBA',
-    n64: 'N64',
-    vb: 'VirtualBoy',
+    nes: "NES",
+    snes: "SuperNES",
+    gb: "GB-GBC",
+    gbc: "GB-GBC",
+    gba: "GBA",
+    n64: "N64",
+    vb: "VirtualBoy",
 
-    pcengine: 'TG16',
+    pcengine: "TG16",
 
-    ngp: 'NGP-NGPC',
-    ngpc: 'NGP-NGPC',
+    ngp: "NGP-NGPC",
+    ngpc: "NGP-NGPC",
 
-    atari2600: 'Atari2600',
-    atari7800: 'Atari7800',
-//    lynx:
+    atari2600: "Atari2600",
+    atari7800: "Atari7800",
+    //    lynx:
 
-    arcade: 'Arcade'
+    arcade: "Arcade"
 };
-const consoleList = `\`${Object.keys(vgmapsConsole).join('`, `')}\``;
+const consoleList = `\`${Object.keys(vgmapsConsole).join("`, `")}\``;
 
 module.exports = class VGMapsCommand extends Command {
     constructor(client) {
         super(client, {
-            name: 'vgmaps',
-            aliases: ['vgmap'],
-            group: 'search',
-            memberName: 'vgmaps',
-            description: 'Searches vgmaps.com for a video game\'s map.',
-            examples: ['`vgmaps gba zelda`', '`vgmaps megadrive bonanza`'],
+            name: "vgmaps",
+            aliases: ["vgmap"],
+            group: "search",
+            memberName: "vgmaps",
+            description: "Searches vgmaps.com for a video game's map.",
+            examples: ["`vgmaps gba zelda`", "`vgmaps megadrive bonanza`"],
             details: `__Available console systems__: ${consoleList}`,
             guildOnly: true, // XXX: maybe remove this limitation later
             throttling: { usages: 3, duration: 120 }, // TODO: optimize the script to cache the html file
-            clientPermssions: ['EMBED_LINKS'],
+            clientPermssions: ["EMBED_LINKS"],
             argsPromptLimit: 2,
             args: [
                 {
-                    key: 'system',
+                    key: "system",
                     prompt: `The game is from which console system?\n**Options**: ${consoleList}.`,
-                    type: 'string',
+                    type: "string",
                     validate: sys => {
                         const value = sys.toLowerCase();
                         if(vgmapsConsole[value] || Object.keys(vgmapsConsole).find(key => vgmapsConsole[key].toLowerCase() === value))
@@ -61,9 +61,9 @@ module.exports = class VGMapsCommand extends Command {
                     }
                 },
                 {
-                    key: 'game',
-                    prompt: 'Do you want to search for maps of which game?',
-                    type: 'string',
+                    key: "game",
+                    prompt: "Do you want to search for maps of which game?",
+                    type: "string",
                     min: 2,
                     max: 100
                 }
@@ -73,14 +73,14 @@ module.exports = class VGMapsCommand extends Command {
 
 
     async run( msg, { system, game } ) {
-        msg.say(':hourglass: Getting info, please wait...');
+        msg.say(":hourglass: Getting info, please wait...");
 
         try {
             let failMsg = `**You can try looking directly on the vgmaps page for ${system} games**:\n${url + system}`;
             const res = await fetch(url + system);
             const $ = cheerio.load( await res.text() );
 
-            const searchTerm = game.replace(/[^a-zA-Z0-9]/g, '');
+            const searchTerm = game.replace(/[^a-zA-Z0-9]/g, "");
 
             let games = $("table")
                 .find(`a[name='${searchTerm}' i]`) // trying the exact match first
@@ -101,13 +101,13 @@ module.exports = class VGMapsCommand extends Command {
 
             let choice = 0;
             if( games.length > 1 ) {
-                choice = await this.whichOption( msg, games, '__**Games found:**__', failMsg );
+                choice = await this.whichOption( msg, games, "__**Games found:**__", failMsg );
                 if( choice < 0 )
                     return;
             }
 
             const gameAnchor = games[choice];
-            const gameMapsUrl = url + system + '/index.htm#' + gameAnchor;
+            const gameMapsUrl = url + system + "/index.htm#" + gameAnchor;
             failMsg = `**You can try looking directly on the vgmaps page**:\n${gameMapsUrl}`;
 
             const maps = $("table")
@@ -128,14 +128,14 @@ module.exports = class VGMapsCommand extends Command {
 
             choice = 0;
             if( maps.length > 1 ) {
-                choice = await this.whichOption( msg, maps, '__**Maps found:**__', failMsg );
+                choice = await this.whichOption( msg, maps, "__**Maps found:**__", failMsg );
                 if( choice < 0 )
                     return;
             }
 
             const map = maps[choice];
 
-            return msg.reply(`**Map:** ${url + system + '/' + map}\n**Check here for more maps**: <${gameMapsUrl}>`);
+            return msg.reply(`**Map:** ${url + system + "/" + map}\n**Check here for more maps**: <${gameMapsUrl}>`);
 
         } catch(err) {
             msg.say(`**Whoops! Something went wrong!**\n\`${err.message}\``);
@@ -148,7 +148,7 @@ module.exports = class VGMapsCommand extends Command {
      * -1 means "time is up!"
      * -2 means "too many options"
      */
-    async whichOption( msg, array, title = '', failMsg = '' ) {
+    async whichOption( msg, array, title = "", failMsg = "" ) {
         if( array.length < 1 )
             return -1;
 
@@ -178,12 +178,12 @@ module.exports = class VGMapsCommand extends Command {
         });
 
         if(!msgs.size) {
-            msg.say('Sorry, time is up!\n' + failMsg);
+            msg.say("Sorry, time is up!\n" + failMsg);
             return -1;
         }
 
         // since it passed the 'filter', it's supposed to be a positive number
         return parseInt(msgs.first().content) - 1;
     }
-}
+};
 

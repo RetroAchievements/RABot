@@ -1,4 +1,4 @@
-const Command = require('./Command.js');
+const Command = require("./Command.js");
 
 module.exports = class ConvertCommand extends Command {
     constructor(client, info, base) {
@@ -7,17 +7,17 @@ module.exports = class ConvertCommand extends Command {
     }
 
     async run(msg, { numbers }) {
-        let response = '```';
+        let response = "```";
         let nStr;
         let num;
         let binStr;
         let outOfRangeFlag = false;
-        const basePrefix = this.base === 16 ? '0x' : this.base === 2 ? '0b' : '';
+        const basePrefix = this.base === 16 ? "0x" : this.base === 2 ? "0b" : "";
     
         for(let i = 0; i < numbers.length; i++) {
             nStr = numbers[i];
             num = parseInt(nStr);
-            response += '\n';
+            response += "\n";
     
             // dealing with binary numbers
             if(binStr = nStr.match(/^0b([01]+)$/i)) {
@@ -32,7 +32,7 @@ module.exports = class ConvertCommand extends Command {
     
                 num = 0;
                 for(let j = binStr.length - 1; j >= 0; j--)
-                    num += binStr[j] === '1' ? 2 ** j : 0;
+                    num += binStr[j] === "1" ? 2 ** j : 0;
     
                 response += `0b${num.toString(2)} = 0x${num.toString(16)} = ${num}`;
                 continue;
@@ -52,7 +52,7 @@ module.exports = class ConvertCommand extends Command {
                     continue;
                 }
     
-                if(nStr.startsWith('0x'))
+                if(nStr.startsWith("0x"))
                     response += `0x${num.toString(16)} = ${this.base == 2 ? `0b${num.toString(2)}` : num}`;
                 else
                     response += `${num} = ${basePrefix}${num.toString(this.base)}`;
@@ -60,10 +60,10 @@ module.exports = class ConvertCommand extends Command {
             }
             response += `${nStr} = NaN`;
         }
-        response += '```';
+        response += "```";
     
         if(outOfRangeFlag)
-            response += '\n**Note**: use numbers between 0 and 4294967295 (which is `0xffffffff`)';
+            response += "\n**Note**: use numbers between 0 and 4294967295 (which is `0xffffffff`)";
     
         return msg.channel.send(response);
     }

@@ -1,7 +1,7 @@
-const Command = require('../../structures/Command.js');
-const ytSearch = require('youtube-search');
+const Command = require("../../structures/Command.js");
+const ytSearch = require("youtube-search");
 
-require('dotenv').config({path: __dirname + '../../.env'});
+require("dotenv").config({path: __dirname + "../../.env"});
 const { YOUTUBE_API_KEY } = process.env;
 
 const opts = {
@@ -13,21 +13,21 @@ const opts = {
 module.exports = class LongPlayCommand extends Command {
     constructor(client) {
         super(client, {
-            name: 'longplay',
-            aliases: ['lplay', 'lp'],
-            group: 'search',
-            memberName: 'longplay',
-            description: 'Search for a longplay video on youtube and post the link.',
-            examples: ['`longplay street fighter mega drive`', '`longplay final fight arcade`' ],
+            name: "longplay",
+            aliases: ["lplay", "lp"],
+            group: "search",
+            memberName: "longplay",
+            description: "Search for a longplay video on youtube and post the link.",
+            examples: ["`longplay street fighter mega drive`", "`longplay final fight arcade`" ],
             throttling: {
                 usages: 3,
                 duration: 60,
             },
             args: [
                 {
-                    key: 'terms',
-                    prompt: '',
-                    type: 'string',
+                    key: "terms",
+                    prompt: "",
+                    type: "string",
                     infinite: true,
                 },
             ]
@@ -35,7 +35,7 @@ module.exports = class LongPlayCommand extends Command {
     }
 
     async run(msg, { terms } ) {
-        let searchTerms = 'longplay'
+        let searchTerms = "longplay";
         let response;
 
         terms.forEach(term => searchTerms += ` ${term}`);

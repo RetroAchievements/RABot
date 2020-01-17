@@ -1,4 +1,4 @@
-const { Command } = require('discord.js-commando');
+const { Command } = require("discord.js-commando");
 
 class DefaultCommand extends Command {
     constructor(client, info) {

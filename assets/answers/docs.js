@@ -1,4 +1,4 @@
-const site = 'https://docs.retroachievements.org/';
+const site = "https://docs.retroachievements.org/";
 const radocs = "index.html";
 const dev = "Developer-docs";
 const devstart = "Getting-Started-as-an-Achievement-Developer";
@@ -154,4 +154,4 @@ module.exports = {
     answers: {
         default: site,
     }
-}
+};

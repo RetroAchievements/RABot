@@ -1,24 +1,24 @@
-const Command = require('../../structures/Command.js');
+const Command = require("../../structures/Command.js");
 
 module.exports = class FramesCommand extends Command {
     constructor(client) {
         super(client, {
-            name: 'frames',
-            group: 'rautil',
-            memberName: 'frames',
-            description: 'Says how many frames corresponds to a given amount of time or the vice-versa (see Examples below).',
+            name: "frames",
+            group: "rautil",
+            memberName: "frames",
+            description: "Says how many frames corresponds to a given amount of time or the vice-versa (see Examples below).",
             examples: [
-                '`frames 1h 5min 15s` - info for 1 hour, 5 minutes and 15 seconds considering 60 frames/second (default)',
-                '`frames 500ms 30fps` - info for 500 milliseconds, considering 30 frames/second',
-                '`frames 123.321min 25fps` - info for 123.321 minutes, considering 25 frames/second',
-                '`frames 40` - info for 40 frames, considering 60 frames/second (default)',
-                '`frames 123 30fps` - info for 123 frames, considering 30 frames/second',
+                "`frames 1h 5min 15s` - info for 1 hour, 5 minutes and 15 seconds considering 60 frames/second (default)",
+                "`frames 500ms 30fps` - info for 500 milliseconds, considering 30 frames/second",
+                "`frames 123.321min 25fps` - info for 123.321 minutes, considering 25 frames/second",
+                "`frames 40` - info for 40 frames, considering 60 frames/second (default)",
+                "`frames 123 30fps` - info for 123 frames, considering 30 frames/second",
             ],
             args: [
                 {
-                    key: 'input',
-                    prompt: '',
-                    type: 'string',
+                    key: "input",
+                    prompt: "",
+                    type: "string",
                     infinite: true,
                 },
             ]
@@ -36,9 +36,9 @@ module.exports = class FramesCommand extends Command {
         const regexFps = /([0-9]+) *fps/i;
 
         // group2: frames amount
-        const regexFramesAmount = /^ *([0-9]+ *fps )? *([0-9]+) *( [0-9]+ *fps)? *$/
+        const regexFramesAmount = /^ *([0-9]+ *fps )? *([0-9]+) *( [0-9]+ *fps)? *$/;
 
-        const inputString = input.join(' ');
+        const inputString = input.join(" ");
 
         const parsedTime = inputString.match(regexTime);
         const parsedFps  = inputString.match(regexFps);
@@ -62,7 +62,7 @@ module.exports = class FramesCommand extends Command {
             frames = parsedFramesAmount ? parseInt(parsedFramesAmount[2]) : 0;
 
             if (frames <= 0 || fps <= 0) {
-                msg.reply('invalid time format: `' + inputString + '`\nUse `!help frames` to se some useful examples');
+                msg.reply("invalid time format: `" + inputString + "`\nUse `!help frames` to se some useful examples");
                 return;
             }
 
@@ -81,4 +81,4 @@ module.exports = class FramesCommand extends Command {
             `\n**FPS:** \`${fps}\`` +
             `\n**Frames:** \`${frames} (0x${frames.toString(16)})\``);
     }
-}
+};

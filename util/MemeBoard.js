@@ -1,11 +1,11 @@
 // TODO: assure bot has permissions to manage messages in the meme-board channel
 const { CHANNEL_MEME, ROLE_MOD, MAX_MEMES } = process.env;
-const { RichEmbed } = require('discord.js');
+const { RichEmbed } = require("discord.js");
 
 const minimumReactions = 5;
 
-const modEmoji = '🚫';
-const memoji = '🤖';
+const modEmoji = "🚫";
+const memoji = "🤖";
 // regex: memoji followed by the number of votes followed '| message.id'
 const memeRegex = /^\🤖\s([0-9]{1,3})\s\|\s([0-9]{17,20})/;
 
@@ -25,7 +25,7 @@ async function addMeme(reaction, user) {
     const memeChannel = message.guild.channels.get(CHANNEL_MEME);
 
     if (!memeChannel)
-        return message.channel.send(`It appears that you do not have a meme-board channel.`); 
+        return message.channel.send("It appears that you do not have a meme-board channel."); 
 
     // fetch MAX_MEMES messages from the memeboard channel.
     const fetch = await memeChannel.fetchMessages({ limit: MAX_MEMES }); 
@@ -33,7 +33,7 @@ async function addMeme(reaction, user) {
     // check the messages within the fetch object to see if the message
     // that was reacted to is already in the meme-board
     const memes = fetch.find(m => {
-        typeof m.embeds[0] !=='undefined' && m.embeds[0].footer !== null  && m.embeds[0].footer.text.startsWith(memoji) && m.embeds[0].footer.text.endsWith(message.id)
+        typeof m.embeds[0] !=="undefined" && m.embeds[0].footer !== null  && m.embeds[0].footer.text.startsWith(memoji) && m.embeds[0].footer.text.endsWith(message.id);
     }); 
     
     // if the message is found within the memeboard.
@@ -50,7 +50,7 @@ async function addMeme(reaction, user) {
         const foundMeme = memes.embeds[0];
 
         // the extension function checks if there is anything attached to the message.
-        const image = message.attachments.size > 0 ? await extension(reaction, message.attachments.array()[0].url) : ''; 
+        const image = message.attachments.size > 0 ? await extension(reaction, message.attachments.array()[0].url) : ""; 
 
         const embed = new RichEmbed()
             .setColor(foundMeme.color)
@@ -86,10 +86,10 @@ async function addMeme(reaction, user) {
         if(reactionCounter < minimumReactions)
             return;
 
-        const image = message.attachments.size > 0 ? await extension(reaction, message.attachments.array()[0].url) : ''; 
+        const image = message.attachments.size > 0 ? await extension(reaction, message.attachments.array()[0].url) : ""; 
 
         // If the message is empty, we don't allow the user to meme the message.
-        if (image === '' && message.cleanContent.length < 1)
+        if (image === "" && message.cleanContent.length < 1)
             return message.channel.send(`${user}, you cannot meme an empty message.`); 
 
         const embed = new RichEmbed()
@@ -118,14 +118,14 @@ async function removeMeme(reaction, user) {
     const memeChannel = message.guild.channels.get(CHANNEL_MEME);
 
     if (!memeChannel)
-        return message.channel.send(`It appears that you do not have a meme-board channel.`); 
+        return message.channel.send("It appears that you do not have a meme-board channel."); 
 
     const fetchedMessages = await memeChannel.fetchMessages({ limit: MAX_MEMES });
-    const memes = fetchedMessages.find(m => typeof m.embeds[0] !=='undefined' && m.embeds[0].footer !== null  && m.embeds[0].footer.text.startsWith(memoji) && m.embeds[0].footer.text.endsWith(reaction.message.id));
+    const memes = fetchedMessages.find(m => typeof m.embeds[0] !=="undefined" && m.embeds[0].footer !== null  && m.embeds[0].footer.text.startsWith(memoji) && m.embeds[0].footer.text.endsWith(reaction.message.id));
     if (memes) {
         const memeCounter = memeRegex.exec(memes.embeds[0].footer.text);
         const foundMeme = memes.embeds[0];
-        const image = message.attachments.size > 0 ? await extension(reaction, message.attachments.array()[0].url) : '';
+        const image = message.attachments.size > 0 ? await extension(reaction, message.attachments.array()[0].url) : "";
         const embed = new RichEmbed()
             .setColor(foundMeme.color)
             .setTitle(foundMeme.title)
@@ -153,10 +153,10 @@ function isValidReaction(reaction, user) {
 
 // Here we add the extension function to check if there's anything attached to the message.
 function extension(reaction, attachment) {
-    const imageLink = attachment.split('.');
+    const imageLink = attachment.split(".");
     const typeOfImage = imageLink[imageLink.length - 1];
     const image = /(jpg|jpeg|png|gif)/gi.test(typeOfImage);
-    if (!image) return '';
+    if (!image) return "";
     return attachment;
 }
 

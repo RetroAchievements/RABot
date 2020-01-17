@@ -1,34 +1,34 @@
-const RandomGameCommand = require('../../structures/RandomGameCommand.js');
-const fetch = require('node-fetch');
+const RandomGameCommand = require("../../structures/RandomGameCommand.js");
+const fetch = require("node-fetch");
 
-require('dotenv').config({path: __dirname + '../../.env'});
+require("dotenv").config({path: __dirname + "../../.env"});
 const { RA_USER, RA_TOKEN } = process.env;
 
-const cheevoUrl = 'https://retroachievements.org/achievement/';
+const cheevoUrl = "https://retroachievements.org/achievement/";
 
 module.exports = class WhatCheevoCommand extends RandomGameCommand {
     constructor(client) {
         super(client, {
-            name: 'whatcheevo',
-            aliases: ['wa', 'whatachievement', 'whatach'],
-            group: 'random',
-            memberName: 'whatcheevo',
-            description: 'Responds with a random achievement.',
-            examples: ['`whatcheevo`', '`wa nes`', '`whatachievement "street fighter"`', '`whatach megadrive`'],
+            name: "whatcheevo",
+            aliases: ["wa", "whatachievement", "whatach"],
+            group: "random",
+            memberName: "whatcheevo",
+            description: "Responds with a random achievement.",
+            examples: ["`whatcheevo`", "`wa nes`", "`whatachievement \"street fighter\"`", "`whatach megadrive`"],
             args: [
                 {
-                    key: 'terms',
-                    prompt: '',
-                    type: 'string',
+                    key: "terms",
+                    prompt: "",
+                    type: "string",
                     //infinite: true, // there's a Commando bug with infinite+default
-                    default: '~NOARGS~'
+                    default: "~NOARGS~"
                 },
             ]
         });
     }
 
     async run(msg, { terms }) {
-        const sentMsg = await msg.reply(':hourglass: picking a random game, please wait...');
+        const sentMsg = await msg.reply(":hourglass: picking a random game, please wait...");
         let response = "Uh-oh! I think I faced a problem... :frowning:";
         let chosenGame = this.getRandomGame( terms );
 
@@ -50,7 +50,7 @@ module.exports = class WhatCheevoCommand extends RandomGameCommand {
                 return sentMsg.edit( response );
             })
             .catch(res => {
-                return sentMsg.edit('Ouch! :frowning2:\nAn error occurred:```' + res + '```Please, contact a @mod.');
+                return sentMsg.edit("Ouch! :frowning2:\nAn error occurred:```" + res + "```Please, contact a @mod.");
             });
     }
 

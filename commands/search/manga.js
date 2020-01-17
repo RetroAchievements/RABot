@@ -2,11 +2,11 @@
  * This code is highly based on the work of dragonfire535 and his Xiao bot:
  * https://github.com/dragonfire535/xiao
  */
-const Command = require('../../structures/Command');
-const request = require('node-superfetch');
-const { RichEmbed } = require('discord.js');
-const { stripIndents } = require('common-tags');
-const { shorten } = require('../../util/Utils');
+const Command = require("../../structures/Command");
+const request = require("node-superfetch");
+const { RichEmbed } = require("discord.js");
+const { stripIndents } = require("common-tags");
+const { shorten } = require("../../util/Utils");
 
 const searchGraphQL = stripIndents`
     query ($search: String, $type: MediaType, $isAdult: Boolean) {
@@ -37,23 +37,23 @@ const resultGraphQL = stripIndents`
 module.exports = class MangaCommand extends Command {
     constructor(client) {
         super(client, {
-            name: 'manga',
-            group: 'search',
-            memberName: 'manga',
-            description: 'Searches AniList for your query, getting manga results.',
-            clientPermissions: ['EMBED_LINKS'],
+            name: "manga",
+            group: "search",
+            memberName: "manga",
+            description: "Searches AniList for your query, getting manga results.",
+            clientPermissions: ["EMBED_LINKS"],
             args: [
                 {
-                    key: 'query',
-                    prompt: 'What manga would you like to search for?',
-                    type: 'string'
+                    key: "query",
+                    prompt: "What manga would you like to search for?",
+                    type: "string"
                 }
             ]
         });
     }
 
     async run(msg, { query }) {
-        const sentMsg = await msg.reply(':hourglass: Getting info, please wait...');
+        const sentMsg = await msg.reply(":hourglass: Getting info, please wait...");
 
         try {
             const id = await this.search(query, msg.channel.nsfw);
@@ -64,15 +64,15 @@ module.exports = class MangaCommand extends Command {
 
             const response = new RichEmbed()
                 .setColor(0x02A9FF)
-                .setAuthor('AniList', 'https://i.imgur.com/iUIRC7v.png', 'https://anilist.co/')
+                .setAuthor("AniList", "https://i.imgur.com/iUIRC7v.png", "https://anilist.co/")
                 .setURL(`https://anilist.co/manga/${manga.id}`)
                 .setThumbnail(manga.coverImage.large || null)
                 .setTitle(manga.title.userPreferred)
-                .setDescription(manga.description ? shorten(manga.description.replace(/( *<br> *)+/g, '\n')) : 'No description.')
-                .addField('Status', manga.status, true)
-                .addField('Chapters / Volumes', `${manga.chapters || '???'}/${manga.volumes || '???'}`, true)
-                .addField('Year', manga.startDate.year, true)
-                .addField('Average Score', `${manga.meanScore}/100`, true);
+                .setDescription(manga.description ? shorten(manga.description.replace(/( *<br> *)+/g, "\n")) : "No description.")
+                .addField("Status", manga.status, true)
+                .addField("Chapters / Volumes", `${manga.chapters || "???"}/${manga.volumes || "???"}`, true)
+                .addField("Year", manga.startDate.year, true)
+                .addField("Average Score", `${manga.meanScore}/100`, true);
 
             return sentMsg.edit(response);
         } catch (err) {
@@ -82,11 +82,11 @@ module.exports = class MangaCommand extends Command {
 
     async search(query, nsfw) {
         const { body } = await request
-            .post('https://graphql.anilist.co/')
+            .post("https://graphql.anilist.co/")
             .send({
                 variables: {
                     search: query,
-                    type: 'MANGA',
+                    type: "MANGA",
                     isAdult: Boolean(nsfw)
                 },
                 query: searchGraphQL
@@ -97,11 +97,11 @@ module.exports = class MangaCommand extends Command {
 
     async fetchAnime(id) {
         const { body } = await request
-            .post('https://graphql.anilist.co/')
+            .post("https://graphql.anilist.co/")
             .send({
                 variables: {
                     id,
-                    type: 'MANGA'
+                    type: "MANGA"
                 },
                 query: resultGraphQL
             });
