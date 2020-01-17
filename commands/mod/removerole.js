@@ -11,40 +11,40 @@ module.exports = class PruneCommand extends Command {
       group: 'mod',
       memberName: 'removerole',
       description: 'Gives specific role to designated user.',
-      examples:[`'!removerole @role @user'`],
+      examples: ['\'!removerole @role @user\''],
       guildOnly: true,
       clientPermissions: ['ADMINISTRATOR'],
       userPermissions: ['MANAGE_ROLES'],
       args: [
         {
-            key: 'role',
-            label: 'role',
-            prompt: 'What role would you like to remove?',
-            type: 'role'
+          key: 'role',
+          label: 'role',
+          prompt: 'What role would you like to remove?',
+          type: 'role',
         },
         {
           key: 'user',
           label: 'user',
           prompt: 'What user would you like the remove the role from?',
-          type: 'user'
-      }
+          type: 'user',
+        },
       ],
     });
   }
 
   async run(msg, { role, user }) {
     const allowedMember = msg.guild.members.get(user.id).permissions.has('MANAGE_ROLES');
-    if(allowedMember){
-        const guild = msg.guild;
-        const guildRole = guild.roles.find(r => r.name == role.name);
-        const guildMember = guild.members.find(u => u.id == user.id);
-        if(!guildMember.roles.has(guildRole.id)){
-            return msg.reply(`User ${guildMember.displayName} does not have that role.`);
-        }
-        if(guildMember && guildRole){
-            await guildMember.removeRole(guildRole);
-            msg.reply(`I have removed the role of ${role.name} from ${guildMember.displayName}.`);
-        }
+    if (allowedMember) {
+      const { guild } = msg;
+      const guildRole = guild.roles.find((r) => r.name == role.name);
+      const guildMember = guild.members.find((u) => u.id == user.id);
+      if (!guildMember.roles.has(guildRole.id)) {
+        return msg.reply(`User ${guildMember.displayName} does not have that role.`);
+      }
+      if (guildMember && guildRole) {
+        await guildMember.removeRole(guildRole);
+        msg.reply(`I have removed the role of ${role.name} from ${guildMember.displayName}.`);
+      }
     }
   }
 };
