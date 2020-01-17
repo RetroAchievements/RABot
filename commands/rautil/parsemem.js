@@ -1,5 +1,9 @@
 const Command = require('../../structures/Command.js');
+const { RichEmbed } = require('discord.js');
 const fetch = require('node-fetch');
+const { RA_USER, RA_TOKEN, RA_WEB_API_KEY, CHANNEL_DEV_CHANNELS } = process.env;
+
+const baseUrl = 'https://retroachievements.org/'
 
 const maxChars = 6;
 
@@ -104,14 +108,23 @@ module.exports = class ParseMemCommand extends Command {
         let achievementId;
 
         try {
-            if( achievementId = memLowerCase.match(achievementUrlRegex) ) {
+            if (achievementId = memLowerCase.match(achievementUrlRegex)) {
                 achievementId = parseInt(achievementId[2]);
+                if (achievementId <= 0) {
+                    return msg.reply('Invalid achievement ID');
+                }
+
                 const sentMsg = await msg.reply(`:hourglass: Getting MemAddr for achievement ID **${achievementId}**, please wait...`);
 
-                let memAddr = await this.getMemAddr(achievementId);
+                const gameId = await this.getGameId(achievementId);
+                if (achievementId <= 0) {
+                    return sentMsg.edit(`**Whoops!**\nI didn't find the game ID for achievement ID **${achievementId}**.`);
+                }
 
-                if( memAddr ) {
-                    reply = this.parsemem( memAddr );
+                const memAddr = await this.getMemAddr(gameId, achievementId);
+
+                if (memAddr) {
+                    reply = this.parsemem(memAddr);
                 } else {
                     reply = `**Whoops!**\nI didn't find the MemAddr for achievement ID **${achievementId}**.`;
                 }
@@ -201,35 +214,21 @@ module.exports = class ParseMemCommand extends Command {
     }
 
 
-    async getMemAddr( achievementId ) {
-        if( achievementId <= 0 ) {
-            return false;
-        }
-
-        let gameId;
-        let memAddr;
-        const raUser = process.env.RA_USER;
-        const apiKey = process.env.RA_WEB_API_KEY;
-        const raToken = process.env.RA_TOKEN;
-        const baseUrl = 'https://retroachievements.org/';
-
-        const achievementUnlocksUrl = `${baseUrl}API/API_GetAchievementUnlocks.php?z=${raUser}&y=${apiKey}&a=${achievementId}`;
-        await fetch(achievementUnlocksUrl)
+    async getGameId(achievementId) {
+        const achievementUnlocksUrl = `${baseUrl}API/API_GetAchievementUnlocks.php?z=${RA_USER}&y=${RA_WEB_API_KEY}&a=${achievementId}`;
+        return await fetch(achievementUnlocksUrl)
             .then(res => res.json())
-            .then(res => {
-                gameId = parseInt(res.Game.ID);
-                if(gameId <= 0) {
-                    return false;
-                }
-            })
-            .catch(err => false);
+            .then(res => parseInt(res.Game.ID))
+            .catch(err => null);
 
-        const dorequestPatchUrl = `${baseUrl}dorequest.php?r=patch&g=${gameId}&u=${raUser}&t=${raToken}`
-        await fetch(dorequestPatchUrl)
+    }
+
+
+    async getMemAddr(gameId, achievementId) {
+        const dorequestPatchUrl = `${baseUrl}dorequest.php?r=patch&g=${gameId}&u=${RA_USER}&t=${RA_TOKEN}`;
+        return await fetch(dorequestPatchUrl)
             .then(res => res.json())
-            .then(res => memAddr = res.PatchData.Achievements.find(ach => ach.ID == achievementId).MemAddr)
-            .catch(err => false);
-
-        return memAddr;
+            .then(res => res.PatchData.Achievements.find(ach => ach.ID == achievementId).MemAddr)
+            .catch(err => null);
     }
 }
