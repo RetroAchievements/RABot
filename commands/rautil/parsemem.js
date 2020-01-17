@@ -129,7 +129,7 @@ module.exports = class ParseMemCommand extends Command {
                 }
 
                 const addresses = [];
-                reply = await this.parsemem(memAddr, addresses);
+                reply = this.parsemem(memAddr, addresses);
 
                 if (addresses.length > 0 && devChannels.includes(msg.channel.id)) {
                     const codeNotesEmbed = await this.getCodeNotesEmbed(gameId, addresses);
@@ -150,7 +150,7 @@ module.exports = class ParseMemCommand extends Command {
         return msg.reply(reply);
     }
 
-    async parsemem(mem, addresses) {
+    parsemem(mem, addresses) {
         const collectAddresses = Array.isArray(addresses);
         const groups = mem.split(/(?<!0x)S/); // <-- pure JavaScript doesn't support lookbehind RegEx
         //const groups = mem.split(/(^(?!0x$).).+S/); // https://stackoverflow.com/a/7376273/6354514
