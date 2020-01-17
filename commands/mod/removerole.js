@@ -33,8 +33,7 @@ module.exports = class PruneCommand extends Command {
   }
 
   async run(msg, { role, user }) {
-    
-    const HIGER_ORDER_ROLES=['mod','staff','patron','admin'];
+    const HIGER_ORDER_ROLES = ['mod', 'staff', 'patron', 'admin'];
 
     const allowedMember = msg.guild.members.get(user.id).permissions.has('MANAGE_ROLES');
 
