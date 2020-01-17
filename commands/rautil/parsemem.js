@@ -218,11 +218,11 @@ module.exports = class ParseMemCommand extends Command {
                 }
 
                 if (collectAddresses) {
-                    if (lType && lType != 'v' && !addresses.includes(lMemory)) {
+                    if (lType && lMemory && lType != 'v' && !addresses.includes(lMemory)) {
                         addresses.push(lMemory);
                     }
-                    if (lType && rType != 'v' && !addresses.includes(rMemory)) {
-                        addresses.push(rMemory);
+                    if (rType && rMemVal && rType != 'v' && !addresses.includes(rMemVal)) {
+                        addresses.push(rMemVal);
                     }
                 }
             } // end of for looping through requirements in a group
