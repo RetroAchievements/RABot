@@ -1,26 +1,27 @@
-const SelfRoleCommand = require("../../structures/SelfRoleCommand.js");
+const SelfRoleCommand = require('../../structures/SelfRoleCommand.js');
 
-require("dotenv").config({path: __dirname + "/.env"});
+require('dotenv').config({ path: `${__dirname}/.env` });
+
 const { REVISION_VOTING } = process.env;
 
 
 module.exports = class RevisionVotingCommand extends SelfRoleCommand {
-    constructor(client) {
-        super(client, {
-            name: "revision-voting",
-            group: "mod",
-            aliases: ["revisionvoting", "rev-voting"],
-            memberName: "revision-voting",
-            description: "Add/Remove the `@revision-voting` role to/from yourself",
-            argsPromptLimit: 0,
-            args: [
-                {
-                    key: "action",
-                    type: "string",
-                    prompt: "",
-                    default: "show",
-                },
-            ],
-        }, REVISION_VOTING);
-    }
+  constructor(client) {
+    super(client, {
+      name: 'revision-voting',
+      group: 'mod',
+      aliases: ['revisionvoting', 'rev-voting'],
+      memberName: 'revision-voting',
+      description: 'Add/Remove the `@revision-voting` role to/from yourself',
+      argsPromptLimit: 0,
+      args: [
+        {
+          key: 'action',
+          type: 'string',
+          prompt: '',
+          default: 'show',
+        },
+      ],
+    }, REVISION_VOTING);
+  }
 };

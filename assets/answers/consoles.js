@@ -1,5 +1,5 @@
 // TODO: this will change on RAWeb v2
-const site = "https://retroachievements.org/gameList.php?c=";
+const site = 'https://retroachievements.org/gameList.php?c=';
 
 const megadrive = 1;
 const n64 = 2;
@@ -34,61 +34,61 @@ const commodore64 = 30;
 const zx81 = 31;
 
 module.exports = {
-    site: site,
+  site,
 
-    pages: {
-        all: site,
-        
-        megadrive: megadrive,
-        md: megadrive,
-        smd: megadrive,
-        genesis: megadrive,
-        gen: megadrive,
+  pages: {
+    all: site,
 
-        n64: n64,
-        nintendo64: n64,
+    megadrive,
+    md: megadrive,
+    smd: megadrive,
+    genesis: megadrive,
+    gen: megadrive,
 
-        snes: snes,
-        supernintendo: snes,
+    n64,
+    nintendo64: n64,
 
-        gb: gb,
-        gameboy: gb,
+    snes,
+    supernintendo: snes,
 
-        gba: gba,
-        gameboyadvance: gba,
+    gb,
+    gameboy: gb,
 
-        gbc: gbc,
-        gameboycolor: gbc,
+    gba,
+    gameboyadvance: gba,
 
-        nes: nes,
+    gbc,
+    gameboycolor: gbc,
 
-        pcengine: pcengine,
-        turbografx: pcengine,
-        turbografx16: pcengine,
+    nes,
 
-        mastersystem: mastersystem,
-        sms: mastersystem,
+    pcengine,
+    turbografx: pcengine,
+    turbografx16: pcengine,
 
-        ngp: ngp,
-        neogeopocket: ngp,
-        ngpc: ngp,
-        neogeopocketcolor: ngp,
+    mastersystem,
+    sms: mastersystem,
 
-        gamegear: gamegear,
-        gg: gamegear,
+    ngp,
+    neogeopocket: ngp,
+    ngpc: ngp,
+    neogeopocketcolor: ngp,
 
-        atari2600: atari2600,
-        vcs: atari2600,
-        atari: atari2600,
+    gamegear,
+    gg: gamegear,
 
-        arcade: arcade,
-        fba: arcade,
+    atari2600,
+    vcs: atari2600,
+    atari: atari2600,
 
-        virtualboy: virtualboy,
-        vb: virtualboy,
-    },
+    arcade,
+    fba: arcade,
 
-    answers: {
-        default: site,
-    },
+    virtualboy,
+    vb: virtualboy,
+  },
+
+  answers: {
+    default: site,
+  },
 };
