@@ -1,33 +1,35 @@
-require('dotenv').config({path: __dirname + '/.env'});
-const { BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE, BOT_NAME } = process.env;
+require('dotenv').config({ path: `${__dirname}/.env` });
+
+const {
+    BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE, BOT_NAME,
+} = process.env;
 const NEWS_ROLES = process.env.NEWS_ROLES.split(',');
 
 const Discord = require('discord.js');
 const logger = require('pino')({
-    useLevelLabels:true,
-    timestamp:()=>{
-        return `,"time":"${new Date()}"`
-    }
+    useLevelLabels: true,
+    timestamp: () => `,"time":"${new Date()}"`,
 });
+const path = require('path');
+const { CommandoClient } = require('discord.js-commando');
 const responses = require('./assets/answers/responses.js');
-//const checkFeed = require('./util/CheckFeed.js');
+// const checkFeed = require('./util/CheckFeed.js');
 const { getGameList } = require('./util/GetGameList.js');
 const { addMeme, removeMeme } = require('./util/MemeBoard.js');
 
 const badwordsRule2JSON = require('./assets/json/badwordsRule2.json');
 
-const regexRule2 = new RegExp('(' + badwordsRule2JSON.join('|') + ')', 'i');
+const regexRule2 = new RegExp(`(${badwordsRule2JSON.join('|')})`, 'i');
 const talkedRecently = new Set();
 
-const path = require('path');
-const { CommandoClient } = require('discord.js-commando');
+
 const client = new CommandoClient({
     commandPrefix: BOT_PREFIX,
     owner: OWNERS.split(','),
     invite: INVITE,
     disableEveryone: true,
     unknownCommandResponse: false,
-    disabledEvents: ['TYPING_START']
+    disabledEvents: ['TYPING_START'],
 });
 
 client.registry
@@ -46,7 +48,7 @@ client.registry
     .registerDefaultCommands({
         ping: false,
         prefix: false,
-        commandState: false
+        commandState: false,
     })
     .registerCommandsIn(path.join(__dirname, 'commands'));
 
@@ -58,53 +60,51 @@ client.once('ready', () => {
 });
 
 client.on('guildMemberAdd', async (member) => {
-    await member.setRoles(NEWS_ROLES).catch(err => logger.error(err));
+    await member.setRoles(NEWS_ROLES).catch((err) => logger.error(err));
     const message = `Hello ${member.displayName}. Welcome to the RetroAchievements Discord server. Please verify your account by sending a message to RAdmin on the website asking to be verified (once verified, you'll have access to more channels).\nhttps://retroachievements.org/user/RAdmin`;
     member.send(message)
-        .then(message => logger.info({msg: 'Sent message', msgID: message.id}))
-        .catch(error => logger.error(error));
+        .then((msg) => logger.info({ msg: 'Sent message', msgID: msg.id }))
+        .catch((error) => logger.error(error));
 });
 
-client.on('disconnect', event => {
+client.on('disconnect', (event) => {
     logger.error(`[DISCONNECT] Disconnected with code ${event.code}.`);
     process.exit(0);
 });
 
-client.on('commandRun', command => logger.info(`[COMMAND] Ran command ${command.groupID}:${command.memberName}.`));
+client.on('commandRun', (command) => logger.info(`[COMMAND] Ran command ${command.groupID}:${command.memberName}.`));
 
-client.on('error', err => logger.error(err));
+client.on('error', (err) => logger.error(err));
 
-client.on('warn', err => logger.warn(err));
+client.on('warn', (err) => logger.warn(err));
 
-client.on('commandError', (command, err) => logger.error({command:command.name, err}));
+client.on('commandError', (command, err) => logger.error({ command: command.name, err }));
 
 client.on('message', async (msg) => {
-    if(msg.author.bot) return;
-    if(msg.content.length <= 3) return;
+    if (msg.author.bot) return;
+    if (msg.content.length <= 3) return;
 
     const content = msg.content.toLowerCase();
-    if(responses[content]) {
-        if( talkedRecently.has(msg.author.id) )
-            return;
+    if (responses[content]) {
+        if (talkedRecently.has(msg.author.id)) { return; }
         talkedRecently.add(msg.author.id);
-        setTimeout( () => {
+        setTimeout(() => {
             talkedRecently.delete(msg.author.id);
         }, 10000);
 
-        return msg.reply(responses[content]);
+        msg.reply(responses[content]);
     }
 
     // checking for Rule 2 badwords
-    if(regexRule2.length && content.length >= 7 && content.match(regexRule2)) {
+    if (regexRule2.length && content.length >= 7 && content.match(regexRule2)) {
         try {
             await msg.react('🇷');
             await msg.react('🇺');
             await msg.react('🇱');
             await msg.react('🇪');
             await msg.react('2⃣');
-        }
-        catch (error) {
-            logger.error({error,msg:'[ERROR] Failed to react with "RULE2".'});
+        } catch (error) {
+            logger.error({ error, msg: '[ERROR] Failed to react with "RULE2".' });
         }
     }
 });
@@ -119,8 +119,8 @@ const events = {
     MESSAGE_REACTION_REMOVE: 'messageReactionRemove',
 };
 
-client.on('raw', async event => {
-    if (!events.hasOwnProperty(event.t)) return;
+client.on('raw', async (event) => {
+    if (!Object.prototype.hasOwnProperty.call(events, event.t)) return;
 
     const { d: data } = event;
     const user = client.users.get(data.user_id);
@@ -140,15 +140,15 @@ client.on('raw', async event => {
     client.emit(events[event.t], reaction, user);
 });
 
-client.on('messageReactionAdd', (reaction, user) => addMeme(reaction, user) );
+client.on('messageReactionAdd', (reaction, user) => addMeme(reaction, user));
 
-client.on('messageReactionRemove', (reaction, user) => removeMeme(reaction, user) );
+client.on('messageReactionRemove', (reaction, user) => removeMeme(reaction, user));
 // --- END OF THE WORKAROUND ---
 
 
 client.login(BOT_TOKEN);
 
-process.on('unhandledRejection', err => {
+process.on('unhandledRejection', (err) => {
     logger.error(err);
     process.exit(1);
 });
