@@ -1,6 +1,6 @@
 const GoogleCommand = require('../../structures/GoogleCommand.js');
 
-const site = "gamefaqs.com";
+const site = 'gamefaqs.com';
 const regex = /www\.gamefaqs\.com\/(?!boards)[^\/]+\/[^"&\/]+/;
 
 
@@ -12,7 +12,7 @@ module.exports = class GamefaqsCommand extends GoogleCommand {
             group: 'search',
             memberName: 'gamefaqs',
             description: 'Google for a game at GameFAQs and show the link.',
-            examples: ['`gamefaqs street fighter mega drive`', '`gamefaqs final fight arcade`' ],
+            examples: ['`gamefaqs street fighter mega drive`', '`gamefaqs final fight arcade`'],
             args: [
                 {
                     key: 'terms',
@@ -21,8 +21,7 @@ module.exports = class GamefaqsCommand extends GoogleCommand {
                     infinite: true,
                     default: '1',
                 },
-            ]
+            ],
         }, site, regex);
     }
-
 };

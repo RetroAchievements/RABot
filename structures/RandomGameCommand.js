@@ -7,45 +7,41 @@ module.exports = class RandomGameCommand extends Command {
     }
 
 
-    pickGame( games ) {
-        if( ! games instanceof Array || games.length == 0)
-            return undefined;
+    pickGame(games) {
+        if (!games instanceof Array || games.length == 0) return undefined;
 
-        return games[ Math.floor( Math.random() * games.length ) ];
+        return games[Math.floor(Math.random() * games.length)];
     }
 
 
-    getRandomGame( terms ) {
+    getRandomGame(terms) {
         // picking a random game globally
-        if( terms == '~NOARGS~' )
-            return this.pickGame( gamelist.games );
+        if (terms == '~NOARGS~') return this.pickGame(gamelist.games);
 
         let games;
-        let term = terms.toLowerCase();
+        const term = terms.toLowerCase();
         let offset;
         let length;
 
         // if the search term is a console name, pick a random game from that console
-        if( consoles.includes( term ) ) {
-            const index = gamelist.index;
+        if (consoles.includes(term)) {
+            const { index } = gamelist;
             const consoleName = term;
-            offset = index[ consoleName ][0];
-            length = index[ consoleName ][1];
-            games = gamelist.games.slice( offset, offset + length );
-            return this.pickGame( games );
+            offset = index[consoleName][0];
+            length = index[consoleName][1];
+            games = gamelist.games.slice(offset, offset + length);
+            return this.pickGame(games);
         }
 
         let regex;
         try {
-            regex = new RegExp( term, 'i' );
-        } catch( err ) {
+            regex = new RegExp(term, 'i');
+        } catch (err) {
             return `invalid Regular Expression: \`${term}\``;
         }
         games = gamelist.games;
-        games = games.filter( entry => entry[1].match( regex ) );
+        games = games.filter((entry) => entry[1].match(regex));
 
-        return this.pickGame( games );
+        return this.pickGame(games);
     }
-
 };
-

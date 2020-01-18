@@ -11,14 +11,13 @@ module.exports = class RarchCommand extends HelperCommand {
             description: 'Provide basic info about RetroArch.',
             examples: ['`rarch nightly`', '`rarch cores`'],
             args: [
-                {   
+                {
                     key: 'arg',
                     prompt: '',
                     type: 'string',
                     default: 'default',
-                }
-            ]
-            }, site, pages, answers);
+                },
+            ],
+        }, site, pages, answers);
     }
-
 };

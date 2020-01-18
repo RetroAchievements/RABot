@@ -1,34 +1,35 @@
-const Command = require('../../structures/Command.js');
 const { RichEmbed } = require('discord.js');
 const fetch = require('node-fetch');
+const Command = require('../../structures/Command.js');
+
 const { RA_USER, RA_TOKEN, RA_WEB_API_KEY } = process.env;
 
 const devChannels = process.env.CHANNEL_DEV_CHANNELS.split(',');
 
-const baseUrl = 'https://retroachievements.org/'
+const baseUrl = 'https://retroachievements.org/';
 
 const maxChars = 6;
 
 const finishleveln = '0xhlevel=n.1._0xhlevel=n+1_0xhlevel>d0xhlevel_R:0xhlevel<d0xhlevel';
 const templates = {
     finishlevel: finishleveln,
-    finishlevelbeforetime: finishleveln + '_0xhtime>=t',
-    finishlevelnodeath: finishleveln + '_0xhscreen=lvlintro.1._R:0xhlife<d0xhlife',
-    finishlevelwithitem: finishleveln + '_0xhitem=true',
+    finishlevelbeforetime: `${finishleveln}_0xhtime>=t`,
+    finishlevelnodeath: `${finishleveln}_0xhscreen=lvlintro.1._R:0xhlife<d0xhlife`,
+    finishlevelwithitem: `${finishleveln}_0xhitem=true`,
     collectitem: '0xhitem=false.1._0xhitem=true_R:0xhlevel!=0xhlevel',
-    changevalue: 'd:0xhaddress=v1.n._0xhaddress=v2.n._P:0xhaddress=0xhaddress'
-}
+    changevalue: 'd:0xhaddress=v1.n._0xhaddress=v2.n._P:0xhaddress=0xhaddress',
+};
 
 const specialFlags = {
-    'r': 'ResetIf',
-    'p': 'PauseIf',
-    'a': 'AddSource',
-    'b': 'SubSource',
-    'c': 'AddHits',
-    'n': 'AndNext',
-    'm': 'Measured',
-    'i': 'AddAddress',
-    '' : ''
+    r: 'ResetIf',
+    p: 'PauseIf',
+    a: 'AddSource',
+    b: 'SubSource',
+    c: 'AddHits',
+    n: 'AndNext',
+    m: 'Measured',
+    i: 'AddAddress',
+    '': '',
 };
 
 const memSize = {
@@ -46,34 +47,33 @@ const memSize = {
     '0xw': '24-bit',
     '0xx': '32-bit', // needs to be before the 16bits below to make the RegEx work
     '0x ': '16-bit',
-    '0x' : '16-bit',
-    'h'  : '',       // this means hex notation for values
-    ''   : ''
+    '0x': '16-bit',
+    h: '', // this means hex notation for values
+    '': '',
 };
 
 const memTypes = {
-    'd': 'Delta',
-    'p': 'Prior',
-    'm': 'Mem',
-    'v': 'Value',
-    '' : ''
+    d: 'Delta',
+    p: 'Prior',
+    m: 'Mem',
+    v: 'Value',
+    '': '',
 };
 
 
-const operandRegex = 
-  '(d|p)?(' +
-  Object.keys(memSize).join('|') + 
-  ')?([0-9a-z+-]*)';
+const operandRegex = `(d|p)?(${
+    Object.keys(memSize).join('|')
+})?([0-9a-z+-]*)`;
 
 const memRegex = new RegExp(
-  '(?:([' +
-  Object.keys(specialFlags).join('') +
-  ']):)?' +
-  operandRegex +
-  '(<=|>=|<|>|=|!=)?' +
-  operandRegex +
-  '(?:[(.]([0-9a-z]+)[).])?',
-  'i'
+    `(?:([${
+        Object.keys(specialFlags).join('')
+    }]):)?${
+        operandRegex
+    }(<=|>=|<|>|=|!=)?${
+        operandRegex
+    }(?:[(.]([0-9a-z]+)[).])?`,
+    'i',
 );
 
 
@@ -88,25 +88,25 @@ module.exports = class ParseMemCommand extends Command {
             examples: ['`mem R:0xH00175b=73_0xH0081f9=0S0xH00b241=164.40._P:d0xH00b241=164S0xH00a23f=164.40._P:d0xH00a23f=164`'],
             throttling: {
                 usages: 5,
-                duration: 60
+                duration: 60,
             },
             args: [
                 {
                     key: 'mem',
                     prompt: '',
                     type: 'string',
-                    infinite: true
+                    infinite: true,
                 },
-            ]
+            ],
         });
     }
 
-    async run( msg, { mem } ) {
+    async run(msg, { mem }) {
         // group2: achievementId
         const achievementUrlRegex = /^<?(https?:\/\/)?retroachievements\.org\/achievement\/([0-9]+)>?$/i;
 
         let reply;
-        let memLowerCase = mem[0].toLowerCase();
+        const memLowerCase = mem[0].toLowerCase();
         let achievementId;
 
         try {
@@ -137,14 +137,14 @@ module.exports = class ParseMemCommand extends Command {
                 }
 
                 return sentMsg.edit(reply);
-            } else if( memLowerCase === "templates" ) {
-                reply = '**Templates available**: `' + Object.keys(templates).join('`, `') + '`';
-            } else if( Object.keys(templates).includes(mem[0].toLowerCase()) ) {
-                reply = this.parsemem( templates[mem[0].toLowerCase()] );
+            } if (memLowerCase === 'templates') {
+                reply = `**Templates available**: \`${Object.keys(templates).join('`, `')}\``;
+            } else if (Object.keys(templates).includes(mem[0].toLowerCase())) {
+                reply = this.parsemem(templates[mem[0].toLowerCase()]);
             } else {
-                reply = this.parsemem( mem.join(' ') );
+                reply = this.parsemem(mem.join(' '));
             }
-        } catch(error) {
+        } catch (error) {
             reply = `**Whoops!**\n${error.message}\nCheck your MemAddr string and try again.`;
         }
         return msg.reply(reply);
@@ -153,68 +153,65 @@ module.exports = class ParseMemCommand extends Command {
     parsemem(mem, addresses) {
         const collectAddresses = Array.isArray(addresses);
         const groups = mem.split(/(?<!0x)S/); // <-- pure JavaScript doesn't support lookbehind RegEx
-        //const groups = mem.split(/(^(?!0x$).).+S/); // https://stackoverflow.com/a/7376273/6354514
+        // const groups = mem.split(/(^(?!0x$).).+S/); // https://stackoverflow.com/a/7376273/6354514
         let reqs;
         let parsedReq;
-        let reqNum, flag, lType, lSize, lMemory, cmp, rType, rSize, rMemVal, hits;
+        let reqNum; let flag; let lType; let lSize; let lMemory; let cmp; let rType; let rSize; let rMemVal; let
+            hits;
         let num;
         let countLines = 0;
         let res = '\n';
 
-        for( let i = 0; i < groups.length; i++ ) {
+        for (let i = 0; i < groups.length; i++) {
             res += i == 0 ? '__**Core Group**__:' : `__**Alt Group ${i}**__:`;
             res += '```';
 
             reqs = groups[i].split('_');
             countLines += reqs.length;
-            if( countLines > 20 )
-                return "I'm unable to handle this, it's TOO BIG!";
+            if (countLines > 20) return "I'm unable to handle this, it's TOO BIG!";
 
-            for( let j = 0; j < reqs.length; j++ ) {
+            for (let j = 0; j < reqs.length; j++) {
                 reqNum = j + 1;
                 parsedReq = reqs[j].match(memRegex);
-                if( !parsedReq )
-                    return `invalid "Mem" string: \`${mem}\`\nI've failed to parse this: \`${reqs[j]}\`\n**Note**: strings for address/value should be lowercased`;
+                if (!parsedReq) return `invalid "Mem" string: \`${mem}\`\nI've failed to parse this: \`${reqs[j]}\`\n**Note**: strings for address/value should be lowercased`;
 
-                flag =    parsedReq[1] ? parsedReq[1].toLowerCase() : '';
-                lType =   parsedReq[2] ? parsedReq[2].toLowerCase() : '';
-                lSize =   parsedReq[3] ? parsedReq[3].toLowerCase() : '';
+                flag = parsedReq[1] ? parsedReq[1].toLowerCase() : '';
+                lType = parsedReq[2] ? parsedReq[2].toLowerCase() : '';
+                lSize = parsedReq[3] ? parsedReq[3].toLowerCase() : '';
                 lMemory = parsedReq[4] || '';
-                cmp =     parsedReq[5] || '=';
-                rType =   parsedReq[6] ? parsedReq[6].toLowerCase() : '';
-                rSize =   parsedReq[7] ? parsedReq[7].toLowerCase() : '';
+                cmp = parsedReq[5] || '=';
+                rType = parsedReq[6] ? parsedReq[6].toLowerCase() : '';
+                rSize = parsedReq[7] ? parsedReq[7].toLowerCase() : '';
                 rMemVal = parsedReq[8] || '';
-                hits =    parsedReq[9] || '0';
+                hits = parsedReq[9] || '0';
 
-                if( lSize == '' ) {
+                if (lSize == '') {
                     num = parseInt(lMemory).toString(16);
-                    if(!isNaN('0x' + num)) lMemory = num;
+                    if (!isNaN(`0x${num}`)) lMemory = num;
                 }
-                lMemory = '0x' + lMemory.substring(0, maxChars+2).padStart(maxChars, '0');
-                if( rSize == '' ){
+                lMemory = `0x${lMemory.substring(0, maxChars + 2).padStart(maxChars, '0')}`;
+                if (rSize == '') {
                     num = parseInt(rMemVal).toString(16);
-                    if(!isNaN('0x' + num)) rMemVal = num;
+                    if (!isNaN(`0x${num}`)) rMemVal = num;
                 }
-                rMemVal = '0x' + rMemVal.substring(0, maxChars+2).padStart(maxChars, '0');
+                rMemVal = `0x${rMemVal.substring(0, maxChars + 2).padStart(maxChars, '0')}`;
 
-                if( lType !== 'd' && lType !== 'p')
-                    lType = ( lSize == '' || lSize == 'h' ) ? 'v' : 'm';
-                if( rType !== 'd' && rType !== 'p')
-                    rType = ( rSize == '' || rSize == 'h' ) ? 'v' : 'm';
+                if (lType !== 'd' && lType !== 'p') lType = (lSize == '' || lSize == 'h') ? 'v' : 'm';
+                if (rType !== 'd' && rType !== 'p') rType = (rSize == '' || rSize == 'h') ? 'v' : 'm';
 
-                res += '\n' + reqNum.toString().padStart(2, ' ') + ':';
+                res += `\n${reqNum.toString().padStart(2, ' ')}:`;
                 res += specialFlags[flag].padEnd(10, ' ');
                 res += memTypes[lType].padEnd(6, ' ');
                 res += memSize[lSize].padEnd(7, ' ');
-                res += lMemory + ' ';
-                if( flag == 'A' || flag == 'B' ) {
+                res += `${lMemory} `;
+                if (flag == 'A' || flag == 'B') {
                     res += '\n';
                 } else {
                     res += cmp.padEnd(3, ' ');
                     res += memTypes[rType].padEnd(6, ' ');
                     res += memSize[rSize].padEnd(7, ' ');
-                    res += rMemVal + ' ';
-                    res += ' (' + hits + ')';
+                    res += `${rMemVal} `;
+                    res += ` (${hits})`;
                 }
 
                 if (collectAddresses) {
@@ -235,28 +232,27 @@ module.exports = class ParseMemCommand extends Command {
     async getGameId(achievementId) {
         const achievementUnlocksUrl = `${baseUrl}API/API_GetAchievementUnlocks.php?z=${RA_USER}&y=${RA_WEB_API_KEY}&a=${achievementId}`;
         return await fetch(achievementUnlocksUrl)
-            .then(res => res.json())
-            .then(res => parseInt(res.Game.ID))
-            .catch(err => null);
-
+            .then((res) => res.json())
+            .then((res) => parseInt(res.Game.ID))
+            .catch((err) => null);
     }
 
 
     async getMemAddr(gameId, achievementId) {
         const dorequestPatchUrl = `${baseUrl}dorequest.php?r=patch&g=${gameId}&u=${RA_USER}&t=${RA_TOKEN}`;
         return await fetch(dorequestPatchUrl)
-            .then(res => res.json())
-            .then(res => res.PatchData.Achievements.find(ach => ach.ID == achievementId).MemAddr)
-            .catch(err => null);
+            .then((res) => res.json())
+            .then((res) => res.PatchData.Achievements.find((ach) => ach.ID == achievementId).MemAddr)
+            .catch((err) => null);
     }
 
 
     async getCodeNotes(gameId) {
         const dorequestCodeNotesUrl = `${baseUrl}dorequest.php?r=codenotes2&g=${gameId}&u=${RA_USER}&t=${RA_TOKEN}`;
         return await fetch(dorequestCodeNotesUrl)
-            .then(res => res.json())
-            .then(res => res.CodeNotes)
-            .catch(err => null);
+            .then((res) => res.json())
+            .then((res) => res.CodeNotes)
+            .catch((err) => null);
     }
 
 
@@ -269,16 +265,16 @@ module.exports = class ParseMemCommand extends Command {
             .setURL(`${baseUrl}codenotes.php?g=${gameId}`);
 
         try {
-            addresses.forEach(addr => {
-                const codeNote = codeNotes.find(note => note.Address == addr);
+            addresses.forEach((addr) => {
+                const codeNote = codeNotes.find((note) => note.Address == addr);
                 if (codeNote) {
                     hasNote = true;
                     codeNotesEmbed.addField(`**${addr}**`, codeNote.Note, true);
                 }
             });
             return hasNote ? codeNotesEmbed : undefined;
-        } catch(err) {
+        } catch (err) {
             return undefined;
         }
     }
-}
+};

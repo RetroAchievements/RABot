@@ -12,14 +12,13 @@ module.exports = class GameListCommand extends HelperCommand {
             description: 'Link to the list of supported games.',
             examples: ['`gl nes`', '`gl megadrive`', '`gl arcade`'],
             args: [
-                {   
+                {
                     key: 'arg',
                     prompt: '',
                     type: 'string',
                     default: 'default',
-                }
-            ]
-            }, site, pages, answers);
+                },
+            ],
+        }, site, pages, answers);
     }
-
 };

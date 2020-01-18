@@ -1,6 +1,6 @@
-const Command = require('../../structures/Command');
 const { RichEmbed } = require('discord.js');
 const request = require('node-superfetch');
+const Command = require('../../structures/Command');
 const { shorten } = require('../../util/Utils');
 
 module.exports = class BulbapediaCommand extends Command {
@@ -15,9 +15,9 @@ module.exports = class BulbapediaCommand extends Command {
                 {
                     key: 'query',
                     prompt: 'What article would you like to search for?',
-                    type: 'string'
-                }
-            ]
+                    type: 'string',
+                },
+            ],
         });
     }
 
@@ -36,12 +36,11 @@ module.exports = class BulbapediaCommand extends Command {
                     explaintext: '',
                     pithumbsize: 150,
                     redirects: '',
-                    formatversion: 2
+                    formatversion: 2,
                 });
             const data = body.query.pages[0];
 
-            if (data.missing)
-                return sentMsg.edit("Didn't find anything... :frowning:");
+            if (data.missing) return sentMsg.edit("Didn't find anything... :frowning:");
 
             const response = new RichEmbed()
                 .setColor(0x3E7614)

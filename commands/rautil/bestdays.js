@@ -24,31 +24,28 @@ module.exports = class BestDaysCommand extends Command {
         });
     }
 
-    async run( msg, { user } ) {
+    async run(msg, { user }) {
         const days = 3;
         const sentMsg = await msg.reply(':hourglass: Getting info, please wait...');
-        const bestDaysInfo = await bestDays( user, days );
-        if( !bestDaysInfo )
-            return sentMsg.edit(`There's no info for \`${user}\``);
+        const bestDaysInfo = await bestDays(user, days);
+        if (!bestDaysInfo) return sentMsg.edit(`There's no info for \`${user}\``);
 
         let response = `:trophy: __**${user}'s best days**__ :trophy:\n`;
         response += '```md\n';
 
-        response += "[   date    ]( cheevos )< score >\n"
-        response += "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        response += '[   date    ]( cheevos )< score >\n';
+        response += '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~';
 
-        for(let i = 0; i <= days && i < bestDaysInfo.date.length; i++) {
+        for (let i = 0; i <= days && i < bestDaysInfo.date.length; i++) {
             response += `\n[${bestDaysInfo.date[i]}]`;
             response += `( ${bestDaysInfo.cheevos[i].padEnd(8, ' ')})`;
             response += `< ${bestDaysInfo.score[i].padEnd(6, ' ')}>`;
         }
         response += '\n```';
 
-        const scoreComment = await bestScoreComment( user );
-        if( scoreComment )
-            response += scoreComment;
+        const scoreComment = await bestScoreComment(user);
+        if (scoreComment) response += scoreComment;
 
-        return sentMsg.edit( response );
+        return sentMsg.edit(response);
     }
-
 };

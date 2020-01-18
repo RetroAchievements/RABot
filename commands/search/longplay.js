@@ -1,12 +1,13 @@
-const Command = require('../../structures/Command.js');
 const ytSearch = require('youtube-search');
+const Command = require('../../structures/Command.js');
 
-require('dotenv').config({path: __dirname + '../../.env'});
+require('dotenv').config({ path: `${__dirname}../../.env` });
+
 const { YOUTUBE_API_KEY } = process.env;
 
 const opts = {
     maxResults: 1,
-    key: YOUTUBE_API_KEY
+    key: YOUTUBE_API_KEY,
 };
 
 
@@ -18,7 +19,7 @@ module.exports = class LongPlayCommand extends Command {
             group: 'search',
             memberName: 'longplay',
             description: 'Search for a longplay video on youtube and post the link.',
-            examples: ['`longplay street fighter mega drive`', '`longplay final fight arcade`' ],
+            examples: ['`longplay street fighter mega drive`', '`longplay final fight arcade`'],
             throttling: {
                 usages: 3,
                 duration: 60,
@@ -30,26 +31,22 @@ module.exports = class LongPlayCommand extends Command {
                     type: 'string',
                     infinite: true,
                 },
-            ]
+            ],
         });
     }
 
-    async run(msg, { terms } ) {
-        let searchTerms = 'longplay'
+    async run(msg, { terms }) {
+        let searchTerms = 'longplay';
         let response;
 
-        terms.forEach(term => searchTerms += ` ${term}`);
+        terms.forEach((term) => searchTerms += ` ${term}`);
 
-        const sentMsg = await msg.reply(":mag: Searching the longplay, please wait...");
+        const sentMsg = await msg.reply(':mag: Searching the longplay, please wait...');
 
         ytSearch(searchTerms, opts, (err, results) => {
-            if(err)
-                return sentMsg.edit(`${msg.author}, **error**: Something went wrong...`);
-            if(!results)
-                return sentMsg.edit(`${msg.author} , Didn't find anything... :frowning:`);
-            return sentMsg.edit(`${msg.author}, ${results[0].link}`); 
+            if (err) return sentMsg.edit(`${msg.author}, **error**: Something went wrong...`);
+            if (!results) return sentMsg.edit(`${msg.author} , Didn't find anything... :frowning:`);
+            return sentMsg.edit(`${msg.author}, ${results[0].link}`);
         });
     }
-
 };
-

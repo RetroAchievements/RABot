@@ -1,157 +1,157 @@
 const site = 'https://docs.retroachievements.org/';
-const radocs = "index.html";
-const dev = "Developer-docs";
-const devstart = "Getting-Started-as-an-Achievement-Developer";
-const meminspector = "Memory-Inspector-Overview";
-const logic = "Achievement-Logic-Features";
-const delta = "Achievement-Logic-Features#delta-values";
-const hitcounts = "Achievement-Logic-Features#hit-counts";
-const resetif = "Achievement-Logic-Features#resetif";
-const pauseif = "Achievement-Logic-Features#pauseif";
-const addsource = "Achievement-Logic-Features#add-source";
-const subsource = "Achievement-Logic-Features#sub-source";
-const addhits = "Achievement-Logic-Features#add-hits";
-const altgroups = "Achievement-Logic-Features#alt-groups";
-const examples = "Real-Examples";
-const templates = "Achievement-Templates";
-const finishlevel = "Achievement-Templates#finish-level-n";
-const damageless = "Achievement-Templates#finish-level-n-without-dying-or-getting-hit-using-a-weapon-etc";
-const collect = "Achievement-Templates#collect-an-item-in-a-specific-level";
-const changeval = "Achievement-Templates#check-for-a-specific-value-changing-to-another-specific-value-ten-times";
-const condreset = "Achievement-Templates#conditional-resets";
-const difficulty = "Difficulty-Scale-and-Balance";
-const roadmap = "Set-Development-Roadmap";
-const badge = "Badge-and-Icon-Creation";
-const lboards = "Leaderboards";
-const rps = "Rich-Presence";
-const cheevodesign = "Achievement-Design";
-const bonus = "Bonus-Sets";
-const hacks = "Achievements-for-ROM-hacks";
-const lazy = "I-am-too-lazy-to-read-the-docs";
-const coc = "Users-Code-of-Conduct";
-const faq = "FAQ";
-const nocheevos = "My-game-is-not-loading-achievements";
-const contribute = "How-to-contribute-if-you-are-not-a-developer";
+const radocs = 'index.html';
+const dev = 'Developer-docs';
+const devstart = 'Getting-Started-as-an-Achievement-Developer';
+const meminspector = 'Memory-Inspector-Overview';
+const logic = 'Achievement-Logic-Features';
+const delta = 'Achievement-Logic-Features#delta-values';
+const hitcounts = 'Achievement-Logic-Features#hit-counts';
+const resetif = 'Achievement-Logic-Features#resetif';
+const pauseif = 'Achievement-Logic-Features#pauseif';
+const addsource = 'Achievement-Logic-Features#add-source';
+const subsource = 'Achievement-Logic-Features#sub-source';
+const addhits = 'Achievement-Logic-Features#add-hits';
+const altgroups = 'Achievement-Logic-Features#alt-groups';
+const examples = 'Real-Examples';
+const templates = 'Achievement-Templates';
+const finishlevel = 'Achievement-Templates#finish-level-n';
+const damageless = 'Achievement-Templates#finish-level-n-without-dying-or-getting-hit-using-a-weapon-etc';
+const collect = 'Achievement-Templates#collect-an-item-in-a-specific-level';
+const changeval = 'Achievement-Templates#check-for-a-specific-value-changing-to-another-specific-value-ten-times';
+const condreset = 'Achievement-Templates#conditional-resets';
+const difficulty = 'Difficulty-Scale-and-Balance';
+const roadmap = 'Set-Development-Roadmap';
+const badge = 'Badge-and-Icon-Creation';
+const lboards = 'Leaderboards';
+const rps = 'Rich-Presence';
+const cheevodesign = 'Achievement-Design';
+const bonus = 'Bonus-Sets';
+const hacks = 'Achievements-for-ROM-hacks';
+const lazy = 'I-am-too-lazy-to-read-the-docs';
+const coc = 'Users-Code-of-Conduct';
+const faq = 'FAQ';
+const nocheevos = 'My-game-is-not-loading-achievements';
+const contribute = 'How-to-contribute-if-you-are-not-a-developer';
 const softcore = "Why-you-shouldn't-use-the-load-state-feature";
-const about = "About";
-const ralibretro = "RALibretro";
-const devcoc = "Developers-Code-of-Conduct";
-const badconcepts = "Developers-Code-of-Conduct#unwelcome-concepts";
-const beadev = "How-to-Become-an-Achievement-Developer";
-const revision = "Achievement-Set-Revisions";
+const about = 'About';
+const ralibretro = 'RALibretro';
+const devcoc = 'Developers-Code-of-Conduct';
+const badconcepts = 'Developers-Code-of-Conduct#unwelcome-concepts';
+const beadev = 'How-to-Become-an-Achievement-Developer';
+const revision = 'Achievement-Set-Revisions';
 
 
 module.exports = {
-    site: site,
+    site,
 
     pages: {
-        dev: dev,
+        dev,
         devdocs: dev,
 
-        devstart: devstart,
+        devstart,
         jrdev: devstart,
         startdev: devstart,
 
-        meminspector: meminspector,
+        meminspector,
 
-        logic: logic,
+        logic,
 
-        delta: delta,
+        delta,
 
-        hitcounts: hitcounts,
+        hitcounts,
         hits: hitcounts,
 
-        resetif: resetif,
+        resetif,
 
-        pauseif: pauseif,
+        pauseif,
 
-        addsource: addsource,
+        addsource,
 
-        subsource: subsource,
+        subsource,
 
-        addhits: addhits,
+        addhits,
 
-        altgroups: altgroups,
+        altgroups,
         alts: altgroups,
         alt: altgroups,
 
-        examples: examples,
+        examples,
 
-        templates: templates,
+        templates,
 
-        finishlevel: finishlevel,
+        finishlevel,
 
-        damageless: damageless,
+        damageless,
         deathless: damageless,
 
-        collect: collect,
+        collect,
         collectitem: collect,
         getitem: collect,
 
-        changeval: changeval,
+        changeval,
         changingvalues: changeval,
 
-        condreset: condreset,
+        condreset,
         conditionalreset: condreset,
 
-        difficulty: difficulty,
+        difficulty,
 
-        roadmap: roadmap,
+        roadmap,
         devroadmap: roadmap,
 
-        badge: badge,
+        badge,
         icon: badge,
 
-        lboards: lboards,
+        lboards,
         leaderboards: lboards,
         lbs: lboards,
 
-        rps: rps,
+        rps,
         richpresence: rps,
         rp: rps,
 
-        cheevodesign: cheevodesign,
+        cheevodesign,
         achievementdesign: cheevodesign,
         design: cheevodesign,
 
-        bonus: bonus,
+        bonus,
         bonusset: bonus,
 
-        hacks: hacks,
+        hacks,
         hack: hacks,
 
-        lazy: lazy,
+        lazy,
         lazydev: lazy,
         lazynoob: lazy,
 
-        coc: coc,
+        coc,
         conduct: coc,
         usercoc: coc,
 
-        faq: faq,
+        faq,
 
-        nocheevos: nocheevos,
+        nocheevos,
         missingcheevos: nocheevos,
 
-        contribute: contribute,
+        contribute,
 
-        softcore: softcore,
+        softcore,
         loadstate: softcore,
 
-        about: about,
+        about,
 
-        ralibretro: ralibretro,
-        
-        devcoc: devcoc,
+        ralibretro,
 
-        badconcepts: badconcepts,
+        devcoc,
 
-        beadev: beadev,
-        
-        revision: revision
+        badconcepts,
+
+        beadev,
+
+        revision,
     },
 
     answers: {
         default: site,
-    }
-}
+    },
+};

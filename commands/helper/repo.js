@@ -11,14 +11,13 @@ module.exports = class RepoCommand extends HelperCommand {
             description: 'Provide links to RetroAchievements repositories.',
             examples: ['`repo ralibretro`', '`repo raintegration`', '`repo wiki`'],
             args: [
-                {   
+                {
                     key: 'arg',
                     prompt: '',
                     type: 'string',
                     default: 'default',
-                }
-            ]
-            }, site, pages, answers);
+                },
+            ],
+        }, site, pages, answers);
     }
-
 };

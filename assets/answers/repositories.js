@@ -10,20 +10,20 @@ const guides = 'guides';
 const wiki = 'docs/wiki';
 
 module.exports = {
-    site: site,
+    site,
 
     pages: {
-        rabot: rabot,
-        raintegration: raintegration,
-        raweb: raweb,
-        raemus: raemus,
-        ralibretro: ralibretro,
-        rcheevos: rcheevos,
-        guides: guides,
-        wiki: wiki,
+        rabot,
+        raintegration,
+        raweb,
+        raemus,
+        ralibretro,
+        rcheevos,
+        guides,
+        wiki,
     },
 
     answers: {
         default: site,
     },
-}
+};

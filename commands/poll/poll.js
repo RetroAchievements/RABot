@@ -1,5 +1,5 @@
-const Command = require('../../structures/Command.js');
 const { Collection } = require('discord.js');
+const Command = require('../../structures/Command.js');
 
 const allOptions = Object.values(require('../../assets/json/emoji-alphabet.json'));
 
@@ -18,8 +18,8 @@ module.exports = class PollCommand extends Command {
                     key: 'question',
                     type: 'string',
                     prompt: '',
-                    validate: question => {
-                        if(question.length > 0 && question.length < 400) return true;
+                    validate: (question) => {
+                        if (question.length > 0 && question.length < 400) return true;
                         return 'Invalid question';
                     },
                 },
@@ -35,7 +35,6 @@ module.exports = class PollCommand extends Command {
     }
 
     async run(msg, { question, opts }) {
-        return this.client.registry.resolveCommand('poll:tpoll').run(msg, { seconds: 0, question: question, opts: opts });
+        return this.client.registry.resolveCommand('poll:tpoll').run(msg, { seconds: 0, question, opts });
     }
-
 };

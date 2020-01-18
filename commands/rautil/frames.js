@@ -21,11 +21,11 @@ module.exports = class FramesCommand extends Command {
                     type: 'string',
                     infinite: true,
                 },
-            ]
+            ],
         });
     }
 
-    run( msg, { input }) {
+    run(msg, { input }) {
         // group2: hours
         // group4: minutes
         // group6: seconds
@@ -36,21 +36,23 @@ module.exports = class FramesCommand extends Command {
         const regexFps = /([0-9]+) *fps/i;
 
         // group2: frames amount
-        const regexFramesAmount = /^ *([0-9]+ *fps )? *([0-9]+) *( [0-9]+ *fps)? *$/
+        const regexFramesAmount = /^ *([0-9]+ *fps )? *([0-9]+) *( [0-9]+ *fps)? *$/;
 
         const inputString = input.join(' ');
 
         const parsedTime = inputString.match(regexTime);
-        const parsedFps  = inputString.match(regexFps);
+        const parsedFps = inputString.match(regexFps);
 
         let totalSeconds = 0;
-        let fps, frames;
-        let hours, minutes, seconds, milliseconds;
+        let fps; let
+            frames;
+        let hours; let minutes; let seconds; let
+            milliseconds;
 
         fps = parsedFps ? parseFloat(parsedFps[1]) : 60;
-        hours        = parseFloat(parsedTime[2] || 0);
-        minutes      = parseFloat(parsedTime[4] || 0);
-        seconds      = parseFloat(parsedTime[6] || 0);
+        hours = parseFloat(parsedTime[2] || 0);
+        minutes = parseFloat(parsedTime[4] || 0);
+        seconds = parseFloat(parsedTime[6] || 0);
         milliseconds = parseFloat(parsedTime[8] || 0);
         totalSeconds = seconds + milliseconds / 1000 + minutes * 60 + hours * 60 * 60;
 
@@ -62,7 +64,7 @@ module.exports = class FramesCommand extends Command {
             frames = parsedFramesAmount ? parseInt(parsedFramesAmount[2]) : 0;
 
             if (frames <= 0 || fps <= 0) {
-                msg.reply('invalid time format: `' + inputString + '`\nUse `!help frames` to se some useful examples');
+                msg.reply(`invalid time format: \`${inputString}\`\nUse \`!help frames\` to se some useful examples`);
                 return;
             }
 
@@ -73,12 +75,12 @@ module.exports = class FramesCommand extends Command {
         milliseconds = Math.round(1000 * (totalSeconds - Math.floor(totalSeconds)));
         totalSeconds = Math.floor(totalSeconds);
 
-        hours   = Math.floor(totalSeconds / 3600);
+        hours = Math.floor(totalSeconds / 3600);
         minutes = Math.floor((totalSeconds - hours * 3600) / 60);
         seconds = totalSeconds - hours * 3600 - minutes * 60;
 
-        msg.say(`**Time:** \`${hours}h ${minutes}min ${seconds}s ${milliseconds}ms\`` +
-            `\n**FPS:** \`${fps}\`` +
-            `\n**Frames:** \`${frames} (0x${frames.toString(16)})\``);
+        msg.say(`**Time:** \`${hours}h ${minutes}min ${seconds}s ${milliseconds}ms\``
+            + `\n**FPS:** \`${fps}\``
+            + `\n**Frames:** \`${frames} (0x${frames.toString(16)})\``);
     }
-}
+};

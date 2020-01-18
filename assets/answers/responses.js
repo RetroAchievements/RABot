@@ -6,21 +6,21 @@ const pfp = "**So you've changed your profile picture on the site and it wasn't 
 
 module.exports = {
     'hi there': hi,
-    'hello': hi,
+    hello: hi,
     'hello guys': hi,
     'hi guys': hi,
 
     'good night here': gnight,
-    'gnight': gnight,
+    gnight,
     'g\'night here': gnight,
     'gnight here': gnight,
-    
+
     'morning guys': gmorning,
     'good morning': gmorning,
     'good morning guys': gmorning,
-    'gmorning': gmorning,
+    gmorning,
     'g\'morning': gmorning,
 
     '!pfp': pfp, // a workaround to pretend it's a command
-    'pfp': pfp,
-}
+    pfp,
+};

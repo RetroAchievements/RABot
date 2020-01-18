@@ -1,9 +1,10 @@
 /*
  * This code is originally from https://github.com/dragonfire535/xiao/
  */
-const Command = require('../../structures/Command');
 const request = require('node-superfetch');
 const { stripIndents } = require('common-tags');
+const Command = require('../../structures/Command');
+
 const { WORDNIK_KEY } = process.env;
 
 module.exports = class DefineCommand extends Command {
@@ -19,9 +20,9 @@ module.exports = class DefineCommand extends Command {
                     key: 'word',
                     prompt: 'What word would you like to look up?',
                     type: 'string',
-                    parse: word => encodeURIComponent(word)
-                }
-            ]
+                    parse: (word) => encodeURIComponent(word),
+                },
+            ],
         });
     }
 
@@ -33,7 +34,7 @@ module.exports = class DefineCommand extends Command {
                     limit: 1,
                     includeRelated: false,
                     useCanonical: true,
-                    api_key: WORDNIK_KEY
+                    api_key: WORDNIK_KEY,
                 });
             if (!body.length) return msg.say('Could not find any results.');
             const data = body[0];

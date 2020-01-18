@@ -13,10 +13,9 @@ module.exports = class FunFactCommand extends RandomFactCommand {
                     key: 'number',
                     prompt: '',
                     type: 'string',
-                    default: '~NOARGS~'
-                }
-            ]
-        }, '../assets/json/funfacts.json' );
-
+                    default: '~NOARGS~',
+                },
+            ],
+        }, '../assets/json/funfacts.json');
     }
 };

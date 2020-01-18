@@ -2,10 +2,10 @@
  * This code is highly based on the work of dragonfire535 and his Xiao bot:
  * https://github.com/dragonfire535/xiao
  */
-const Command = require('../../structures/Command');
 const request = require('node-superfetch');
 const { RichEmbed } = require('discord.js');
 const { stripIndents } = require('common-tags');
+const Command = require('../../structures/Command');
 const { shorten } = require('../../util/Utils');
 
 const searchGraphQL = stripIndents`
@@ -46,9 +46,9 @@ module.exports = class MangaCommand extends Command {
                 {
                     key: 'query',
                     prompt: 'What manga would you like to search for?',
-                    type: 'string'
-                }
-            ]
+                    type: 'string',
+                },
+            ],
         });
     }
 
@@ -57,8 +57,7 @@ module.exports = class MangaCommand extends Command {
 
         try {
             const id = await this.search(query, msg.channel.nsfw);
-            if (!id)
-                return sentMsg.edit("Didn't find anything... :frowning:");
+            if (!id) return sentMsg.edit("Didn't find anything... :frowning:");
 
             const manga = await this.fetchAnime(id);
 
@@ -87,9 +86,9 @@ module.exports = class MangaCommand extends Command {
                 variables: {
                     search: query,
                     type: 'MANGA',
-                    isAdult: Boolean(nsfw)
+                    isAdult: Boolean(nsfw),
                 },
-                query: searchGraphQL
+                query: searchGraphQL,
             });
         if (!body.data.anime.results.length) return null;
         return body.data.anime.results[0].id;
@@ -101,9 +100,9 @@ module.exports = class MangaCommand extends Command {
             .send({
                 variables: {
                     id,
-                    type: 'MANGA'
+                    type: 'MANGA',
                 },
-                query: resultGraphQL
+                query: resultGraphQL,
             });
         return body.data.Media;
     }

@@ -1,5 +1,5 @@
-const Command = require('../../structures/Command.js');
 const crypto = require('crypto');
+const Command = require('../../structures/Command.js');
 
 module.exports = class Md5Command extends Command {
     constructor(client) {
@@ -8,7 +8,7 @@ module.exports = class Md5Command extends Command {
             group: 'rautil',
             memberName: 'md5',
             description: 'Generates an md5 hash for the strings given as arguments.',
-            examples: ['`md5 dino`', '`md5 mvsc`' ],
+            examples: ['`md5 dino`', '`md5 mvsc`'],
             args: [
                 {
                     key: 'terms',
@@ -17,13 +17,13 @@ module.exports = class Md5Command extends Command {
                     infinite: true,
                     default: '1',
                 },
-            ]
+            ],
         });
     }
 
-    run(msg, { terms } ) {
+    run(msg, { terms }) {
         let reply = '';
-        terms.forEach(term => reply += `md5(\`${term}\`) = \`${crypto.createHash('md5').update(term).digest('hex')}\`\n`);
+        terms.forEach((term) => reply += `md5(\`${term}\`) = \`${crypto.createHash('md5').update(term).digest('hex')}\`\n`);
 
         return msg.say(reply);
     }

@@ -13,7 +13,7 @@ module.exports = class RulesCommand extends Command {
             description: 'Show the rules (or a specific one).',
             argsPromptLimit: 0,
             args: [
-                {   
+                {
                     key: 'arg',
                     prompt: '',
                     type: 'string',
@@ -26,8 +26,7 @@ module.exports = class RulesCommand extends Command {
     run(msg, { arg }) {
         let response = rules[arg];
 
-        if(!response)
-            response = `**invalid rule**: ${arg}\n\n${rules['all']}`;
+        if (!response) response = `**invalid rule**: ${arg}\n\n${rules.all}`;
 
         return msg.say(response);
     }

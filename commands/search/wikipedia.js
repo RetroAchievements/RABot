@@ -2,9 +2,9 @@
  * The inspiration for this came from Xiao bot's code:
  * https://github.com/dragonfire535/xiao
  */
-const Command = require('../../structures/Command.js');
 const fetch = require('node-fetch');
 const { RichEmbed } = require('discord.js');
+const Command = require('../../structures/Command.js');
 const { shorten } = require('../../util/Utils.js');
 
 module.exports = class WikipediaCommand extends Command {
@@ -20,9 +20,9 @@ module.exports = class WikipediaCommand extends Command {
                 {
                     key: 'query',
                     prompt: 'What article would you like to search for?',
-                    type: 'string'
-                }
-            ]
+                    type: 'string',
+                },
+            ],
         });
     }
 
@@ -35,15 +35,14 @@ module.exports = class WikipediaCommand extends Command {
                 'action=opensearch',
                 'format=json',
                 'limit=1',
-                'namespace=0'
+                'namespace=0',
             ];
 
-            let res = await fetch('https://en.wikipedia.org/w/api.php?' + params.join('&'));
+            let res = await fetch(`https://en.wikipedia.org/w/api.php?${params.join('&')}`);
             let body = await res.json();
             query = body[1][0];
 
-            if (!query)
-                return sentMsg.edit("Didn't find anything... :frowning:");
+            if (!query) return sentMsg.edit("Didn't find anything... :frowning:");
 
             params = [
                 `titles=${encodeURI(query)}`,
@@ -54,15 +53,14 @@ module.exports = class WikipediaCommand extends Command {
                 'explaintext=',
                 'pithumbsize=150',
                 'redirects=',
-                'formatversion=2'
+                'formatversion=2',
             ];
 
-            res = await fetch('https://en.wikipedia.org/w/api.php?' + params.join('&'));
+            res = await fetch(`https://en.wikipedia.org/w/api.php?${params.join('&')}`);
             body = await res.json();
             const data = body.query.pages[0];
 
-            if (data.missing)
-                return sentMsg.edit("Didn't find anything... :frowning:");
+            if (data.missing) return sentMsg.edit("Didn't find anything... :frowning:");
 
             const response = new RichEmbed()
                 .setColor(0xE7E7E7)

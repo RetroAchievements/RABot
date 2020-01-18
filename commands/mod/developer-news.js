@@ -1,6 +1,7 @@
 const SelfRoleCommand = require('../../structures/SelfRoleCommand.js');
 
-require('dotenv').config({path: __dirname + '/.env'});
+require('dotenv').config({ path: `${__dirname}/.env` });
+
 const { DEVELOPER_NEWS } = process.env;
 
 

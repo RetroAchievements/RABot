@@ -1,7 +1,8 @@
-const Command = require('../../structures/Command.js');
 const fetch = require('node-fetch');
 const { RichEmbed } = require('discord.js');
+const Command = require('../../structures/Command.js');
 const { shorten } = require('../../util/Utils.js');
+
 const { TMDB_KEY } = process.env;
 
 module.exports = class MovieCommand extends Command {
@@ -17,9 +18,9 @@ module.exports = class MovieCommand extends Command {
                 {
                     key: 'query',
                     prompt: 'What movie would you like to search for?',
-                    type: 'string'
-                }
-            ]
+                    type: 'string',
+                },
+            ],
         });
     }
 
@@ -30,14 +31,13 @@ module.exports = class MovieCommand extends Command {
             const params = [
                 `api_key=${TMDB_KEY}`,
                 `include_adult=${msg.channel.nsfw || false}`,
-                `query=${encodeURI(query)}`
+                `query=${encodeURI(query)}`,
             ];
 
-            let res = await fetch('http://api.themoviedb.org/3/search/movie?' + params.join('&'));
+            let res = await fetch(`http://api.themoviedb.org/3/search/movie?${params.join('&')}`);
             let body = await res.json();
 
-            if(!body.results.length)
-                return sentMsg.edit("Didn't find anything... :frowning:");
+            if (!body.results.length) return sentMsg.edit("Didn't find anything... :frowning:");
 
             res = await fetch(`https://api.themoviedb.org/3/movie/${body.results[0].id}?api_key=${TMDB_KEY}`);
             body = await res.json();
@@ -51,9 +51,9 @@ module.exports = class MovieCommand extends Command {
                 .setThumbnail(body.poster_path ? `https://image.tmdb.org/t/p/w500${body.poster_path}` : null)
                 .addField('Runtime', body.runtime ? `${body.runtime} mins.` : '???', true)
                 .addField('Release Date', body.release_date || '???', true)
-                .addField('Genres', body.genres.length ? body.genres.map(genre => genre.name).join(', ') : '???')
+                .addField('Genres', body.genres.length ? body.genres.map((genre) => genre.name).join(', ') : '???')
                 .addField('Production Companies',
-                        body.production_companies.length ? body.production_companies.map(c => c.name).join(', ') : '???');
+                    body.production_companies.length ? body.production_companies.map((c) => c.name).join(', ') : '???');
 
             return sentMsg.edit(response);
         } catch (err) {

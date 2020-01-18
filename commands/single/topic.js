@@ -15,6 +15,6 @@ module.exports = class TopicCommand extends Command {
     run(msg) {
         const channel = msg.channel.type === 'dm' ? `@${msg.channel.recipient.username}` : msg.channel;
         const topic = channel.topic || ' ';
-        return msg.say(channel + "'s topic:\n`---`\n**" + topic + "**\n`---`");
+        return msg.say(`${channel}'s topic:\n\`---\`\n**${topic}**\n\`---\``);
     }
 };

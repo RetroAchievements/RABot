@@ -1,4 +1,5 @@
 const Command = require('../../structures/Command');
+
 const { CHANNEL_BOTGAMES, CHANNEL_BOTSPAM } = process.env;
 
 
@@ -13,7 +14,7 @@ module.exports = class PruneCommand extends Command {
             guildOnly: true,
             throttling: {
                 usages: 1,
-                duration: 10
+                duration: 10,
             },
             clientPermissions: ['READ_MESSAGE_HISTORY', 'MANAGE_MESSAGES'],
             userPermissions: ['MANAGE_MESSAGES'],
@@ -25,15 +26,14 @@ module.exports = class PruneCommand extends Command {
                     type: 'integer',
                     default: 1,
                     min: 1,
-                    max: 99
-                }
-            ]
+                    max: 99,
+                },
+            ],
         });
     }
 
     async run(msg, { count }) {
-        if (msg.channel.id !== CHANNEL_BOTGAMES && msg.channel.id !== CHANNEL_BOTSPAM)
-            return msg.reply(`This command is only available to be used in ${this.client.channels.get(CHANNEL_BOTGAMES)} and ${this.client.channels.get(CHANNEL_BOTSPAM)}`);
+        if (msg.channel.id !== CHANNEL_BOTGAMES && msg.channel.id !== CHANNEL_BOTSPAM) return msg.reply(`This command is only available to be used in ${this.client.channels.get(CHANNEL_BOTGAMES)} and ${this.client.channels.get(CHANNEL_BOTSPAM)}`);
 
         try {
             const messages = await msg.channel.fetchMessages({ limit: count + 1 });

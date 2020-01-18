@@ -14,45 +14,45 @@ const rarchbadges = '#how-can-i-see-the-badge-when-i-earn-a-cheevo-on-retroarch'
 
 
 module.exports = {
-    site: site,
+    site,
 
     pages: {
-        emulator: emulator,
+        emulator,
         emu: emulator,
 
-        psx: psx,
+        psx,
         rapsx: psx,
 
-        roms: roms,
+        roms,
         getroms: roms,
 
-        missingcheevos: missingcheevos,
+        missingcheevos,
         nocheevos: missingcheevos,
 
-        hardcore: hardcore,
+        hardcore,
         hc: hardcore,
 
-        rarchbadges: rarchbadges,
+        rarchbadges,
 
-        tickets: tickets,
+        tickets,
         ticket: tickets,
         bug: tickets,
         buggycheevo: tickets,
 
-        manualunlock: manualunlock,
+        manualunlock,
         manualaward: manualunlock,
 
-        whitepoints: whitepoints,
+        whitepoints,
         wp: whitepoints,
         retroratio: whitepoints,
 
-        cheat: cheat,
+        cheat,
         cheater: cheat,
 
-        resetcheevo: resetcheevo,
+        resetcheevo,
         reset: resetcheevo,
 
-        resetpassword: resetpassword,
+        resetpassword,
         password: resetpassword,
         pw: resetpassword,
     },
@@ -60,4 +60,4 @@ module.exports = {
     answers: {
         default: site,
     },
-}
+};

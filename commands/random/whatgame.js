@@ -16,21 +16,18 @@ module.exports = class WhatGameCommand extends RandomGameCommand {
                     key: 'terms',
                     prompt: '',
                     type: 'string',
-                    //infinite: true, // there's a Commando bug with infinite+default
-                    default: '~NOARGS~'
+                    // infinite: true, // there's a Commando bug with infinite+default
+                    default: '~NOARGS~',
                 },
-            ]
+            ],
         });
     }
 
     run(msg, { terms }) {
-        let chosenGame = this.getRandomGame( terms );
+        const chosenGame = this.getRandomGame(terms);
 
-        if( !chosenGame || ! chosenGame instanceof Array || chosenGame.length == 0 )
-            return msg.reply( "Didn't find anything... :frowning:" );
+        if (!chosenGame || !chosenGame instanceof Array || chosenGame.length == 0) return msg.reply("Didn't find anything... :frowning:");
 
-        return msg.reply( `**${chosenGame[1]}**\n${gameURL}/${chosenGame[0]}` );
+        return msg.reply(`**${chosenGame[1]}**\n${gameURL}/${chosenGame[0]}`);
     }
-
 };
-

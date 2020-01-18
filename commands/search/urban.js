@@ -2,9 +2,9 @@
  * The inspiration for this came from Xiao bot's code:
  * https://github.com/dragonfire535/xiao
  */
-const Command = require('../../structures/Command');
 const { RichEmbed } = require('discord.js');
 const request = require('node-superfetch');
+const Command = require('../../structures/Command');
 const { shorten } = require('../../util/Utils');
 
 module.exports = class UrbanCommand extends Command {
@@ -20,9 +20,9 @@ module.exports = class UrbanCommand extends Command {
                 {
                     key: 'word',
                     prompt: 'What word would you like to look up?',
-                    type: 'string'
-                }
-            ]
+                    type: 'string',
+                },
+            ],
         });
     }
 
@@ -34,8 +34,7 @@ module.exports = class UrbanCommand extends Command {
                 .get('http://api.urbandictionary.com/v0/define')
                 .query({ term: word });
 
-            if (!body.list.length)
-                return msg.say('Could not find any results.');
+            if (!body.list.length) return msg.say('Could not find any results.');
 
             const data = body.list[0];
 

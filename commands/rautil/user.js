@@ -1,6 +1,6 @@
-const Command = require('../../structures/Command.js');
 const { RichEmbed } = require('discord.js');
 const fetch = require('node-fetch');
+const Command = require('../../structures/Command.js');
 
 module.exports = class User extends Command {
     constructor(client) {
@@ -21,9 +21,7 @@ module.exports = class User extends Command {
                     type: 'string',
                     prompt: 'What user would you like to fetch?',
                     default: '',
-                    parse: username => {
-                        return username.toLowerCase();
-                    },
+                    parse: (username) => username.toLowerCase(),
                 },
             ],
         });
@@ -34,7 +32,7 @@ module.exports = class User extends Command {
         const k = process.env.RA_WEB_API_KEY;
         const baseUrl = 'https://retroachievements.org/';
 
-        if(username === '') {
+        if (username === '') {
             username = msg.member ? (msg.member.nickname || msg.author.username) : msg.author.username;
         }
 
@@ -46,57 +44,54 @@ module.exports = class User extends Command {
         const permissions = {
             '-2': 'Spam',
             '-1': 'Banned',
-            '0': 'Unregistered',
-            '1': 'Registered',
-            '2': 'SuperUser',
-            '3': 'Developer',
-            '4': 'Admin',
-            '5': 'Root'
-        }
+            0: 'Unregistered',
+            1: 'Registered',
+            2: 'SuperUser',
+            3: 'Developer',
+            4: 'Admin',
+            5: 'Root',
+        };
 
         fetch(url)
-            .then(res => res.json())
-            .then(res => {
-                if(res.ID == null){ 
-                  return sentMsg.edit(`Couldn't find any user called **${username}** on site.`);
+            .then((res) => res.json())
+            .then((res) => {
+                if (res.ID == null) {
+                    return sentMsg.edit(`Couldn't find any user called **${username}** on site.`);
                 }
 
                 const richEmbed = new RichEmbed()
                     .setColor('#3498DB')
                     .setTitle(`Role: ${permissions[res.Permissions]}`)
                     .setURL(`${baseUrl}user/${username}`)
-                    .setAuthor(username, baseUrl + res.UserPic)
+                    .setAuthor(username, baseUrl + res.UserPic);
 
                 if (res.Motto) {
-                   richEmbed.addField(':speech_balloon: Motto', `**${res.Motto}**`);
+                    richEmbed.addField(':speech_balloon: Motto', `**${res.Motto}**`);
                 }
 
                 richEmbed
                     .addField(
                         ':bust_in_silhouette: Member since',
-                        `**${res.MemberSince}**`
+                        `**${res.MemberSince}**`,
                     )
                     .addField(
                         ':trophy: Rank | Points',
-                        `Rank **${res.Rank}** | **${res.Points}** points`
+                        `Rank **${res.Rank}** | **${res.Points}** points`,
                     )
                     .addField(
                         `:video_game: Last game played (${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].LastPlayed : ''})`,
-                        `**${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].Title : ''} (${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].ConsoleName : ''})**`
-                    )
+                        `**${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].Title : ''} (${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].ConsoleName : ''})**`,
+                    );
 
                 if (res.RichPresenceMsg && res.LastGame) {
                     richEmbed.addField(
                         ':clock4: Last seen in',
-                        `**${res.LastGame.Title} (${res.LastGame.ConsoleName})**:\n${res.RichPresenceMsg}`
-                    )
+                        `**${res.LastGame.Title} (${res.LastGame.ConsoleName})**:\n${res.RichPresenceMsg}`,
+                    );
                 }
 
                 return sentMsg.edit(richEmbed);
             })
-            .catch(err => {
-                return sentMsg.edit('Ouch! An error occurred! :frowning2:\nPlease, contact a @mod.');
-            });
+            .catch((err) => sentMsg.edit('Ouch! An error occurred! :frowning2:\nPlease, contact a @mod.'));
     }
-
 };

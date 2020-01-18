@@ -1,5 +1,5 @@
 // TODO: this will change on RAWeb v2
-const site = 'https://retroachievements.org/gameList.php?c='
+const site = 'https://retroachievements.org/gameList.php?c=';
 
 const megadrive = 1;
 const n64 = 2;
@@ -34,61 +34,61 @@ const commodore64 = 30;
 const zx81 = 31;
 
 module.exports = {
-    site: site,
+    site,
 
     pages: {
         all: site,
-        
-        megadrive: megadrive,
+
+        megadrive,
         md: megadrive,
         smd: megadrive,
         genesis: megadrive,
         gen: megadrive,
 
-        n64: n64,
+        n64,
         nintendo64: n64,
 
-        snes: snes,
+        snes,
         supernintendo: snes,
 
-        gb: gb,
+        gb,
         gameboy: gb,
 
-        gba: gba,
+        gba,
         gameboyadvance: gba,
 
-        gbc: gbc,
+        gbc,
         gameboycolor: gbc,
 
-        nes: nes,
+        nes,
 
-        pcengine: pcengine,
+        pcengine,
         turbografx: pcengine,
         turbografx16: pcengine,
 
-        mastersystem: mastersystem,
+        mastersystem,
         sms: mastersystem,
 
-        ngp: ngp,
+        ngp,
         neogeopocket: ngp,
         ngpc: ngp,
         neogeopocketcolor: ngp,
 
-        gamegear: gamegear,
+        gamegear,
         gg: gamegear,
 
-        atari2600: atari2600,
+        atari2600,
         vcs: atari2600,
         atari: atari2600,
 
-        arcade: arcade,
+        arcade,
         fba: arcade,
 
-        virtualboy: virtualboy,
+        virtualboy,
         vb: virtualboy,
     },
 
     answers: {
         default: site,
     },
-}
+};

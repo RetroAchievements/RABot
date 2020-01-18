@@ -1,6 +1,6 @@
 const GoogleCommand = require('../../structures/GoogleCommand.js');
 
-const site = "retroachievements.org/game";
+const site = 'retroachievements.org/game';
 const regex = /retroachievements\.org\/game\/[0-9]+/i;
 
 
@@ -12,7 +12,7 @@ module.exports = class RAGameCommand extends GoogleCommand {
             group: 'search',
             memberName: 'ragame',
             description: 'Google for a game at RetroAchievements.org and show the link.',
-            examples: ['`ragame street fighter mega drive`', '`ragame final fight arcade`' ],
+            examples: ['`ragame street fighter mega drive`', '`ragame final fight arcade`'],
             throttling: {
                 usages: 5,
                 duration: 60,
@@ -25,8 +25,7 @@ module.exports = class RAGameCommand extends GoogleCommand {
                     infinite: true,
                     default: '1',
                 },
-            ]
+            ],
         }, site, regex);
     }
-
 };
