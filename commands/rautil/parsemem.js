@@ -1,7 +1,7 @@
 const Command = require('../../structures/Command.js');
 const { RichEmbed } = require('discord.js');
 const fetch = require('node-fetch');
-const { RA_USER, RA_TOKEN, RA_WEB_API_KEY, CHANNEL_DEV_CHANNELS } = process.env;
+const { RA_USER, RA_TOKEN, RA_WEB_API_KEY } = process.env;
 
 const devChannels = process.env.CHANNEL_DEV_CHANNELS.split(',');
 
