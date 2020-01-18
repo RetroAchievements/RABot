@@ -1,13 +1,37 @@
 // TODO: assure bot has permissions to manage messages in the meme-board channel
 const { CHANNEL_MEME, ROLE_MOD, MAX_MEMES } = process.env;
 const { RichEmbed } = require('discord.js');
+const logger = require('pino')({
+    useLevelLabels: true,
+    timestamp: () => `,"time":"${new Date()}"`,
+});
 
 const minimumReactions = 5;
 
 const modEmoji = '🚫';
 const memoji = '🤖';
 // regex: memoji followed by the number of votes followed '| message.id'
-const memeRegex = /^\🤖\s([0-9]{1,3})\s\|\s([0-9]{17,20})/;
+const memeRegex = /^🤖\s([0-9]{1,3})\s\|\s([0-9]{17,20})/;
+
+
+function isValidReaction(reaction, user) {
+    const { message } = reaction;
+    return reaction.emoji.name === memoji // reaction is the memoji
+        && message.author.id !== user.id // reaction not sent by the author
+        && !user.bot // reaction not sent by a bot
+        && !message.author.bot; // author is not a bot
+}
+
+
+// Here we add the extension function to check if there's anything attached to the message.
+function extension(reaction, attachment) {
+    const imageLink = attachment.split('.');
+    const typeOfImage = imageLink[imageLink.length - 1];
+    const image = /(jpg|jpeg|png|gif)/gi.test(typeOfImage);
+    if (!image) return '';
+    return attachment;
+}
+
 
 async function addMeme(reaction, user) {
     const { message } = reaction;
@@ -21,19 +45,20 @@ async function addMeme(reaction, user) {
 
     const memeChannel = message.guild.channels.get(CHANNEL_MEME);
 
-    if (!memeChannel) return message.channel.send('It appears that you do not have a meme-board channel.');
+    if (!memeChannel) {
+        message.channel.send('It appears that you do not have a meme-board channel.');
+        return;
+    }
 
     // fetch MAX_MEMES messages from the memeboard channel.
     const fetch = await memeChannel.fetchMessages({ limit: MAX_MEMES });
 
     // check the messages within the fetch object to see if the message
     // that was reacted to is already in the meme-board
-    const memes = fetch.find((m) => {
-        m.embeds[0]
+    const memes = fetch.find((m) => m.embeds[0]
             && m.embeds[0].footer
             && m.embeds[0].footer.text.startsWith(memoji)
-            && m.embeds[0].footer.text.endsWith(message.id);
-    });
+            && m.embeds[0].footer.text.endsWith(message.id));
 
     // if the message is found within the memeboard.
     if (memes) {
@@ -41,9 +66,10 @@ async function addMeme(reaction, user) {
         const memeMsg = await memeChannel.fetchMessage(memes.id);
 
         if (deleteMsg) {
-            return memeMsg.delete(1000)
-                .then((msg) => logger.info('Deleted a meme entry'))
+            memeMsg.delete(1000)
+                .then(() => logger.info('Deleted a meme entry'))
                 .catch(logger.error);
+            return;
         }
 
         const memeCounter = memeRegex.exec(memes.embeds[0].footer.text);
@@ -60,11 +86,12 @@ async function addMeme(reaction, user) {
             .setAuthor(message.author.tag, message.author.displayAvatarURL)
             .setTimestamp()
             .setDescription(`[link](${message.url})`)
-            .setFooter(`${memoji} ${parseInt(memeCounter[1]) + 1} | ${message.id}`)
+            .setFooter(`${memoji} ${parseInt(memeCounter[1], 10) + 1} | ${message.id}`)
             .setImage(image);
 
         // edit the message with the new embed
-        return await memeMsg.edit({ embed });
+        await memeMsg.edit({ embed });
+        return;
     }
 
     // if the message is not on the memeboard yet
@@ -81,22 +108,33 @@ async function addMeme(reaction, user) {
         // message only goes to the meme-board after 5 memoji reactions by non-bot users
         let reactionCounter = 0;
         msgReaction = await message.reactions.find((r) => r.emoji.name === memoji);
-        for (const u of msgReaction.users.values()) if (!u.bot) ++reactionCounter;
+        for (const u of msgReaction.users.values()) {
+            if (!u.bot) {
+                reactionCounter += 1;
+            }
+        }
 
-        if (reactionCounter < minimumReactions) return;
+        if (reactionCounter < minimumReactions) {
+            return;
+        }
 
         const image = message.attachments.size > 0 ? await extension(reaction, message.attachments.array()[0].url) : '';
 
         // If the message is empty, we don't allow the user to meme the message.
-        if (image === '' && message.cleanContent.length < 1) return message.channel.send(`${user}, you cannot meme an empty message.`);
+        if (image === '' && message.cleanContent.length < 1) {
+            message.channel.send(`${user}, you cannot meme an empty message.`);
+            return;
+        }
 
         const embed = new RichEmbed()
             // nice yellow
             .setColor(15844367)
-            // Here we use cleanContent, which replaces all mentions in the message with their
-            // equivalent text. For example, an @everyone ping will just display as @everyone, without tagging you!
+            // Here we use cleanContent, which replaces all mentions in the message with
+            // their equivalent text. For example, an @everyone ping will just display
+            // as @everyone, without tagging you!
             // At the date of this edit (31/Jan/19) embeds do not mention yet.
-            // But nothing is stopping Discord from enabling mentions from embeds in a future update.
+            // But nothing is stopping Discord from enabling mentions from embeds
+            // in a future update.
             .setTitle(message.cleanContent)
             .setAuthor(message.author.tag, message.author.displayAvatarURL)
             .setTimestamp(new Date())
@@ -114,7 +152,10 @@ async function removeMeme(reaction, user) {
     const { message } = reaction;
     const memeChannel = message.guild.channels.get(CHANNEL_MEME);
 
-    if (!memeChannel) return message.channel.send('It appears that you do not have a meme-board channel.');
+    if (!memeChannel) {
+        message.channel.send('It appears that you do not have a meme-board channel.');
+        return;
+    }
 
     const fetchedMessages = await memeChannel.fetchMessages({ limit: MAX_MEMES });
     const memes = fetchedMessages.find(
@@ -133,32 +174,16 @@ async function removeMeme(reaction, user) {
             .setDescription(`[link](${message.url})`)
             .setAuthor(message.author.tag, message.author.displayAvatarURL)
             .setTimestamp()
-            .setFooter(`${memoji} ${parseInt(memeCounter[1]) - 1} | ${message.id}`)
+            .setFooter(`${memoji} ${parseInt(memeCounter[1], 10) - 1} | ${message.id}`)
             .setImage(image);
 
         const memeMsg = await memeChannel.fetchMessage(memes.id);
         await memeMsg.edit({ embed });
 
-        if (parseInt(memeCounter[1]) - 1 == 0) return memeMsg.delete(1000);
+        if (parseInt(memeCounter[1], 10) - 1 === 0) {
+            memeMsg.delete(1000);
+        }
     }
-}
-
-function isValidReaction(reaction, user) {
-    const { message } = reaction;
-    return reaction.emoji.name === memoji // reaction is the memoji
-        && message.author.id !== user.id // reaction not sent by the author
-        && !user.bot // reaction not sent by a bot
-        && !message.author.bot; // author is not a bot
-}
-
-
-// Here we add the extension function to check if there's anything attached to the message.
-function extension(reaction, attachment) {
-    const imageLink = attachment.split('.');
-    const typeOfImage = imageLink[imageLink.length - 1];
-    const image = /(jpg|jpeg|png|gif)/gi.test(typeOfImage);
-    if (!image) return '';
-    return attachment;
 }
 
 module.exports.addMeme = addMeme;

@@ -1,4 +1,8 @@
 require('dotenv').config({ path: `${__dirname}/.env` });
+const logger = require('pino')({
+    useLevelLabels: true,
+    timestamp: () => `,"time":"${new Date()}"`,
+});
 
 const {
     CHEEVO_WARNING_NUM,
@@ -8,7 +12,7 @@ const {
     CHANNEL_TICKETS,
     CHANNEL_CHEATING,
     GLOBAL_FEED_INTERVAL,
-    NEWS_FEED_INTERVAL,
+    // NEWS_FEED_INTERVAL,
 } = process.env;
 
 const { RichEmbed } = require('discord.js');
@@ -18,7 +22,7 @@ const { bestScoreComment } = require('./Utils.js');
 const parser = new Parser();
 const raorg = 'https://retroachievements.org';
 const globalFeed = `${raorg}/rss-activity`;
-const newsFeed = `${raorg}/rss-news`;
+// const newsFeed = `${raorg}/rss-news`;
 
 // regexEarned: capture (1)  everything before " earned " followed by anything,
 //              then the number of points in parentheses, then " in ",
@@ -49,10 +53,13 @@ async function checkGlobalFeed() {
     const oldestTime = new Date(items[items.length - 1].pubDate);
     const userCheevoTimes = new Map();
     const userCheevoGames = new Map();
-    let parsedString; let user; let game; let system; let
-        msg;
+    let parsedString;
+    let user;
+    let game;
+    // let system;
+    let msg;
 
-    for (let i = items.length - 1; i >= 0; i--) {
+    for (let i = items.length - 1; i >= 0; i -= 1) {
         const pubDate = new Date(items[i].pubDate);
 
         // checking for multiple unlocks
@@ -78,21 +85,21 @@ async function checkGlobalFeed() {
         parsedString = items[i].content.match(regexCompleted);
         if (parsedString) {
             const userPic = parsedString[1];
-            const user = parsedString[2];
+            const currentUser = parsedString[2];
             const gameid = parsedString[3];
-            const game = parsedString[4];
+            const currentGame = parsedString[4];
             const system = parsedString[5];
 
             // announce mastery
             msg = new RichEmbed()
                 .setTitle('Mastery!')
-                .setURL(`${raorg}/user/${user}`)
+                .setURL(`${raorg}/user/${currentUser}`)
                 .setThumbnail(`${raorg}/UserPic/${userPic}`)
-                .setDescription(`Let's hear a round of applause for **${user}**'s mastery of **${game}** for **${system}**!\n\nCongratulate the player:\n${raorg}/user/${user}\nTry the game:\n${raorg}/game/${gameid}`);
+                .setDescription(`Let's hear a round of applause for **${currentUser}**'s mastery of **${currentGame}** for **${system}**!\n\nCongratulate the player:\n${raorg}/user/${currentUser}\nTry the game:\n${raorg}/game/${gameid}`);
 
             masteryChannel.send(msg);
 
-            const botComment = await bestScoreComment(user);
+            const botComment = await bestScoreComment(currentUser);
             if (botComment) {
                 msg.addField("RABot's comment", botComment);
                 cheatingChannel.send(msg);
@@ -106,7 +113,7 @@ async function checkGlobalFeed() {
         if (parsedString) {
             // TODO: use an optmized regex
             const userPic = parsedString[1];
-            const user = parsedString[2];
+            const currentUser = parsedString[2];
             const ticketActivity = parsedString[3];
             const cheevoId = parsedString[4];
             const cheevoName = parsedString[5];
@@ -116,9 +123,9 @@ async function checkGlobalFeed() {
             msg = new RichEmbed()
                 .setTitle(`Ticket ${ticketActivity.toUpperCase()}`)
                 .setURL(`${raorg}/ticketmanager.php?a=${cheevoId}`) // TODO: gonna change in v2
-                .setColor(ticketActivity == 'closed' ? 'BLUE' : 'RED')
+                .setColor(ticketActivity === 'closed' ? 'BLUE' : 'RED')
                 .setThumbnail(`${raorg}/UserPic/${userPic}`)
-                .setDescription(`**${user}** ${ticketActivity} a ticket for **${cheevoName}** in **${gameName}**.`);
+                .setDescription(`**${currentUser}** ${ticketActivity} a ticket for **${cheevoName}** in **${gameName}**.`);
 
             ticketsChannel.send(msg);
         }
@@ -135,7 +142,7 @@ async function checkGlobalFeed() {
     // announcing multiple unlocks
     for (const keyValue of userCheevoTimes) {
         user = keyValue[0];
-        value = keyValue[1];
+        const value = keyValue[1];
 
         if (value.length >= CHEEVO_WARNING_NUM) {
             // avoiding reporting the same user in a short period of time
@@ -172,7 +179,7 @@ module.exports = (channels) => {
     cheatingChannel = channels.get(CHANNEL_CHEATING);
 
     if (!masteryChannel || !unlocksChannel || !ticketsChannel || !cheatingChannel) {
-        console.log('invalid channels');
+        logger.info('invalid channels');
     } else {
         setInterval(checkGlobalFeed, GLOBAL_FEED_INTERVAL * 1000);
     }

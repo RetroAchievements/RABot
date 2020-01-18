@@ -1,4 +1,8 @@
 const { execFile } = require('child_process');
+const logger = require('pino')({
+    useLevelLabels: true,
+    timestamp: () => `,"time":"${new Date()}"`,
+});
 
 const getGLScript = `${__dirname}/getgamelist.sh`;
 
@@ -74,7 +78,7 @@ function loadGameLists() {
     let entries;
     let tmpIndex = 0;
 
-    for (let i = 0; i < consoleIDs.length; i++) {
+    for (let i = 0; i < consoleIDs.length; i += 1) {
         consoleID = consoleIDs[i];
         json = require(`${glPath}/gl-${consoles[consoleID]}.json`);
         if (json.Success) {
@@ -92,13 +96,14 @@ function loadGameLists() {
 
 
 function getAllGameLists() {
-    const script = execFile('bash', [getGLScript], (err, stdout, stderr) => {
+    execFile('bash', [getGLScript], (err, stdout) => {
         if (err) {
-            console.error(err);
+            logger.error(err);
             return 1;
         }
-        console.log(stdout);
+        logger.info(stdout);
         loadGameLists();
+        return true;
     });
 }
 
@@ -129,7 +134,10 @@ async function getGameListByConsole( consoleID ) {
         globalGamelist = Object.assign( tmpJson, globalGamelist );
 
         // writing the current file
-        fs.writeFile( `${glPath}/gl-${consoles[consoleID]}.json`, JSON.stringify(tmpJson, null, 1), (err) => {
+        fs.writeFile(
+            `${glPath}/gl-${consoles[consoleID]}.json`,
+            JSON.stringify(tmpJson, null, 1),
+            (err) => {
             if( err ) {
                 console.error(err);
                 return;
@@ -137,8 +145,8 @@ async function getGameListByConsole( consoleID ) {
             console.log(`[LOG] successfully updated gamelist for console ID ${consoleID}`);
         });
     } else {
-		console.warn(`[WARNING] failed to get gamelist for console ID ${consoleID}`);
-	}
+        console.warn(`[WARNING] failed to get gamelist for console ID ${consoleID}`);
+    }
 }
 
 

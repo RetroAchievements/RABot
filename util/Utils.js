@@ -30,7 +30,7 @@ module.exports = class Utils {
             return false;
         }
 
-        for (let i = 1; i <= days && i < bestDays.length; i++) {
+        for (let i = 1; i <= days && i < bestDays.length; i += 1) {
             date.push(bestDays[i].date);
             cheevos.push(bestDays[i].achievements);
             score.push(bestDays[i].score);
@@ -55,8 +55,9 @@ module.exports = class Utils {
             if (bestScore >= 10000) scoreComment += '**GASP! This user has a ridiculously unreal score for a single day!!!**';
             else if (bestScore >= 6000) scoreComment += '**WOW!** This user seems to play retrogames all day long!';
             else if (bestScore >= 5000) scoreComment += "That's a pretty dedicated retrogamer";
-            else // the ">= 3500" case
-            { scoreComment += "That's a good retrogamer!"; }
+            else { // the ">= 3500" case
+                scoreComment += "That's a good retrogamer!";
+            }
         }
         return scoreComment;
     }
@@ -66,10 +67,12 @@ module.exports = class Utils {
         const regex = /retroachievements\.org\/game\/([0-9]+)/i;
         const site = 'retroachievements.org/game';
         let searchURL = `https://www.google.com/search?q=site:${site}`;
-        let parseGameUrl;
-        let gameid;
+        let parseGameUrl = 0;
+        let gameid = 0;
 
-        terms.forEach((term) => searchURL += `+${term}`);
+        terms.forEach((term) => {
+            searchURL += `+${term}`;
+        });
 
         const res = await fetch(encodeURI(searchURL));
         const $ = cheerio.load(await res.text());
