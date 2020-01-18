@@ -34,61 +34,61 @@ const commodore64 = 30;
 const zx81 = 31;
 
 module.exports = {
-  site,
+    site,
 
-  pages: {
-    all: site,
+    pages: {
+        all: site,
 
-    megadrive,
-    md: megadrive,
-    smd: megadrive,
-    genesis: megadrive,
-    gen: megadrive,
+        megadrive,
+        md: megadrive,
+        smd: megadrive,
+        genesis: megadrive,
+        gen: megadrive,
 
-    n64,
-    nintendo64: n64,
+        n64,
+        nintendo64: n64,
 
-    snes,
-    supernintendo: snes,
+        snes,
+        supernintendo: snes,
 
-    gb,
-    gameboy: gb,
+        gb,
+        gameboy: gb,
 
-    gba,
-    gameboyadvance: gba,
+        gba,
+        gameboyadvance: gba,
 
-    gbc,
-    gameboycolor: gbc,
+        gbc,
+        gameboycolor: gbc,
 
-    nes,
+        nes,
 
-    pcengine,
-    turbografx: pcengine,
-    turbografx16: pcengine,
+        pcengine,
+        turbografx: pcengine,
+        turbografx16: pcengine,
 
-    mastersystem,
-    sms: mastersystem,
+        mastersystem,
+        sms: mastersystem,
 
-    ngp,
-    neogeopocket: ngp,
-    ngpc: ngp,
-    neogeopocketcolor: ngp,
+        ngp,
+        neogeopocket: ngp,
+        ngpc: ngp,
+        neogeopocketcolor: ngp,
 
-    gamegear,
-    gg: gamegear,
+        gamegear,
+        gg: gamegear,
 
-    atari2600,
-    vcs: atari2600,
-    atari: atari2600,
+        atari2600,
+        vcs: atari2600,
+        atari: atari2600,
 
-    arcade,
-    fba: arcade,
+        arcade,
+        fba: arcade,
 
-    virtualboy,
-    vb: virtualboy,
-  },
+        virtualboy,
+        vb: virtualboy,
+    },
 
-  answers: {
-    default: site,
-  },
+    answers: {
+        default: site,
+    },
 };

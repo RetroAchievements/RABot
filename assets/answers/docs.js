@@ -42,116 +42,116 @@ const revision = 'Achievement-Set-Revisions';
 
 
 module.exports = {
-  site,
+    site,
 
-  pages: {
-    dev,
-    devdocs: dev,
+    pages: {
+        dev,
+        devdocs: dev,
 
-    devstart,
-    jrdev: devstart,
-    startdev: devstart,
+        devstart,
+        jrdev: devstart,
+        startdev: devstart,
 
-    meminspector,
+        meminspector,
 
-    logic,
+        logic,
 
-    delta,
+        delta,
 
-    hitcounts,
-    hits: hitcounts,
+        hitcounts,
+        hits: hitcounts,
 
-    resetif,
+        resetif,
 
-    pauseif,
+        pauseif,
 
-    addsource,
+        addsource,
 
-    subsource,
+        subsource,
 
-    addhits,
+        addhits,
 
-    altgroups,
-    alts: altgroups,
-    alt: altgroups,
+        altgroups,
+        alts: altgroups,
+        alt: altgroups,
 
-    examples,
+        examples,
 
-    templates,
+        templates,
 
-    finishlevel,
+        finishlevel,
 
-    damageless,
-    deathless: damageless,
+        damageless,
+        deathless: damageless,
 
-    collect,
-    collectitem: collect,
-    getitem: collect,
+        collect,
+        collectitem: collect,
+        getitem: collect,
 
-    changeval,
-    changingvalues: changeval,
+        changeval,
+        changingvalues: changeval,
 
-    condreset,
-    conditionalreset: condreset,
+        condreset,
+        conditionalreset: condreset,
 
-    difficulty,
+        difficulty,
 
-    roadmap,
-    devroadmap: roadmap,
+        roadmap,
+        devroadmap: roadmap,
 
-    badge,
-    icon: badge,
+        badge,
+        icon: badge,
 
-    lboards,
-    leaderboards: lboards,
-    lbs: lboards,
+        lboards,
+        leaderboards: lboards,
+        lbs: lboards,
 
-    rps,
-    richpresence: rps,
-    rp: rps,
+        rps,
+        richpresence: rps,
+        rp: rps,
 
-    cheevodesign,
-    achievementdesign: cheevodesign,
-    design: cheevodesign,
+        cheevodesign,
+        achievementdesign: cheevodesign,
+        design: cheevodesign,
 
-    bonus,
-    bonusset: bonus,
+        bonus,
+        bonusset: bonus,
 
-    hacks,
-    hack: hacks,
+        hacks,
+        hack: hacks,
 
-    lazy,
-    lazydev: lazy,
-    lazynoob: lazy,
+        lazy,
+        lazydev: lazy,
+        lazynoob: lazy,
 
-    coc,
-    conduct: coc,
-    usercoc: coc,
+        coc,
+        conduct: coc,
+        usercoc: coc,
 
-    faq,
+        faq,
 
-    nocheevos,
-    missingcheevos: nocheevos,
+        nocheevos,
+        missingcheevos: nocheevos,
 
-    contribute,
+        contribute,
 
-    softcore,
-    loadstate: softcore,
+        softcore,
+        loadstate: softcore,
 
-    about,
+        about,
 
-    ralibretro,
+        ralibretro,
 
-    devcoc,
+        devcoc,
 
-    badconcepts,
+        badconcepts,
 
-    beadev,
+        beadev,
 
-    revision,
-  },
+        revision,
+    },
 
-  answers: {
-    default: site,
-  },
+    answers: {
+        default: site,
+    },
 };
