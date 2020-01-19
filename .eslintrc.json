@@ -15,10 +15,6 @@
         "sourceType": "module"
     },
     "rules": {
-        "indent": [
-            "error",
-            4
-        ],
         "prefer-destructuring": [
             "error",
             {

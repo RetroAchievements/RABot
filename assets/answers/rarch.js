@@ -16,18 +16,18 @@ const def = `**With RetroArch you can earn RetroAchievements on a wide range of 
 
 
 module.exports = {
-    site,
+  site,
 
-    pages: {
-        cheevos,
-        netplay,
-        cores,
-    },
+  pages: {
+    cheevos,
+    netplay,
+    cores,
+  },
 
-    answers: {
-        nightly,
-        specific,
-        badges,
-        default: def,
-    },
+  answers: {
+    nightly,
+    specific,
+    badges,
+    default: def,
+  },
 };
