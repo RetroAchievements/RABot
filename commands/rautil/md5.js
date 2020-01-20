@@ -23,7 +23,9 @@ module.exports = class Md5Command extends Command {
 
   run(msg, { terms }) {
     let reply = '';
-    terms.forEach((term) => reply += `md5(\`${term}\`) = \`${crypto.createHash('md5').update(term).digest('hex')}\`\n`);
+    terms.forEach((term) => {
+      reply += `md5(\`${term}\`) = \`${crypto.createHash('md5').update(term).digest('hex')}\`\n`;
+    });
 
     return msg.say(reply);
   }

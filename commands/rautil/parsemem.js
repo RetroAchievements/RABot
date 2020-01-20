@@ -110,8 +110,9 @@ module.exports = class ParseMemCommand extends Command {
     let achievementId;
 
     try {
-      if (achievementId = memLowerCase.match(achievementUrlRegex)) {
-        achievementId = parseInt(achievementId[2]);
+      achievementId = memLowerCase.match(achievementUrlRegex);
+      if (achievementId) {
+        achievementId = parseInt(achievementId[2], 10);
         if (achievementId <= 0) {
           return msg.reply('Invalid achievement ID');
         }
@@ -156,21 +157,29 @@ module.exports = class ParseMemCommand extends Command {
     // const groups = mem.split(/(^(?!0x$).).+S/); // https://stackoverflow.com/a/7376273/6354514
     let reqs;
     let parsedReq;
-    let reqNum; let flag; let lType; let lSize; let lMemory; let cmp; let rType; let rSize; let rMemVal; let
-      hits;
+    let reqNum;
+    let flag;
+    let lType;
+    let lSize;
+    let lMemory;
+    let cmp;
+    let rType;
+    let rSize;
+    let rMemVal;
+    let hits;
     let num;
     let countLines = 0;
     let res = '\n';
 
-    for (let i = 0; i < groups.length; i++) {
-      res += i == 0 ? '__**Core Group**__:' : `__**Alt Group ${i}**__:`;
+    for (let i = 0; i < groups.length; i += 1) {
+      res += i === 0 ? '__**Core Group**__:' : `__**Alt Group ${i}**__:`;
       res += '```';
 
       reqs = groups[i].split('_');
       countLines += reqs.length;
       if (countLines > 20) return "I'm unable to handle this, it's TOO BIG!";
 
-      for (let j = 0; j < reqs.length; j++) {
+      for (let j = 0; j < reqs.length; j += 1) {
         reqNum = j + 1;
         parsedReq = reqs[j].match(memRegex);
         if (!parsedReq) return `invalid "Mem" string: \`${mem}\`\nI've failed to parse this: \`${reqs[j]}\`\n**Note**: strings for address/value should be lowercased`;
@@ -185,26 +194,30 @@ module.exports = class ParseMemCommand extends Command {
         rMemVal = parsedReq[8] || '';
         hits = parsedReq[9] || '0';
 
-        if (lSize == '') {
+        if (lSize === '') {
           num = parseInt(lMemory).toString(16);
-          if (!isNaN(`0x${num}`)) lMemory = num;
+          if (!Number.isNaN(`0x${num}`)) lMemory = num;
         }
         lMemory = `0x${lMemory.substring(0, maxChars + 2).padStart(maxChars, '0')}`;
-        if (rSize == '') {
+        if (rSize === '') {
           num = parseInt(rMemVal).toString(16);
-          if (!isNaN(`0x${num}`)) rMemVal = num;
+          if (!Number.isNaN(`0x${num}`)) rMemVal = num;
         }
         rMemVal = `0x${rMemVal.substring(0, maxChars + 2).padStart(maxChars, '0')}`;
 
-        if (lType !== 'd' && lType !== 'p') lType = (lSize == '' || lSize == 'h') ? 'v' : 'm';
-        if (rType !== 'd' && rType !== 'p') rType = (rSize == '' || rSize == 'h') ? 'v' : 'm';
+        if (lType !== 'd' && lType !== 'p') {
+          lType = (lSize === '' || lSize === 'h') ? 'v' : 'm';
+        }
+        if (rType !== 'd' && rType !== 'p') {
+          rType = (rSize === '' || rSize === 'h') ? 'v' : 'm';
+        }
 
         res += `\n${reqNum.toString().padStart(2, ' ')}:`;
         res += specialFlags[flag].padEnd(10, ' ');
         res += memTypes[lType].padEnd(6, ' ');
         res += memSize[lSize].padEnd(7, ' ');
         res += `${lMemory} `;
-        if (flag == 'A' || flag == 'B') {
+        if (flag === 'A' || flag === 'B') {
           res += '\n';
         } else {
           res += cmp.padEnd(3, ' ');
@@ -215,10 +228,10 @@ module.exports = class ParseMemCommand extends Command {
         }
 
         if (collectAddresses) {
-          if (lType && lMemory && lType != 'v' && !addresses.includes(lMemory)) {
+          if (lType && lMemory && lType !== 'v' && !addresses.includes(lMemory)) {
             addresses.push(lMemory);
           }
-          if (rType && rMemVal && rType != 'v' && !addresses.includes(rMemVal)) {
+          if (rType && rMemVal && rType !== 'v' && !addresses.includes(rMemVal)) {
             addresses.push(rMemVal);
           }
         }
@@ -231,28 +244,28 @@ module.exports = class ParseMemCommand extends Command {
 
   async getGameId(achievementId) {
     const achievementUnlocksUrl = `${baseUrl}API/API_GetAchievementUnlocks.php?z=${RA_USER}&y=${RA_WEB_API_KEY}&a=${achievementId}`;
-    return await fetch(achievementUnlocksUrl)
+    return fetch(achievementUnlocksUrl)
       .then((res) => res.json())
-      .then((res) => parseInt(res.Game.ID))
-      .catch((err) => null);
+      .then((res) => parseInt(res.Game.ID, 10))
+      .catch(() => null);
   }
 
 
   async getMemAddr(gameId, achievementId) {
     const dorequestPatchUrl = `${baseUrl}dorequest.php?r=patch&g=${gameId}&u=${RA_USER}&t=${RA_TOKEN}`;
-    return await fetch(dorequestPatchUrl)
+    return fetch(dorequestPatchUrl)
       .then((res) => res.json())
-      .then((res) => res.PatchData.Achievements.find((ach) => ach.ID == achievementId).MemAddr)
-      .catch((err) => null);
+      .then((res) => res.PatchData.Achievements.find((ach) => ach.ID === achievementId).MemAddr)
+      .catch(() => null);
   }
 
 
   async getCodeNotes(gameId) {
     const dorequestCodeNotesUrl = `${baseUrl}dorequest.php?r=codenotes2&g=${gameId}&u=${RA_USER}&t=${RA_TOKEN}`;
-    return await fetch(dorequestCodeNotesUrl)
+    return fetch(dorequestCodeNotesUrl)
       .then((res) => res.json())
       .then((res) => res.CodeNotes)
-      .catch((err) => null);
+      .catch(() => null);
   }
 
 
@@ -266,7 +279,7 @@ module.exports = class ParseMemCommand extends Command {
 
     try {
       addresses.forEach((addr) => {
-        const codeNote = codeNotes.find((note) => note.Address == addr);
+        const codeNote = codeNotes.find((note) => note.Address === addr);
         if (codeNote) {
           hasNote = true;
           codeNotesEmbed.addField(`**${addr}**`, codeNote.Note, true);

@@ -44,14 +44,13 @@ module.exports = class FramesCommand extends Command {
     const parsedFps = inputString.match(regexFps);
 
     let totalSeconds = 0;
-    let fps;
     let frames;
     let hours;
     let minutes;
     let seconds;
     let milliseconds;
 
-    fps = parsedFps ? parseFloat(parsedFps[1]) : 60;
+    const fps = parsedFps ? parseFloat(parsedFps[1]) : 60;
     hours = parseFloat(parsedTime[2] || 0);
     minutes = parseFloat(parsedTime[4] || 0);
     seconds = parseFloat(parsedTime[6] || 0);

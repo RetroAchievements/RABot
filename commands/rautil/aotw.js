@@ -33,7 +33,7 @@ module.exports = class AotwCommand extends Command {
         response += `\n\n**Recent Winners** (max ${max}, UTC time):\n`;
         response += '```md\n';
         winners.reverse();
-        for (let i = 0; i < max && i < winners.length; i++) {
+        for (let i = 0; i < max && i < winners.length; i += 1) {
           response += `\n[${winners[i].DateAwarded}]`;
           response += `( ${winners[i].User} ) `;
           response += winners[i].HardcoreMode === '1' ? '<hardcore> +1' : '+0.5';
@@ -41,6 +41,6 @@ module.exports = class AotwCommand extends Command {
         response += '\n```\n';
         return sentMsg.edit(response);
       })
-      .catch((error) => sentMsg.delete());
+      .catch(() => sentMsg.delete());
   }
 };

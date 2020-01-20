@@ -36,7 +36,7 @@ module.exports = class BestDaysCommand extends Command {
     response += '[   date    ]( cheevos )< score >\n';
     response += '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~';
 
-    for (let i = 0; i <= days && i < bestDaysInfo.date.length; i++) {
+    for (let i = 0; i <= days && i < bestDaysInfo.date.length; i += 1) {
       response += `\n[${bestDaysInfo.date[i]}]`;
       response += `( ${bestDaysInfo.cheevos[i].padEnd(8, ' ')})`;
       response += `< ${bestDaysInfo.score[i].padEnd(6, ' ')}>`;

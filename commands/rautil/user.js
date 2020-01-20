@@ -31,13 +31,14 @@ module.exports = class User extends Command {
     const u = process.env.RA_USER;
     const k = process.env.RA_WEB_API_KEY;
     const baseUrl = 'https://retroachievements.org/';
+    let userName = username;
 
-    if (username === '') {
-      username = msg.member ? (msg.member.nickname || msg.author.username) : msg.author.username;
+    if (userName === '') {
+      userName = msg.member ? (msg.member.nickname || msg.author.username) : msg.author.username;
     }
 
-    const url = `${baseUrl}API/API_GetUserSummary.php?z=${u}&y=${k}&u=${username}`;
-    const sentMsg = await msg.reply(`:hourglass: Getting ${username}'s info, please wait...`);
+    const url = `${baseUrl}API/API_GetUserSummary.php?z=${u}&y=${k}&u=${userName}`;
+    const sentMsg = await msg.reply(`:hourglass: Getting ${userName}'s info, please wait...`);
 
     // permissions magic numbers
     // https://github.com/RetroAchievements/RAWeb/blob/develop/src/Permissions.php
@@ -56,14 +57,14 @@ module.exports = class User extends Command {
       .then((res) => res.json())
       .then((res) => {
         if (res.ID == null) {
-          return sentMsg.edit(`Couldn't find any user called **${username}** on site.`);
+          return sentMsg.edit(`Couldn't find any user called **${userName}** on site.`);
         }
 
         const richEmbed = new RichEmbed()
           .setColor('#3498DB')
           .setTitle(`Role: ${permissions[res.Permissions]}`)
-          .setURL(`${baseUrl}user/${username}`)
-          .setAuthor(username, baseUrl + res.UserPic);
+          .setURL(`${baseUrl}user/${userName}`)
+          .setAuthor(userName, baseUrl + res.UserPic);
 
         if (res.Motto) {
           richEmbed.addField(':speech_balloon: Motto', `**${res.Motto}**`);
@@ -92,6 +93,6 @@ module.exports = class User extends Command {
 
         return sentMsg.edit(richEmbed);
       })
-      .catch((err) => sentMsg.edit('Ouch! An error occurred! :frowning2:\nPlease, contact a @mod.'));
+      .catch(() => sentMsg.edit('Ouch! An error occurred! :frowning2:\nPlease, contact a @mod.'));
   }
 };
