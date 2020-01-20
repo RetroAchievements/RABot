@@ -15,6 +15,9 @@
         "sourceType": "module"
     },
     "rules": {
+        "class-methods-use-this": [
+            "off"
+        ],
         "prefer-destructuring": [
             "error",
             {

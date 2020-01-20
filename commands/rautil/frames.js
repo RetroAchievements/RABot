@@ -36,7 +36,7 @@ module.exports = class FramesCommand extends Command {
     const regexFps = /([0-9]+) *fps/i;
 
     // group2: frames amount
-    const regexFramesAmount = /^ *([0-9]+ *fps )? *([0-9]+) *( [0-9]+ *fps)? *$/;
+    const regexFramesAmount = /^ *([0-9]+ *fps )? *((0x)?[a-f0-9]+) *( [0-9]+ *fps)? *$/i;
 
     const inputString = input.join(' ');
 
@@ -44,10 +44,12 @@ module.exports = class FramesCommand extends Command {
     const parsedFps = inputString.match(regexFps);
 
     let totalSeconds = 0;
-    let fps; let
-      frames;
-    let hours; let minutes; let seconds; let
-      milliseconds;
+    let fps;
+    let frames;
+    let hours;
+    let minutes;
+    let seconds;
+    let milliseconds;
 
     fps = parsedFps ? parseFloat(parsedFps[1]) : 60;
     hours = parseFloat(parsedTime[2] || 0);
@@ -61,9 +63,12 @@ module.exports = class FramesCommand extends Command {
     } else {
       const parsedFramesAmount = inputString.match(regexFramesAmount);
 
-      frames = parsedFramesAmount ? parseInt(parsedFramesAmount[2]) : 0;
+      if (parsedFramesAmount) {
+        const radix = parsedFramesAmount[2].startsWith('0x') ? 16 : 10;
+        frames = parseInt(parsedFramesAmount[2], radix);
+      }
 
-      if (frames <= 0 || fps <= 0) {
+      if (frames <= 0 || fps <= 0 || Number.isNaN(frames)) {
         msg.reply(`invalid time format: \`${inputString}\`\nUse \`!help frames\` to se some useful examples`);
         return;
       }
