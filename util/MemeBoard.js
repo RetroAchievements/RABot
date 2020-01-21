@@ -1,5 +1,5 @@
 // TODO: assure bot has permissions to manage messages in the meme-board channel
-const { CHANNEL_MEME, ROLE_MOD, MAX_MEMES } = process.env;
+const { CHANNEL_MEME, ROLE_MOD_NAME, MAX_MEMES } = process.env;
 const { RichEmbed } = require('discord.js');
 const logger = require('pino')({
   useLevelLabels: true,
@@ -39,7 +39,7 @@ async function addMeme(reaction, user) {
   // checking if a mod flagged this message
   let deleteMsg = false;
   const member = await message.guild.fetchMember(user);
-  const roleMod = await message.guild.roles.find((role) => role.name === ROLE_MOD);
+  const roleMod = await message.guild.roles.find((role) => role.name === ROLE_MOD_NAME);
   if (reaction.emoji.name === modEmoji) {
     if (member) deleteMsg = await member.roles.has(roleMod.id);
   } else if (!isValidReaction(reaction, user)) return;
