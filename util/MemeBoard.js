@@ -6,7 +6,7 @@ const logger = require('pino')({
   timestamp: () => `,"time":"${new Date()}"`,
 });
 
-const minimumReactions = 0;
+const minimumReactions = 5;
 
 const modEmoji = '🚫';
 const memoji = '🤖';
@@ -38,9 +38,9 @@ async function addMeme(reaction, user) {
 
   // checking if a mod flagged this message
   let deleteMsg = false;
+  const member = await message.guild.fetchMember(user);
   const roleMod = await message.guild.roles.find((role) => role.name === ROLE_MOD);
   if (reaction.emoji.name === modEmoji) {
-    const member = await message.guild.fetchMember(user);
     if (member) deleteMsg = await member.roles.has(roleMod.id);
   } else if (!isValidReaction(reaction, user)) return;
 
@@ -100,12 +100,8 @@ async function addMeme(reaction, user) {
 
   const msgReactionDeny = await message.reactions.find((r) => r.emoji.name === modEmoji);
   if (!memes && msgReactionDeny) {
-    const member = await message.guild.fetchMember(user);
     if (member) {
-      const access = await member.roles.has(roleMod.id);
-      if (access) {
-        return;
-      }
+      return;
     }
   }
 
@@ -114,7 +110,6 @@ async function addMeme(reaction, user) {
     // checking if a mod flagged this message
     let msgReaction = await message.reactions.find((r) => r.emoji.name === modEmoji);
     if (msgReaction) {
-      const member = await message.guild.fetchMember(user);
       if (member && member.roles.has(roleMod.id)) return;
     }
 
@@ -193,7 +188,9 @@ async function removeMeme(reaction, user) {
     const memeMsg = await memeChannel.fetchMessage(memes.id);
     await memeMsg.edit({ embed });
     if (parseInt(memeCounter[1], 10) - 1 === 0) {
-      memeMsg.delete(1000);
+      await memeMsg.delete(1000)
+        .then(() => logger.info('Deleted a meme entry'))
+        .catch(logger.error);
     }
   }
 }
