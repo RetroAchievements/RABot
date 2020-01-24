@@ -3,7 +3,7 @@ const logger = require('pino')({
   timestamp: () => `,"time":"${new Date()}"`,
 });
 
-const { ROLE_MOD_NAME, AOTW_ROLE_ID } = process.env;
+const { ROLE_MOD, AOTW_ROLE_ID } = process.env;
 const Command = require('../../structures/Command.js');
 
 module.exports = class SayCommand extends Command {
@@ -36,7 +36,7 @@ module.exports = class SayCommand extends Command {
     // check if AOTW WINNER role exists on the channel
     const aotwRole = await msg.guild.roles.get(AOTW_ROLE_ID);
     // check if requesting user is mod user
-    const isMod = await msg.member.roles.find((role) => role.name === ROLE_MOD_NAME);
+    const isMod = await msg.member.roles.has(ROLE_MOD);
 
     // if all checks pass give the role to the user
     if (user && isMod && aotwRole) {
