@@ -38,9 +38,10 @@ async function addMeme(reaction, user) {
 
   // checking if a mod flagged this message
   let deleteMsg = false;
+  const member = await message.guild.fetchMember(user);
+  const roleModId = ROLE_MOD;
   if (reaction.emoji.name === modEmoji) {
-    const member = await message.guild.fetchMember(user);
-    if (member) deleteMsg = member.roles.has(ROLE_MOD);
+    if (member) deleteMsg = await member.roles.has(roleModId);
   } else if (!isValidReaction(reaction, user)) return;
 
   const memeChannel = message.guild.channels.get(CHANNEL_MEME);
@@ -55,20 +56,23 @@ async function addMeme(reaction, user) {
 
   // check the messages within the fetch object to see if the message
   // that was reacted to is already in the meme-board
-  const memes = fetch.find((m) => m.embeds[0]
-            && m.embeds[0].footer
-            && m.embeds[0].footer.text.startsWith(memoji)
-            && m.embeds[0].footer.text.endsWith(message.id));
+  const memes = fetch.find((m) => typeof m.embeds[0] !== 'undefined'
+  && m.embeds[0].footer !== null
+  && m.embeds[0].footer.text.startsWith(memoji)
+  && m.embeds[0].footer.text.endsWith(message.id));
 
   // if the message is found within the memeboard.
   if (memes) {
     // fetch the ID of the message already on the memeboard.
     const memeMsg = await memeChannel.fetchMessage(memes.id);
-
     if (deleteMsg) {
-      memeMsg.delete(1000)
+      await memeMsg.delete(1000)
         .then(() => logger.info('Deleted a meme entry'))
         .catch(logger.error);
+      return;
+    }
+
+    if (reaction.emoji.name === modEmoji) {
       return;
     }
 
@@ -94,25 +98,30 @@ async function addMeme(reaction, user) {
     return;
   }
 
+  const msgReactionDeny = await message.reactions.find((r) => r.emoji.name === modEmoji);
+  if (!memes && msgReactionDeny) {
+    if (member) {
+      return;
+    }
+  }
+
   // if the message is not on the memeboard yet
   if (!memes && !deleteMsg) {
     // checking if a mod flagged this message
     let msgReaction = await message.reactions.find((r) => r.emoji.name === modEmoji);
     if (msgReaction) {
-      for (const u of msgReaction.users.values()) {
-        const member = await message.guild.fetchMember(user);
-        if (member && member.roles.has(ROLE_MOD)) return;
-      }
+      if (member && member.roles.has(roleModId)) return;
     }
 
     // message only goes to the meme-board after 5 memoji reactions by non-bot users
     let reactionCounter = 0;
     msgReaction = await message.reactions.find((r) => r.emoji.name === memoji);
-    for (const u of msgReaction.users.values()) {
+    const reactionsUser = msgReaction.users.values();
+    Array.from(reactionsUser).forEach((u) => {
       if (!u.bot) {
         reactionCounter += 1;
       }
-    }
+    });
 
     if (reactionCounter < minimumReactions) {
       return;
@@ -158,12 +167,11 @@ async function removeMeme(reaction, user) {
   }
 
   const fetchedMessages = await memeChannel.fetchMessages({ limit: MAX_MEMES });
-  const memes = fetchedMessages.find(
-    (m) => typeof m.embeds[0]
-            && m.embeds[0].footer
-            && m.embeds[0].footer.text.startsWith(memoji)
-            && m.embeds[0].footer.text.endsWith(reaction.message.id),
-  );
+  const memes = fetchedMessages.find((m) => typeof m.embeds[0] !== 'undefined'
+  && m.embeds[0].footer !== null
+  && m.embeds[0].footer.text.startsWith(memoji)
+  && m.embeds[0].footer.text.endsWith(message.id));
+
   if (memes) {
     const memeCounter = memeRegex.exec(memes.embeds[0].footer.text);
     const foundMeme = memes.embeds[0];
@@ -179,9 +187,10 @@ async function removeMeme(reaction, user) {
 
     const memeMsg = await memeChannel.fetchMessage(memes.id);
     await memeMsg.edit({ embed });
-
     if (parseInt(memeCounter[1], 10) - 1 === 0) {
-      memeMsg.delete(1000);
+      await memeMsg.delete(1000)
+        .then(() => logger.info('Deleted a meme entry'))
+        .catch(logger.error);
     }
   }
 }
