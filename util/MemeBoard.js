@@ -1,5 +1,5 @@
 // TODO: assure bot has permissions to manage messages in the meme-board channel
-const { CHANNEL_MEME, ROLE_MOD_NAME, MAX_MEMES } = process.env;
+const { CHANNEL_MEME, ROLE_MOD, MAX_MEMES } = process.env;
 const { RichEmbed } = require('discord.js');
 const logger = require('pino')({
   useLevelLabels: true,
@@ -39,9 +39,9 @@ async function addMeme(reaction, user) {
   // checking if a mod flagged this message
   let deleteMsg = false;
   const member = await message.guild.fetchMember(user);
-  const roleMod = await message.guild.roles.find((role) => role.name === ROLE_MOD_NAME);
+  const roleModId = ROLE_MOD;
   if (reaction.emoji.name === modEmoji) {
-    if (member) deleteMsg = await member.roles.has(roleMod.id);
+    if (member) deleteMsg = await member.roles.has(roleModId);
   } else if (!isValidReaction(reaction, user)) return;
 
   const memeChannel = message.guild.channels.get(CHANNEL_MEME);
@@ -110,7 +110,7 @@ async function addMeme(reaction, user) {
     // checking if a mod flagged this message
     let msgReaction = await message.reactions.find((r) => r.emoji.name === modEmoji);
     if (msgReaction) {
-      if (member && member.roles.has(roleMod.id)) return;
+      if (member && member.roles.has(roleModId)) return;
     }
 
     // message only goes to the meme-board after 5 memoji reactions by non-bot users
