@@ -177,7 +177,7 @@ module.exports = class ParseMemCommand extends Command {
 
       reqs = groups[i].split('_');
       countLines += reqs.length;
-      if (countLines > 20) return "I'm unable to handle this, it's TOO BIG!";
+      if (countLines > 25) return "I'm unable to handle this, it's TOO BIG!";
 
       for (let j = 0; j < reqs.length; j += 1) {
         reqNum = j + 1;
@@ -195,12 +195,12 @@ module.exports = class ParseMemCommand extends Command {
         hits = parsedReq[9] || '0';
 
         if (lSize === '') {
-          num = parseInt(lMemory).toString(16);
+          num = parseInt(lMemory, 10).toString(16);
           if (!Number.isNaN(`0x${num}`)) lMemory = num;
         }
         lMemory = `0x${lMemory.substring(0, maxChars + 2).padStart(maxChars, '0')}`;
         if (rSize === '') {
-          num = parseInt(rMemVal).toString(16);
+          num = parseInt(rMemVal, 10).toString(16);
           if (!Number.isNaN(`0x${num}`)) rMemVal = num;
         }
         rMemVal = `0x${rMemVal.substring(0, maxChars + 2).padStart(maxChars, '0')}`;
