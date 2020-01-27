@@ -32,7 +32,7 @@ module.exports = class RemoveAOTWCommand extends Command {
     // check if requesting user is mod user
     const isMod = await msg.member.roles.has(ROLE_MOD);
 
-    if(!isMod){
+    if (!isMod) {
       return;
     }
 
@@ -55,9 +55,9 @@ module.exports = class RemoveAOTWCommand extends Command {
         msg.say(`**${aotwRole.name}** has been removed from user **${user.displayName}**.`);
       }
     } else {
-      await msg.channel.send('Are you sure you want to remove from all users? Please answer with `yes` or `y` if so.');
+      await msg.channel.reply('Are you sure you want to remove from all users? Please `cancel` now if not.');
 
-      const filter = (res) => res.content.includes('yes') || res.content.toLowerCase() === 'y';
+      const filter = (res) => res.content.includes('cancel') || res.content.toLowerCase() === 'cancel';
 
       const msgs = await msg.channel.awaitMessages(filter, {
         max: 1,
@@ -65,6 +65,8 @@ module.exports = class RemoveAOTWCommand extends Command {
       });
 
       if (msgs.size) {
+        msg.reply('Cancelled command.');
+      } else {
         const users = msg.guild.members;
         let aotwUsers = 0;
         users.forEach(async (user) => {
@@ -75,8 +77,6 @@ module.exports = class RemoveAOTWCommand extends Command {
         });
         logger.info({ msg: `@Mod ${msg.member.displayName} removed ${aotwRole.name} from ${aotwUsers} users` });
         msg.say(`**${aotwRole.name}** role has been removed from **${aotwUsers}** users.`);
-      } else {
-        msg.say(':no_entry: Cancelled command.');
       }
     }
   }
