@@ -14,7 +14,7 @@ module.exports = class RemoveAOTWCommand extends Command {
       memberName: 'removeaotw',
       aliases: ['aotwremove'],
       description: 'Removes the AOTW Winner role from designated user.',
-      examples:['!removeaotw @user', '!removeaotw'],
+      examples: ['!removeaotw @user', '!removeaotw'],
       args: [
         {
           key: 'username',
@@ -76,7 +76,7 @@ module.exports = class RemoveAOTWCommand extends Command {
         logger.info({ msg: `@Mod ${msg.member.displayName} removed ${aotwRole.name} from ${aotwUsers} users` });
         msg.say(`**${aotwRole.name}** role has been removed from **${aotwUsers}** users.`);
       } else {
-        msg.say('Cancelled command.');
+        msg.say(':no_entry: Cancelled command.');
       }
     }
   }

@@ -14,7 +14,7 @@ module.exports = class SetAOTWCommand extends Command {
       memberName: 'setaotw',
       aliases: ['giveaotw', 'aotwaward'],
       description: 'Offers AOTW Winner role to designated user.',
-      examples:['!setaotw @user'],
+      examples: ['!setaotw @user'],
       args: [
         {
           key: 'username',
