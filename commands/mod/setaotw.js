@@ -3,17 +3,17 @@ const logger = require('pino')({
   timestamp: () => `,"time":"${new Date()}"`,
 });
 
-const { ROLE_MOD, AOTW_ROLE_ID } = process.env;
+const { ROLE_MOD, ROLE_AOTW } = process.env;
 const Command = require('../../structures/Command.js');
 
-module.exports = class SetAOTWCommand extends Command {
+module.exports = class SetAotwCommand extends Command {
   constructor(client) {
     super(client, {
       name: 'setaotw',
       group: 'mod',
+      guildOnly: true,
       memberName: 'setaotw',
-      aliases: ['giveaotw', 'aotwaward'],
-      description: 'Offers AOTW Winner role to designated user.',
+      description: 'Offers AotW Winner role to designated user.',
       examples: ['!setaotw @user'],
       args: [
         {
@@ -26,24 +26,38 @@ module.exports = class SetAOTWCommand extends Command {
   }
 
   async run(msg, { username }) {
-    // check if the requested user to be given role exists
-    const user = await msg.guild.fetchMember(username);
+    const callerIsMod = await msg.member.roles.has(ROLE_MOD);
+    if (!callerIsMod) {
+      return msg.reply('Only moderators can use such command.');
+    }
 
-    // check if AOTW WINNER role exists on the channel
-    const aotwRole = await msg.guild.roles.get(AOTW_ROLE_ID);
-    // check if requesting user is mod user
-    const isMod = await msg.member.roles.has(ROLE_MOD);
-    const hasAOTW = await user.roles.has(AOTW_ROLE_ID);
-    // if the user already has the role, do nothing
-    if (hasAOTW) {
-      return;
+    const aotwRole = await msg.guild.roles.get(ROLE_AOTW);
+    if (!aotwRole) {
+      return msg.reply(
+        ":warning: Looks like there's no role for AotW winners in this server (or maybe I just don't know the role ID).",
+      );
     }
-    // if all checks pass give the role to the user
-    if (user && isMod && aotwRole) {
-      // award the user the role
-      await user.addRole(aotwRole).catch(logger.error);
-      logger.info({ msg: `@Mod ${msg.member.displayName} added ${aotwRole.name} to ${user.displayName}` });
-      msg.say(`:trophy: Congratulations **${user.displayName}**. You have been awarded **${aotwRole.name}** role!`);
+
+    const user = await msg.guild.fetchMember(username);
+    // the args config in the constructor guarantees that 'username' is a valid user
+
+    const userHasAotw = await user.roles.has(ROLE_AOTW);
+    if (userHasAotw) {
+      return msg.reply(`The user **${user.displayName}** already has the **${aotwRole.name}** role.`);
     }
+
+    return user.addRole(aotwRole)
+      .then(() => {
+        logger.info(
+          { msg: `@Mod ${msg.member.displayName} added ${aotwRole.name} to ${user.displayName}` },
+        );
+        msg.say(
+          `:trophy: Congratulations **${user.displayName}**. You have been awarded **${aotwRole.name}** role!`,
+        );
+      })
+      .catch((err) => {
+        logger.error(err);
+        msg.reply(`I wasn't able to give the **${aotwRole.name}** role to **${user.displayName}**... :frowning2:`);
+      });
   }
 };
