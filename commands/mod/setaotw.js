@@ -39,7 +39,7 @@ module.exports = class SetAotwCommand extends Command {
     }
 
     const user = await msg.guild.fetchMember(username);
-    // the args config in the constructor guarantees that 'username' is a valid user
+    // no need to check for success, the args config in the constructor guarantees that 'username' is valid.
 
     const userHasAotw = await user.roles.has(ROLE_AOTW);
     if (userHasAotw) {
