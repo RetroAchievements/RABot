@@ -52,11 +52,11 @@ client.registry
   })
   .registerCommandsIn(path.join(__dirname, 'commands'));
 
-client.once('ready', () => {
+client.once('ready', async () => {
   client.user.setUsername(BOT_NAME || 'RABot');
   logger.info(`[READY] Logged in as ${client.user.tag}! (${client.user.id})`);
   client.user.setActivity('if you need help', { type: 'WATCHING' });
-  getGameList();
+  await getGameList();
 });
 
 client.on('guildMemberAdd', async (member) => {
