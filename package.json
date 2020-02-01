@@ -2,6 +2,7 @@
     "name": "retroachievements-discord-bot",
     "version": "1.1.1",
     "description": "Retroachievements.org Discord Bot - www.retroachievements.org",
+    "homepage": "http://retroachievements.org",
     "main": "index.js",
     "dependencies": {
         "cheerio": "^1.0.0-rc.3",
@@ -44,5 +45,15 @@
         "url": "https://github.com/RetroAchievements/RABot"
     },
     "author": "luchaos",
+    "contributors": [
+        {
+          "name": "zapo",
+          "url": "http://victorz.me"
+        },
+        {
+            "name": "meleu",
+            "url": "http://meleu.sh/"
+        }
+    ],
     "license": "ISC"
 }
