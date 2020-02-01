@@ -74,7 +74,6 @@ async function getConsoles() {
     const res = await fetch(`${getConsolesURL}${c.id}`);
     const json = await res.json();
     if (json.Success) {
-
       // decomment below line to write the response into each .json file if still needed
       // fs.writeFile(`${glPath}/gl-${c.name}.json`,jsonData, err => logger.error(err));
       // let jsonFile = require(`${glPath}/gl-${c.name}.json`);
@@ -97,5 +96,11 @@ async function getGameList() {
 }
 
 module.exports.gamelist = gamelist;
-module.exports.consoles = consoles.map(((c) => c.id));
+module.exports.consoles = (() => {
+  const consolesNames = [];
+  consoles.forEach((c) => {
+    consolesNames.push(c.name);
+  });
+  return consolesNames;
+})();
 module.exports.getGameList = getGameList;
