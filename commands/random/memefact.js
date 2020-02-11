@@ -13,6 +13,7 @@ module.exports = class MemeFactCommand extends Command {
       memberName: 'memefact',
       description: 'Responds with a RetroAchievements meme fact.',
       guildOnly: true,
+      argsPromptLimit: 0,
       args: [
         {
           key: 'number',
