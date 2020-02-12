@@ -2,7 +2,13 @@ require('dotenv').config({ path: `${__dirname}/.env` });
 
 const {
   BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE, BOT_NAME,
+  g_client_id, g_client_secret, g_redirect_uris 
 } = process.env;
+
+const {   
+  authorize,
+  getMessages } = require('./services/gmail');
+
 const NEWS_ROLES = process.env.NEWS_ROLES.split(',');
 
 const Discord = require('discord.js');
@@ -147,6 +153,8 @@ client.on('messageReactionRemove', (reaction, user) => removeMeme(reaction, user
 
 
 client.login(BOT_TOKEN);
+
+authorize(g_client_id, g_client_secret, g_redirect_uris[0], getMessages);
 
 process.on('unhandledRejection', (err) => {
   logger.error(err);
