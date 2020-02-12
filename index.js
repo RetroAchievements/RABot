@@ -2,12 +2,10 @@ require('dotenv').config({ path: `${__dirname}/.env` });
 
 const {
   BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE, BOT_NAME,
-  g_client_id, g_client_secret, g_redirect_uris 
+  CLIENT_ID, CLIENT_SECRET, REDIRECT_URIS,
 } = process.env;
 
-const {   
-  authorize,
-  getMessages } = require('./services/gmail');
+const timeout = 1000 * 60 * 60 * 12;
 
 const NEWS_ROLES = process.env.NEWS_ROLES.split(',');
 
@@ -28,6 +26,10 @@ const badwordsRule2JSON = require('./assets/json/badwordsRule2.json');
 const regexRule2 = new RegExp(`(${badwordsRule2JSON.join('|')})`, 'i');
 const talkedRecently = new Set();
 
+const {
+  authorize,
+  getMessages,
+} = require('./services/gmail');
 
 const client = new CommandoClient({
   commandPrefix: BOT_PREFIX,
@@ -154,7 +156,10 @@ client.on('messageReactionRemove', (reaction, user) => removeMeme(reaction, user
 
 client.login(BOT_TOKEN);
 
-authorize(g_client_id, g_client_secret, g_redirect_uris[0], getMessages);
+// set the service to pull messages each 12h
+setInterval(() => {
+  authorize(CLIENT_ID, CLIENT_SECRET, REDIRECT_URIS[0], getMessages);
+}, timeout);
 
 process.on('unhandledRejection', (err) => {
   logger.error(err);
