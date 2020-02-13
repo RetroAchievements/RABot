@@ -2,10 +2,10 @@ require('dotenv').config({ path: `${__dirname}/.env` });
 
 const {
   BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE, BOT_NAME,
-  CLIENT_ID, CLIENT_SECRET, REDIRECT_URIS,
 } = process.env;
 
-const timeout = 1000 * 60 * 60 * 12;
+// timeout set for gmail service.
+const timeout = 1000 * 60 * 60 * 6;
 
 const NEWS_ROLES = process.env.NEWS_ROLES.split(',');
 
@@ -26,10 +26,7 @@ const badwordsRule2JSON = require('./assets/json/badwordsRule2.json');
 const regexRule2 = new RegExp(`(${badwordsRule2JSON.join('|')})`, 'i');
 const talkedRecently = new Set();
 
-const {
-  authorize,
-  getMessages,
-} = require('./services/gmail');
+const { gmailService } = require('./services/gmail');
 
 const client = new CommandoClient({
   commandPrefix: BOT_PREFIX,
@@ -65,6 +62,12 @@ client.once('ready', async () => {
   logger.info(`[READY] Logged in as ${client.user.tag}! (${client.user.id})`);
   client.user.setActivity('if you need help', { type: 'WATCHING' });
   await getGameList();
+  // start the gmail service
+  gmailService(client);
+  // set the service to pull messages every 6h
+  setInterval(() => {
+    gmailService(client);
+  }, timeout);
 });
 
 client.on('guildMemberAdd', async (member) => {
@@ -155,11 +158,6 @@ client.on('messageReactionRemove', (reaction, user) => removeMeme(reaction, user
 
 
 client.login(BOT_TOKEN);
-
-// set the service to pull messages each 12h
-setInterval(() => {
-  authorize(CLIENT_ID, CLIENT_SECRET, REDIRECT_URIS[0], getMessages);
-}, timeout);
 
 process.on('unhandledRejection', (err) => {
   logger.error(err);

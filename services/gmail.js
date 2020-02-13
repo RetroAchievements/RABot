@@ -1,3 +1,9 @@
+require('dotenv').config({ path: '../.env' });
+
+const {
+  CLIENT_ID, CLIENT_SECRET, REDIRECT_URIS, CHANNEL_RADMIN, RA_GUILD_ID, ROLE_ADMIN,
+} = process.env;
+
 const { base64decode } = require('nodejs-base64');
 const fs = require('fs');
 const readline = require('readline');
@@ -33,11 +39,11 @@ function getNewToken(oAuth2Client, callback) {
   rl.question('Enter the code from that page here: ', (code) => {
     rl.close();
     oAuth2Client.getToken(code, (err, token) => {
-      if (err) return logger.error('Error retrieving access token', err);
+      if (err) logger.error('Error retrieving access token', err);
       oAuth2Client.setCredentials(token);
       // Store the token to disk for later program executions
-      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-        if (err) return console.error(err);
+      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (error) => {
+        if (err) logger.error(error);
         logger.info('Token stored to', TOKEN_PATH);
       });
       callback(oAuth2Client);
@@ -46,40 +52,23 @@ function getNewToken(oAuth2Client, callback) {
 }
 
 function getMessages(auth) {
-  const gmail = google.gmail({ version: 'v1', auth });
-  gmail.users.messages.list({
-    userId: 'me',
-  }, async (err, res) => {
-    if (err) return logger.error(`The API returned an error: ${err}`);
-    const msgs = res.data;
-    if (msgs.messages.length) {
-      /** 
-        * WIP - do something with email body
-        * below is an example of getting the latset message sent to the user's email
-        * a for loop can be used on the msgs.messages array to go thru the  latest cronolgical income order of the newest 100 emails
-        */
-
-      // example to get details of latest email
-      const msgDetails = await gmail.users.messages.get({
-        userId: 'me',
-        id: msgs.messages[0].id,
-      });
-      
-      
-        /**
-         * Retrieve the email sender, date of when the email entered inbox and decode body message of the email
-         * @param {from} string The name and email of the sender.
-         * @param {date} string The date when the email came in.
-         * @param {decodedMessage} string The body of the email message.
-         */
-      let from, date; 
-      from = msgDetails.data.payload.headers.find(data=> data.name == 'From' ).value;
-      date = msgDetails.data.payload.headers.find(data=> data.name == 'Date' ).value;
-      const decodeMessage = base64decode(msgDetails.data.payload.parts[0].body.data);
-
-    } else {
+  return new Promise((resolve, reject) => {
+    const gmail = google.gmail({ version: 'v1', auth });
+    return gmail.users.messages.list({
+      userId: 'me',
+      labelIds: ['INBOX', 'CATEGORY_PERSONAL'],
+    }, async (err, res) => {
+      if (err) {
+        logger.error(`The API returned an error: ${err}`);
+        return reject(err);
+      }
+      const msgs = res.data;
+      if (msgs.messages.length) {
+        return resolve({ gmail, emails: msgs.messages });
+      }
       logger.warn('No messages found');
-    }
+      return resolve('No messages found');
+    });
   });
 }
 
@@ -103,8 +92,51 @@ function authorize(clientId, clientSecret, redirectUris, callback) {
   });
 }
 
+async function gmailService(client) {
+  authorize(CLIENT_ID, CLIENT_SECRET, REDIRECT_URIS[0], async (auth) => {
+    const { gmail, emails } = await getMessages(auth);
+    const RAdmin = await client.channels.get(CHANNEL_RADMIN);
+    const fetchMsgs = await RAdmin.fetchMessages();
+    const adminRole = await client.guilds.get(RA_GUILD_ID).roles.get(ROLE_ADMIN);
+
+    emails.forEach(async (email) => {
+      const emailOptions = {
+        userId: 'me',
+        id: email.id,
+        format: 'full',
+      };
+
+      const emailDetails = await gmail.users.messages.get(emailOptions);
+
+      let from = ''; let to = ''; let date = ''; let subject = ''; let decodeMessage = ''; let mimeType = '';
+      to = emailDetails.data.payload.headers.find((data) => data.name === 'To').value;
+      from = emailDetails.data.payload.headers.find((data) => data.name === 'From').value;
+      date = emailDetails.data.payload.headers.find((data) => data.name === 'Date').value;
+      subject = emailDetails.data.payload.headers.find((data) => data.name === 'Subject').value;
+      mimeType = emailDetails.data.payload.mimeType;
+      if (!mimeType.includes('application/octet-stream')) {
+        if (mimeType.includes('text/html')) {
+          decodeMessage = base64decode(emailDetails.data.payload.body.data);
+        } else if (mimeType.includes('multipart/mixed')) {
+          decodeMessage = base64decode(emailDetails.data.payload.parts[0].parts[0].body.data);
+        } else if (mimeType.includes('multipart/alternative')) {
+          decodeMessage = base64decode(emailDetails.data.payload.parts[0].body.data);
+        }
+      }
+      if (fetchMsgs.size > 1) {
+        fetchMsgs.forEach(async (fetch) => {
+          const msgSubject = fetch.content.substring(fetch.content.indexOf('Subject') + 11, fetch.content.indexOf('\n\n'));
+          if (msgSubject !== subject) {
+            await RAdmin.send(`--- START ---\n **From**: ${from}\n **To**: ${to} - ${adminRole} \n **Date/Time**: ${date}\n **Subject**: ${subject}\n\n ${decodeMessage} \n--- END ---`);
+          }
+        });
+      } else {
+        await RAdmin.send(`--- START ---\n **From**: ${from}\n **To**: ${to} - ${adminRole} \n **Date/Time**: ${date}\n **Subject**: ${subject}\n\n ${decodeMessage} \n--- END ---`);
+      }
+    });
+  });
+}
 
 module.exports = {
-  authorize,
-  getMessages,
+  gmailService,
 };
