@@ -1,6 +1,9 @@
 const { Collection } = require('discord.js');
 const Command = require('../../structures/Command.js');
-
+const logger = require('pino')({
+  useLevelLabels: true,
+  timestamp: () => `,"time":"${new Date()}"`,
+});
 const allOptions = Object.values(require('../../assets/json/emoji-alphabet.json'));
 
 module.exports = class TimedPollCommand extends Command {
