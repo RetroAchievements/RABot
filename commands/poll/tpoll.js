@@ -9,8 +9,8 @@ module.exports = class TimedPollCommand extends Command {
       name: 'tpoll',
       group: 'poll',
       memberName: 'tpoll',
-      description: 'Create a timed poll.',
-      examples: ['`tpoll 60 \'Which option you choose?\' \'option one\' \'option 2\' \'option N\'`'],
+      description: 'Create a timed poll. You can create a hidden time poll by adding hidden as a argument.',
+      examples: ['`tpoll 60 yes \'Which option you choose?\' \'option one\' \'option 2\' \'option N\'`', '`tpoll 60 no \'Which option you choose?\' \'option one\' \'option 2\' \'option N\'`'],
       throttling: {
         usages: 1,
         duration: 30,
@@ -24,6 +24,12 @@ module.exports = class TimedPollCommand extends Command {
           prompt: '',
           min: 0,
           max: 604800, // 604,800 seconds = 1 week
+        },
+        {
+          key: 'hidden',
+          type: 'string',
+          prompt: '',
+          default: 'no',
         },
         {
           key: 'question',
@@ -45,7 +51,9 @@ module.exports = class TimedPollCommand extends Command {
     });
   }
 
-  async run(msg, { seconds, question, opts }) {
+  async run(msg, {
+    seconds, hidden, question, opts,
+  }) {
     if (opts.length < 2 || opts.length > 10) return msg.reply('The number of options must be greater than 2 and less than 10');
 
     let options = '';
@@ -54,13 +62,14 @@ module.exports = class TimedPollCommand extends Command {
     const milliseconds = seconds <= 0 ? 0 : seconds * 1000;
     const voters = [];
     const pollResults = new Collection();
+
     const reactions = allOptions.slice(0, opts.length);
 
-    for (i = 0; i < opts.length; i++) {
+    for (i = 0; i < opts.length; i += 1) {
       options += `\n${reactions[i]} ${opts[i]}`;
 
       // let's check if there's a repetition in the options
-      for (let j = i + 1; j < opts.length; j++) if (opts[i] === opts[j]) return msg.reply(`**\`poll\` error**: repeated options found: \`${opts[i]}\``);
+      for (let j = i + 1; j < opts.length; j += 1) if (opts[i] === opts[j]) return msg.reply(`**\`poll\` error**: repeated options found: \`${opts[i]}\``);
     }
 
     pollMsg.push(`__*${msg.author} started a poll*__:`);
@@ -78,11 +87,11 @@ module.exports = class TimedPollCommand extends Command {
       sentMsg.edit(pollMsg);
     }
 
-    for (i = 0; i < opts.length; i++) await sentMsg.react(reactions[i]);
+    for (i = 0; i < opts.length; i += 1) await sentMsg.react(reactions[i]);
 
     if (!milliseconds) return;
 
-    const filter = (reaction, user) => {
+    const filter = async (reaction, user) => {
       // ignore bot's reactions
       if (this.client.user.id === user.id) {
         return false;
@@ -112,6 +121,13 @@ module.exports = class TimedPollCommand extends Command {
 
       // msg.channel.send(`\`${user.username}\`'s vote: ${reaction.emoji.name}`)
       // .then(m => m.delete(5000));
+
+      if (hidden === 'yes') {
+        sentMsg.channel.fetchMessage(sentMsg.id).then((message) => {
+          message.reactions.forEach((r) => r.remove(user.id));
+        });
+      }
+
       return true;
     };
 
@@ -138,9 +154,9 @@ module.exports = class TimedPollCommand extends Command {
         pollEndedMsg.push(`<${sentMsg.url}>`);
         msg.reply(pollEndedMsg);
       })
-      .catch((collected) => {
+      .catch((error) => {
+        logger.error(error);
         msg.reply('**`poll` error**: Something went wrong with your poll.');
-        console.error(collected);
       });
   }
 };

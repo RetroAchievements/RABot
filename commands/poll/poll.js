@@ -1,7 +1,4 @@
-const { Collection } = require('discord.js');
 const Command = require('../../structures/Command.js');
-
-const allOptions = Object.values(require('../../assets/json/emoji-alphabet.json'));
 
 module.exports = class PollCommand extends Command {
   constructor(client) {
@@ -9,11 +6,17 @@ module.exports = class PollCommand extends Command {
       name: 'poll',
       group: 'poll',
       memberName: 'poll',
-      description: 'Create a (useless) poll.',
-      examples: ['`poll \'Which option you choose?\' \'option one\' \'option 2\' \'option N\'`'],
+      description: 'Create a poll. Can be set hidden or not',
+      examples: ['`poll yes \'Which option you choose?\' \'option one\' \'option 2\' \'option N\'`', '`poll no \'Which option you choose?\' \'option one\' \'option 2\' \'option N\'`'],
       argsSingleQuotes: true,
       argsPromptLimit: 0,
       args: [
+        {
+          key: 'hidden',
+          type: 'string',
+          prompt: '',
+          default: 'no',
+        },
         {
           key: 'question',
           type: 'string',
@@ -34,7 +37,9 @@ module.exports = class PollCommand extends Command {
     });
   }
 
-  async run(msg, { question, opts }) {
-    return this.client.registry.resolveCommand('poll:tpoll').run(msg, { seconds: 0, question, opts });
+  async run(msg, { hidden, question, opts }) {
+    return this.client.registry.resolveCommand('poll:tpoll').run(msg, {
+      seconds: 0, hidden, question, opts,
+    });
   }
 };
