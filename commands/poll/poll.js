@@ -1,7 +1,4 @@
-const { Collection } = require('discord.js');
 const Command = require('../../structures/Command.js');
-
-const allOptions = Object.values(require('../../assets/json/emoji-alphabet.json'));
 
 module.exports = class PollCommand extends Command {
   constructor(client) {
@@ -9,7 +6,7 @@ module.exports = class PollCommand extends Command {
       name: 'poll',
       group: 'poll',
       memberName: 'poll',
-      description: 'Create a (useless) poll.',
+      description: 'Create a poll.',
       examples: ['`poll \'Which option you choose?\' \'option one\' \'option 2\' \'option N\'`'],
       argsSingleQuotes: true,
       argsPromptLimit: 0,

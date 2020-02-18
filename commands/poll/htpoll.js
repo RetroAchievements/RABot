@@ -8,13 +8,20 @@ const logger = require('pino')({
   timestamp: () => `,"time":"${new Date()}"`,
 });
 
+function removeReaction(sentMsg, user) {
+  sentMsg.channel.fetchMessage(sentMsg.id).then((message) => {
+    message.reactions.forEach((r) => r.remove(user.id));
+  });
+}
+
 module.exports = class TimedPollCommand extends Command {
   constructor(client) {
     super(client, {
-      name: 'tpoll',
+      name: 'htpoll',
       group: 'poll',
-      memberName: 'tpoll',
-      description: 'Create a timed poll.',
+      memberName: 'htpoll',
+      aliases: ['hiddentimedpoll'],
+      description: 'Create a timed poll. You can create a hidden time poll by adding hidden as a argument.',
       examples: ['`tpoll 60 \'Which option you choose?\' \'option one\' \'option 2\' \'option N\'`'],
       throttling: {
         usages: 1,
@@ -50,7 +57,9 @@ module.exports = class TimedPollCommand extends Command {
     });
   }
 
-  async run(msg, { seconds, question, opts }) {
+  async run(msg, {
+    seconds, question, opts,
+  }) {
     if (opts.length < 2 || opts.length > 10) return msg.reply('The number of options must be greater than 2 and less than 10');
 
     let options = '';
@@ -59,16 +68,17 @@ module.exports = class TimedPollCommand extends Command {
     const milliseconds = seconds <= 0 ? 0 : seconds * 1000;
     const voters = [];
     const pollResults = new Collection();
+
     const reactions = allOptions.slice(0, opts.length);
 
-    for (i = 0; i < opts.length; i++) {
+    for (i = 0; i < opts.length; i += 1) {
       options += `\n${reactions[i]} ${opts[i]}`;
 
       // let's check if there's a repetition in the options
-      for (let j = i + 1; j < opts.length; j++) if (opts[i] === opts[j]) return msg.reply(`**\`poll\` error**: repeated options found: \`${opts[i]}\``);
+      for (let j = i + 1; j < opts.length; j += 1) if (opts[i] === opts[j]) return msg.reply(`**\`poll\` error**: repeated options found: \`${opts[i]}\``);
     }
 
-    pollMsg.push(`__*${msg.author} started a poll*__:`);
+    pollMsg.push(`__*${msg.author} started a hidden poll*__:`);
     pollMsg.push(`\n:bar_chart: **${question}**\n${options}`);
 
     if (milliseconds) pollMsg.push('\n`Notes:\n- only the first reaction is considered a vote\n- unlisted reactions void the vote`');
@@ -83,11 +93,11 @@ module.exports = class TimedPollCommand extends Command {
       sentMsg.edit(pollMsg);
     }
 
-    for (i = 0; i < opts.length; i++) await sentMsg.react(reactions[i]);
+    for (i = 0; i < opts.length; i += 1) await sentMsg.react(reactions[i]);
 
     if (!milliseconds) return;
 
-    const filter = (reaction, user) => {
+    const filter = async (reaction, user) => {
       // ignore bot's reactions
       if (this.client.user.id === user.id) {
         return false;
@@ -97,6 +107,7 @@ module.exports = class TimedPollCommand extends Command {
       if (voters.indexOf(user.id) < 0) {
         voters.push(user.id);
       } else {
+        removeReaction(sentMsg, user);
         return false;
       }
 
@@ -110,6 +121,8 @@ module.exports = class TimedPollCommand extends Command {
       numVotes = !numVotes ? 1 : numVotes + 1;
 
       pollResults.set(reaction.emoji.name, numVotes);
+
+      removeReaction(sentMsg, user);
 
       return true;
     };
