@@ -12,6 +12,12 @@ module.exports = class PollCommand extends Command {
       argsPromptLimit: 0,
       args: [
         {
+          key: 'hidden',
+          type: 'string',
+          prompt: '',
+          default: 'no',
+        },
+        {
           key: 'question',
           type: 'string',
           prompt: '',
@@ -32,6 +38,8 @@ module.exports = class PollCommand extends Command {
   }
 
   async run(msg, { question, opts }) {
-    return this.client.registry.resolveCommand('poll:tpoll').run(msg, { seconds: 0, question, opts });
+    return this.client.registry.resolveCommand('poll:tpoll').run(msg, {
+      seconds: 0, question, opts,
+    });
   }
 };

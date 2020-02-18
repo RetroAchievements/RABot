@@ -1,12 +1,10 @@
 const { Collection } = require('discord.js');
 const Command = require('../../structures/Command.js');
-
-const allOptions = Object.values(require('../../assets/json/emoji-alphabet.json'));
-
 const logger = require('pino')({
   useLevelLabels: true,
   timestamp: () => `,"time":"${new Date()}"`,
 });
+const allOptions = Object.values(require('../../assets/json/emoji-alphabet.json'));
 
 module.exports = class TimedPollCommand extends Command {
   constructor(client) {
@@ -50,7 +48,9 @@ module.exports = class TimedPollCommand extends Command {
     });
   }
 
-  async run(msg, { seconds, question, opts }) {
+  async run(msg, {
+    seconds, question, opts,
+  }) {
     if (opts.length < 2 || opts.length > 10) return msg.reply('The number of options must be greater than 2 and less than 10');
 
     let options = '';
@@ -59,13 +59,14 @@ module.exports = class TimedPollCommand extends Command {
     const milliseconds = seconds <= 0 ? 0 : seconds * 1000;
     const voters = [];
     const pollResults = new Collection();
+
     const reactions = allOptions.slice(0, opts.length);
 
-    for (i = 0; i < opts.length; i++) {
+    for (i = 0; i < opts.length; i += 1) {
       options += `\n${reactions[i]} ${opts[i]}`;
 
       // let's check if there's a repetition in the options
-      for (let j = i + 1; j < opts.length; j++) if (opts[i] === opts[j]) return msg.reply(`**\`poll\` error**: repeated options found: \`${opts[i]}\``);
+      for (let j = i + 1; j < opts.length; j += 1) if (opts[i] === opts[j]) return msg.reply(`**\`poll\` error**: repeated options found: \`${opts[i]}\``);
     }
 
     pollMsg.push(`__*${msg.author} started a poll*__:`);
@@ -83,11 +84,11 @@ module.exports = class TimedPollCommand extends Command {
       sentMsg.edit(pollMsg);
     }
 
-    for (i = 0; i < opts.length; i++) await sentMsg.react(reactions[i]);
+    for (i = 0; i < opts.length; i += 1) await sentMsg.react(reactions[i]);
 
     if (!milliseconds) return;
 
-    const filter = (reaction, user) => {
+    const filter = async (reaction, user) => {
       // ignore bot's reactions
       if (this.client.user.id === user.id) {
         return false;

@@ -21,7 +21,7 @@ module.exports = class TimedPollCommand extends Command {
       group: 'poll',
       memberName: 'htpoll',
       aliases: ['hiddentimedpoll'],
-      description: 'Create a timed poll. You can create a hidden time poll by adding hidden as a argument.',
+      description: 'Create a hidden timed poll.',
       examples: ['`tpoll 60 \'Which option you choose?\' \'option one\' \'option 2\' \'option N\'`'],
       throttling: {
         usages: 1,
