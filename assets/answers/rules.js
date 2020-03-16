@@ -1,6 +1,6 @@
 const one = '**1.** Promote a positive environment.';
 const two = '**2.** Do NOT use this server to share copyrighted material or info about where they can be downloaded.';
-const three = '**3.** Try to keep the channels on-topic.';
+const three = '**3.** Keep the channels on-topic.';
 const four = '**4.** When in doubt, ask a @mod.';
 
 const coc = '**Complete Version**: <http://docs.retroachievements.org/Users-Code-of-Conduct/>';
