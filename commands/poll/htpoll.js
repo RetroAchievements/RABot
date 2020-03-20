@@ -1,18 +1,27 @@
 const { Collection } = require('discord.js');
 const Command = require('../../structures/Command.js');
+
+const allOptions = Object.values(require('../../assets/json/emoji-alphabet.json'));
+
 const logger = require('pino')({
   useLevelLabels: true,
   timestamp: () => `,"time":"${new Date()}"`,
 });
-const allOptions = Object.values(require('../../assets/json/emoji-alphabet.json'));
+
+function removeReaction(sentMsg, user) {
+  sentMsg.channel.fetchMessage(sentMsg.id).then((message) => {
+    message.reactions.forEach((r) => r.remove(user.id));
+  });
+}
 
 module.exports = class TimedPollCommand extends Command {
   constructor(client) {
     super(client, {
-      name: 'tpoll',
+      name: 'htpoll',
       group: 'poll',
-      memberName: 'tpoll',
-      description: 'Create a timed poll.',
+      memberName: 'htpoll',
+      aliases: ['hiddentimedpoll'],
+      description: 'Create a hidden timed poll.',
       examples: ['`tpoll 60 \'Which option you choose?\' \'option one\' \'option 2\' \'option N\'`'],
       throttling: {
         usages: 1,
@@ -69,7 +78,7 @@ module.exports = class TimedPollCommand extends Command {
       for (let j = i + 1; j < opts.length; j += 1) if (opts[i] === opts[j]) return msg.reply(`**\`poll\` error**: repeated options found: \`${opts[i]}\``);
     }
 
-    pollMsg.push(`__*${msg.author} started a poll*__:`);
+    pollMsg.push(`__*${msg.author} started a hidden poll*__:`);
     pollMsg.push(`\n:bar_chart: **${question}**\n${options}`);
 
     if (milliseconds) pollMsg.push('\n`Notes:\n- only the first reaction is considered a vote\n- unlisted reactions void the vote`');
@@ -98,6 +107,7 @@ module.exports = class TimedPollCommand extends Command {
       if (voters.indexOf(user.id) < 0) {
         voters.push(user.id);
       } else {
+        removeReaction(sentMsg, user);
         return false;
       }
 
@@ -111,6 +121,8 @@ module.exports = class TimedPollCommand extends Command {
       numVotes = !numVotes ? 1 : numVotes + 1;
 
       pollResults.set(reaction.emoji.name, numVotes);
+
+      removeReaction(sentMsg, user);
 
       return true;
     };
