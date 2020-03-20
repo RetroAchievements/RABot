@@ -10,7 +10,7 @@ module.exports = class AotwCommand extends Command {
       group: 'rautil',
       memberName: 'aotw',
       description: 'Show the current Achievement of the Week and the recent winners.',
-      examples: ['`aotw`, `aotw 2018-05-29`'],
+      examples: ['`aotw`'],
       throttling: {
         usages: 2,
         duration: 120,
