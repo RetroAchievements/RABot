@@ -44,15 +44,15 @@
         "type": "git",
         "url": "https://github.com/RetroAchievements/RABot"
     },
-    "author": "luchaos",
+    "author": "meleu",
     "contributors": [
         {
-          "name": "zapo",
-          "url": "http://victorz.me"
+            "name": "zapo",
+            "url": "http://victorz.me"
         },
         {
-            "name": "meleu",
-            "url": "http://meleu.sh/"
+            "name": "luchaos",
+            "url": "http://luchaos.at/"
         }
     ],
     "license": "ISC"
