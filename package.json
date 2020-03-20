@@ -44,8 +44,12 @@
         "type": "git",
         "url": "https://github.com/RetroAchievements/RABot"
     },
-    "author": "meleu",
+    "author": "RetroAchievements",
     "contributors": [
+        {
+            "name": "meleu",
+            "url": "https://meleu.sh/"
+        },
         {
             "name": "zapo",
             "url": "http://victorz.me"
