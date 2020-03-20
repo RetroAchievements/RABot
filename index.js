@@ -3,7 +3,6 @@ require('dotenv').config({ path: `${__dirname}/.env` });
 const {
   BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE, BOT_NAME,
 } = process.env;
-const NEWS_ROLES = process.env.NEWS_ROLES.split(',');
 
 const Discord = require('discord.js');
 const logger = require('pino')({
@@ -60,7 +59,6 @@ client.once('ready', () => {
 });
 
 client.on('guildMemberAdd', async (member) => {
-  await member.setRoles(NEWS_ROLES).catch((err) => logger.error(err));
   const message = `Hello ${member.displayName}. Welcome to the RetroAchievements Discord server. Please verify your account by sending a message to RAdmin on the website asking to be verified (once verified, you'll have access to more channels).\nhttps://retroachievements.org/user/RAdmin`;
   member.send(message)
     .then((msg) => logger.info({ msg: 'Sent message', msgID: msg.id }))
