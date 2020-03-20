@@ -1,14 +1,11 @@
 const fetch = require('node-fetch');
 
-// const glPath = `${__dirname}/../assets/json`;
-// let fs = require('fs');
-
 const gamelist = {
   index: {},
   games: [],
 };
 
-const getConsolesURL = 'https://retroachievements.org/dorequest.php?r=officialgameslist&c=';
+const getGamesURL = 'https://retroachievements.org/dorequest.php?r=officialgameslist&c=';
 
 const consoles = [
   { id: 1, name: 'megadrive' },
@@ -71,21 +68,18 @@ async function getConsoles() {
   let tmpIndex = 0;
   let entries;
   await Promise.all(consoles.map(async (c) => {
-    const res = await fetch(`${getConsolesURL}${c.id}`);
+    const res = await fetch(`${getGamesURL}${c.id}`);
     const json = await res.json();
-    if (json.Success) {
-      // decomment below line to write the response into each .json file if still needed
-      // fs.writeFile(`${glPath}/gl-${c.name}.json`,jsonData, err => logger.error(err));
-      // let jsonFile = require(`${glPath}/gl-${c.name}.json`);
-
-      entries = Object.entries(json.Response);
-      gamelist.games = gamelist.games.concat(entries);
-      gamelist.index[c.name] = [
-        tmpIndex,
-        entries.length,
-      ];
-      tmpIndex += entries.length;
+    if (!json.Response) {
+      return;
     }
+    entries = Object.entries(json.Response);
+    gamelist.games = gamelist.games.concat(entries);
+    gamelist.index[c.name] = [
+      tmpIndex,
+      entries.length,
+    ];
+    tmpIndex += entries.length;
   }));
 }
 
