@@ -149,7 +149,7 @@ async function addMeme(reaction, user) {
       // in a future update.
         .setAuthor(message.author.tag, message.author.displayAvatarURL)
         .setTimestamp(new Date())
-        .setDescription(message.cleanContent)
+        .setDescription(`${message.cleanContent}\n---\n[link](${message.url})`)
         .setFooter(`${memoji} ${reactionCounter} | ${message.id}`)
         .setImage(image)
 
