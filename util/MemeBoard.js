@@ -6,7 +6,7 @@ const logger = require('pino')({
   timestamp: () => `,"time":"${new Date()}"`,
 });
 
-const minimumReactions = 1;
+const minimumReactions = 10;
 
 const modEmoji = '🚫';
 const memoji = '🤖';
