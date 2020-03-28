@@ -147,13 +147,11 @@ async function addMeme(reaction, user) {
       // At the date of this edit (31/Jan/19) embeds do not mention yet.
       // But nothing is stopping Discord from enabling mentions from embeds
       // in a future update.
-        .setTitle(message.cleanContent.substring(0,100) + '...')
         .setAuthor(message.author.tag, message.author.displayAvatarURL)
         .setTimestamp(new Date())
         .setDescription(message.cleanContent)
         .setFooter(`${memoji} ${reactionCounter} | ${message.id}`)
         .setImage(image)
-        .setURL(message.url);
 
       await memeChannel.send({ embed });
     } catch(error){
