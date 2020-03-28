@@ -13,7 +13,6 @@ const memoji = '🤖';
 // regex: memoji followed by the number of votes followed '| message.id'
 const memeRegex = /^🤖\s([0-9]{1,3})\s\|\s([0-9]{17,20})/;
 
-
 function isValidReaction(reaction, user) {
   const { message } = reaction;
   return reaction.emoji.name === memoji // reaction is the memoji
@@ -60,7 +59,6 @@ async function addMeme(reaction, user) {
   && m.embeds[0].footer !== null
   && m.embeds[0].footer.text.startsWith(memoji)
   && m.embeds[0].footer.text.endsWith(message.id));
-
   // if the message is found within the memeboard.
   if (memes) {
     // fetch the ID of the message already on the memeboard.
@@ -83,18 +81,23 @@ async function addMeme(reaction, user) {
 
     // the extension function checks if there is anything attached to the message.
     const image = message.attachments.size > 0 ? await extension(reaction, message.attachments.array()[0].url) : '';
+    try {
+      const embed = new RichEmbed()
+        .setColor(foundMeme.color)
+        .setTitle(foundMeme.title)
+        .setAuthor(message.author.tag, message.author.displayAvatarURL)
+        .setTimestamp()
+        .setDescription()
+        .setFooter(`${memoji} ${parseInt(memeCounter[1], 10) + 1} | ${message.id})`)
+        .setImage(image)
+        .setURL(message.url);
 
-    const embed = new RichEmbed()
-      .setColor(foundMeme.color)
-      .setTitle(foundMeme.title)
-      .setAuthor(message.author.tag, message.author.displayAvatarURL)
-      .setTimestamp()
-      .setDescription(`[link](${message.url})`)
-      .setFooter(`${memoji} ${parseInt(memeCounter[1], 10) + 1} | ${message.id}`)
-      .setImage(image);
 
-    // edit the message with the new embed
-    await memeMsg.edit({ embed });
+      // edit the message with the new embed
+      await memeMsg.edit({ embed });
+    } catch (error){
+      logger.error(error);
+    }
     return;
   }
 
@@ -134,24 +137,26 @@ async function addMeme(reaction, user) {
       message.channel.send(`${user}, you cannot meme an empty message.`);
       return;
     }
+    try {
+      const embed = new RichEmbed()
+      // nice yellow
+        .setColor(15844367)
+      // Here we use cleanContent, which replaces all mentions in the message with
+      // their equivalent text. For example, an @everyone ping will just display
+      // as @everyone, without tagging you!
+      // At the date of this edit (31/Jan/19) embeds do not mention yet.
+      // But nothing is stopping Discord from enabling mentions from embeds
+      // in a future update.
+        .setAuthor(message.author.tag, message.author.displayAvatarURL)
+        .setTimestamp(new Date())
+        .setDescription(`${message.cleanContent}\n---\n[link](${message.url})`)
+        .setFooter(`${memoji} ${reactionCounter} | ${message.id}`)
+        .setImage(image)
 
-    const embed = new RichEmbed()
-    // nice yellow
-      .setColor(15844367)
-    // Here we use cleanContent, which replaces all mentions in the message with
-    // their equivalent text. For example, an @everyone ping will just display
-    // as @everyone, without tagging you!
-    // At the date of this edit (31/Jan/19) embeds do not mention yet.
-    // But nothing is stopping Discord from enabling mentions from embeds
-    // in a future update.
-      .setTitle(message.cleanContent)
-      .setAuthor(message.author.tag, message.author.displayAvatarURL)
-      .setTimestamp(new Date())
-      .setDescription(`[link](${message.url})`)
-      .setFooter(`${memoji} ${reactionCounter} | ${message.id}`)
-      .setImage(image);
-
-    await memeChannel.send({ embed });
+      await memeChannel.send({ embed });
+    } catch(error){
+      logger.error(error);
+    }
   }
 }
 
