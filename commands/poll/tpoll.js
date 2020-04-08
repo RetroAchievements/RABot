@@ -46,7 +46,9 @@ module.exports = class TimedPollCommand extends Command {
   }
 
   async run(msg, { seconds, question, opts }) {
-    if (opts.length < 2 || opts.length > 10) return msg.reply('The number of options must be greater than 2 and less than 10');
+    if (opts.length < 2 || opts.length > 10) {
+      return msg.reply('The number of options must be greater than 2 and less than 10');
+    }
 
     let options = '';
     let i;
@@ -60,13 +62,19 @@ module.exports = class TimedPollCommand extends Command {
       options += `\n${reactions[i]} ${opts[i]}`;
 
       // let's check if there's a repetition in the options
-      for (let j = i + 1; j < opts.length; j++) if (opts[i] === opts[j]) return msg.reply(`**\`poll\` error**: repeated options found: \`${opts[i]}\``);
+      for (let j = i + 1; j < opts.length; j++) {
+        if (opts[i] === opts[j]) {
+          return msg.reply(`**\`poll\` error**: repeated options found: \`${opts[i]}\``);
+        }
+      }
     }
 
     pollMsg.push(`__*${msg.author} started a poll*__:`);
     pollMsg.push(`\n:bar_chart: **${question}**\n${options}`);
 
-    if (milliseconds) pollMsg.push('\n`Notes:\n- only the first reaction is considered a vote\n- unlisted reactions void the vote`');
+    if (milliseconds) {
+      pollMsg.push('\n`Notes:\n- only the first reaction is considered a vote\n- unlisted reactions void the vote`');
+    }
 
     const sentMsg = await msg.channel.send(pollMsg);
 
@@ -78,9 +86,13 @@ module.exports = class TimedPollCommand extends Command {
       sentMsg.edit(pollMsg);
     }
 
-    for (i = 0; i < opts.length; i++) await sentMsg.react(reactions[i]);
+    for (i = 0; i < opts.length; i++) {
+      await sentMsg.react(reactions[i]);
+    }
 
-    if (!milliseconds) return;
+    if (!milliseconds) {
+      return null;
+    }
 
     const filter = (reaction, user) => {
       // ignore bot's reactions
@@ -142,5 +154,6 @@ module.exports = class TimedPollCommand extends Command {
         msg.reply('**`poll` error**: Something went wrong with your poll.');
         console.error(collected);
       });
+    return true;
   }
 };
