@@ -20,7 +20,6 @@ const abbreviations = {
   'Mega Drive': 'MD',
   'Sega CD': 'SCD',
   'Sega Saturn': 'SAT',
-  '32X': '32X',
   'PC Engine': 'PCE',
   PlayStation: 'PS1',
   Arcade: 'Arc',
@@ -32,11 +31,10 @@ const abbreviations = {
   'Game Boy Color': 'GBC',
   'Game Boy Advance': 'GBA',
   'Nintendo DS': 'DS',
-  NES: 'NES',
-  SNES: 'SNES',
   'Pokemon Mini': 'PM',
   'Game Gear': 'GG',
   'Neo Geo Pocket': 'NGP',
+  Intellivision: 'INTV',
 };
 
 module.exports = class HotCheevsCommand extends Command {
@@ -85,7 +83,7 @@ module.exports = class HotCheevsCommand extends Command {
         const json = await res.json();
 
         const gameUri = `/game/${json.ID}`;
-        const gameTitle = `${json.Title} (${abbreviations[json.ConsoleName]})`;
+        const gameTitle = `${json.Title} (${abbreviations[json.ConsoleName] || json.ConsoleName})`;
 
         const authorSet = new Set();
 
