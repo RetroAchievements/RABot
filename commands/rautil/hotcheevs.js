@@ -43,7 +43,7 @@ module.exports = class HotCheevsCommand extends Command {
     const sentMsg = await msg.say(':hourglass: Getting info, please wait...');
     const endpoint = `https://retroachievements.org/API/API_GetGameExtended.php?z=${RA_USER}&y=${RA_WEB_API_KEY}`;
 
-    const templateMsg = ['```'];
+    const templateMsg = ['```html\n'];
 
     const canvas = Canvas.createCanvas(468, 220);
     const ctx = canvas.getContext('2d');
@@ -81,13 +81,13 @@ module.exports = class HotCheevsCommand extends Command {
 
     // closing the message template
     templateMsg.push('```');
-    msg.reply(`Here's your post template:${templateMsg.join('')}`);
+    msg.reply(`Here's the post template:${templateMsg.join('')}`);
 
     // attaching the generated image
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
     ctx.fillRect(0, 0, 468, 220);
     const hotCheevsBackground = new Attachment(canvas.toBuffer(), 'hotcheevs.png');
 
-    return msg.say('And here\'s your HotCheevs background:', hotCheevsBackground);
+    return msg.say('And here\'s the HotCheevs background:', hotCheevsBackground);
   }
 };
