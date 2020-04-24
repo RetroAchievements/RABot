@@ -50,8 +50,6 @@ module.exports = class HotCheevsCommand extends Command {
 
     try {
       for (let i = 0; i < gameIds.length && i < 6; i += 1) {
-        sentMsg.edit(`Getting info for game ID \`${gameIds[i]}\`...`);
-
         const res = await fetch(`${endpoint}&i=${gameIds[i]}`);
         const json = await res.json();
 
@@ -90,6 +88,6 @@ module.exports = class HotCheevsCommand extends Command {
     ctx.fillRect(0, 0, 468, 220);
     const hotCheevsBackground = new Attachment(canvas.toBuffer(), 'hotcheevs.png');
 
-    return msg.reply('And here\'s your HotCheevs background:', hotCheevsBackground);
+    return msg.say('And here\'s your HotCheevs background:', hotCheevsBackground);
   }
 };
