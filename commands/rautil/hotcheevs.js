@@ -8,6 +8,37 @@ const Command = require('../../structures/Command.js');
 
 const { RA_USER, RA_WEB_API_KEY } = process.env;
 
+const abbreviations = {
+  'Atari 2600': '2600',
+  'Atari 7800': '7800',
+  'Atari Jaguar': 'Jag',
+  ColecoVision: 'Col',
+  'Virtual Boy': 'VB',
+  'Nintendo 64': 'N64',
+  'SG-1000': 'SG',
+  'Master System': 'SMS',
+  'Mega Drive': 'MD',
+  'Sega CD': 'SCD',
+  'Sega Saturn': 'SAT',
+  '32X': '32X',
+  'PC Engine': 'PCE',
+  PlayStation: 'PS1',
+  Arcade: 'Arc',
+  'Apple II': 'AII',
+  'PC-8000/8800': 'PC88',
+  'Atari Lynx': 'Lynx',
+  WonderSwan: 'WS',
+  'Game Boy': 'GB',
+  'Game Boy Color': 'GBC',
+  'Game Boy Advance': 'GBA',
+  'Nintendo DS': 'DS',
+  NES: 'NES',
+  SNES: 'SNES',
+  'Pokemon Mini': 'PM',
+  'Game Gear': 'GG',
+  'Neo Geo Pocket': 'NGP',
+};
+
 module.exports = class HotCheevsCommand extends Command {
   constructor(client) {
     super(client, {
@@ -54,7 +85,7 @@ module.exports = class HotCheevsCommand extends Command {
         const json = await res.json();
 
         const gameUri = `/game/${json.ID}`;
-        const gameTitle = `${json.Title} (${json.ConsoleName})`;
+        const gameTitle = `${json.Title} (${abbreviations[json.ConsoleName]})`;
 
         const authorSet = new Set();
 
