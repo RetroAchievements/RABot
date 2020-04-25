@@ -1,13 +1,14 @@
 /* eslint-disable no-await-in-loop */
 const fetch = require('node-fetch');
 const Canvas = require('canvas');
-// const { MessageAttachment } = require('discord.js'); // <-- this works on djs v12
+// const { MessageAttachment } = require('discord.js'); // <-- this works only on djs v12
 const { Attachment } = require('discord.js');
 
 const Command = require('../../structures/Command.js');
 
 const { RA_USER, RA_WEB_API_KEY } = process.env;
 
+// TODO: this kind of info seems to fit better in the /assets directory...
 const abbreviations = {
   'Atari 2600': '2600',
   'Atari 7800': '7800',
@@ -54,32 +55,45 @@ module.exports = class HotCheevsCommand extends Command {
       args: [
         {
           key: 'gameIds',
-          type: 'integer',
+          type: 'string',
           prompt: '',
           infinite: true,
           default: '~NO~OPTS~',
-          validate: (gameId) => gameId > 0,
         },
       ],
     });
   }
 
   async run(msg, { gameIds }) {
+    // ugly workaround to deal with the peculiarities of Nintendo DS titlescreens
+    let orientationDS = null;
+    if (gameIds[0] === '--ds') {
+      gameIds.shift();
+      orientationDS = gameIds.shift();
+    }
+
     if (gameIds.length < 6) {
       return msg.reply(':octagonal_sign: **Whooops!**\nPlease, give me exactly six game IDs!');
     }
 
     const sentMsg = await msg.say(':hourglass: Getting info, please wait...');
+
     const endpoint = `https://retroachievements.org/API/API_GetGameExtended.php?z=${RA_USER}&y=${RA_WEB_API_KEY}`;
 
     const templateMsg = ['```html\n'];
 
     const canvas = Canvas.createCanvas(468, 220);
     const ctx = canvas.getContext('2d');
+    const grid = { width: 156, height: 110 };
 
     try {
       for (let i = 0; i < gameIds.length && i < 6; i += 1) {
-        const res = await fetch(`${endpoint}&i=${gameIds[i]}`);
+        const id = Number.parseInt(gameIds[i], 10);
+        if (id <= 0) {
+          return sentMsg.edit(`**ERROR**: invalid game ID: \`${gameIds[i]}\``);
+        }
+
+        const res = await fetch(`${endpoint}&i=${id}`);
         const json = await res.json();
 
         const gameUri = `/game/${json.ID}`;
@@ -100,7 +114,71 @@ module.exports = class HotCheevsCommand extends Command {
         const titleScreenUrl = `https://retroachievements.org${json.ImageTitle}`;
         const titleScreen = await Canvas.loadImage(titleScreenUrl);
 
-        ctx.drawImage(titleScreen, (i % 3) * 156, (i % 2) * 110, 156, 110);
+        // titleScreen position in the hotcheevs background grid image
+        const imgX = (i % 3) * grid.width;
+        const imgY = (i % 2) * grid.height;
+
+        // Nintendo DS title screens needs an extra care
+        if (json.ConsoleName === 'Nintendo DS') {
+          let sourceX;
+          let sourceY;
+          let imgWidth;
+          let imgHeight;
+
+          switch (orientationDS) {
+            case 'full':
+              sourceX = 0;
+              sourceY = 0;
+              imgWidth = titleScreen.width;
+              imgHeight = titleScreen.height;
+              break;
+            case 'left':
+              sourceX = 0;
+              sourceY = 0;
+              imgWidth = titleScreen.width / 2;
+              imgHeight = titleScreen.height;
+              break;
+            case 'right':
+              sourceX = titleScreen.width / 2;
+              sourceY = 0;
+              imgWidth = titleScreen.width / 2;
+              imgHeight = titleScreen.height;
+              break;
+            case 'bottom':
+              sourceX = 0;
+              sourceY = titleScreen.height / 2;
+              imgWidth = titleScreen.width;
+              imgHeight = titleScreen.height / 2;
+              break;
+            case 'top':
+            default:
+              sourceX = 0;
+              sourceY = 0;
+              imgWidth = titleScreen.width;
+              imgHeight = titleScreen.height / 2;
+              break;
+          }
+
+          ctx.drawImage(
+            titleScreen,
+            sourceX,
+            sourceY,
+            imgWidth,
+            imgHeight,
+            imgX,
+            imgY,
+            grid.width,
+            grid.height,
+          );
+        } else {
+          ctx.drawImage(
+            titleScreen,
+            imgX,
+            imgY,
+            grid.width,
+            grid.height,
+          );
+        }
       }
     } catch (error) {
       return sentMsg.edit(`**Whoops!** Something went wrong! :frowning:\nAre you sure the game IDs are valid?\n**ERROR MESSAGE**:\`${error.message}\``);
