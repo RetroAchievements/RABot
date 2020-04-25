@@ -16,7 +16,7 @@ module.exports = class GenerateAchievementNewsCommand extends Command {
       name: 'genachnews',
       aliases: ['gan'],
       group: 'rautil',
-      memberName: 'achnews',
+      memberName: 'genachnews',
       description: 'Generate an achievement-news post template for the given game ID',
       examples: ['`achnews 4650`'],
       throttling: {
