@@ -10,7 +10,7 @@ module.exports = class AchievementNewsCommand extends SelfRoleCommand {
     super(client, {
       name: 'achievement-news',
       group: 'mod',
-      aliases: ['achievementnews', 'achnews'],
+      aliases: ['achievementnews'],
       memberName: 'achievement-news',
       description: 'Add/Remove the `@achievement-news` role to/from yourself',
       argsPromptLimit: 0,
