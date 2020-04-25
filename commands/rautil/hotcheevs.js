@@ -100,15 +100,24 @@ module.exports = class HotCheevsCommand extends Command {
         const gameTitle = `${json.Title} (${abbreviations[json.ConsoleName] || json.ConsoleName})`;
 
         const authorSet = new Set();
+        const dates = new Set();
 
         const achievements = Object.keys(json.Achievements);
-        achievements.map((cheevo) => authorSet.add(json.Achievements[cheevo].Author));
+        achievements.forEach((cheevo) => {
+          authorSet.add(json.Achievements[cheevo].Author);
+          dates.add(json.Achievements[cheevo].DateCreated.replace(/ ..:..:..$/, ''));
+        });
 
         const authorsMsg = [];
-
         [...authorSet].map((author) => authorsMsg.push(`<a href="/user/${author}">${author}</a>`));
 
-        templateMsg.push(`??.??.?? <a href="${gameUri}">${gameTitle}</a> by ${authorsMsg.join(' and ')}<br />\n\n`);
+        const releaseDate = [...dates].reduce((d1, d2) => {
+          const date1 = new Date(d1);
+          const date2 = new Date(d2);
+          return date1 >= date2 ? d1 : d2;
+        });
+
+        templateMsg.push(`${releaseDate} <a href="${gameUri}">${gameTitle}</a> by ${authorsMsg.join(' and ')}<br />\n\n`);
 
         // creating the HotCheevs background
         const titleScreenUrl = `https://retroachievements.org${json.ImageTitle}`;

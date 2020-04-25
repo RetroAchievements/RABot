@@ -56,6 +56,19 @@ module.exports = class GenerateAchievementNewsCommand extends Command {
       const res = await fetch(endpoint);
       const json = await res.json();
 
+      const dates = new Set();
+
+      const achievements = Object.keys(json.Achievements);
+      achievements.forEach((cheevo) => dates.add(
+        json.Achievements[cheevo].DateCreated.replace(/ ..:..:..$/, ''),
+      ));
+
+      const achievementSetDate = [...dates].reduce((d1, d2) => {
+        const date1 = new Date(d1);
+        const date2 = new Date(d2);
+        return date1 >= date2 ? d1 : d2;
+      });
+
       gameInfo = {
         id: gameId,
         title: json.Title,
@@ -63,6 +76,7 @@ module.exports = class GenerateAchievementNewsCommand extends Command {
         genre: json.Genre,
         developer: json.Developer,
         releaseDate: json.Released,
+        achievementSetDate,
       };
     } catch (error) {
       return null;
@@ -96,7 +110,7 @@ module.exports = class GenerateAchievementNewsCommand extends Command {
 < ${gameInfo.title} >
 [${gameInfo.consoleName}, ${gameInfo.genre}](${gameInfo.developer})< ${gameInfo.releaseDate} >
 \`\`\`\\\`\\\`\\\`
-A new set was published by @{AUTHOR_NAME} on {SET_RELEASE_DATE}
+A new set was published by @{AUTHOR_NAME} on ${gameInfo.achievementSetDate}
 ${youtubeLink || '{LONGPLAY-LINK}'}
 <https://retroachievements.org/game/${id}>
 `;
