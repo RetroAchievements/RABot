@@ -125,7 +125,7 @@ module.exports = class HotCheevsCommand extends Command {
 
         // titleScreen position in the hotcheevs background grid image
         const imgX = (i % 3) * grid.width;
-        const imgY = (i % 2) * grid.height;
+        const imgY = Math.trunc(i / 3) * grid.height;
 
         // Nintendo DS title screens needs an extra care
         if (json.ConsoleName === 'Nintendo DS') {
