@@ -117,7 +117,7 @@ module.exports = class HotCheevsCommand extends Command {
           return date1 >= date2 ? d1 : d2;
         });
 
-        templateMsg.push(`${releaseDate} <a href="${gameUri}">${gameTitle}</a> by ${authorsMsg.join(' and ')}<br />\n\n`);
+        templateMsg.push(`${releaseDate.replace(/-/g, '.')} <a href="${gameUri}">${gameTitle}</a> by ${authorsMsg.join(' and ')}<br />\n\n`);
 
         // creating the HotCheevs background
         const titleScreenUrl = `https://retroachievements.org${json.ImageTitle}`;
