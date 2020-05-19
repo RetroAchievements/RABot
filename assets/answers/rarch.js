@@ -1,4 +1,4 @@
-const site = 'https://docs.libretro.com/en/latest/';
+const site = 'https://docs.libretro.com/';
 
 // pages
 const cheevos = 'guides/retroachievements/';
