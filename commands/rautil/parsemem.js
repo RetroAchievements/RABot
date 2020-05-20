@@ -26,13 +26,16 @@ const specialFlags = {
   a: 'AddSource',
   b: 'SubSource',
   c: 'AddHits',
-  n: 'AndNext',
-  m: 'Measured',
   i: 'AddAddress',
+  m: 'Measured',
+  n: 'AndNext',
+  o: 'OrNext',
+  q: 'MeasuredIf',
   '': '',
 };
 
 const memSize = {
+  '0xk': 'BitCount',
   '0xm': 'Bit0',
   '0xn': 'Bit1',
   '0xo': 'Bit2',
@@ -63,15 +66,15 @@ const memTypes = {
 
 const operandRegex = `(d|p)?(${
   Object.keys(memSize).join('|')
-})?([0-9a-z+-]*)`;
+  })?([0-9a-z+-]*)`;
 
 const memRegex = new RegExp(
   `(?:([${
-    Object.keys(specialFlags).join('')
+  Object.keys(specialFlags).join('')
   }]):)?${
-    operandRegex
+  operandRegex
   }(<=|>=|<|>|=|!=)?${
-    operandRegex
+  operandRegex
   }(?:[(.]([0-9a-z]+)[).])?`,
   'i',
 );
