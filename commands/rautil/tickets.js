@@ -65,6 +65,7 @@ module.exports = class TicketsCommand extends Command {
     if (!json) {
       return `ERROR: failed to get info for ticket ${id}`;
     }
+    console.log(json);
 
     const truncate = (str, n = 512) => ((str.length > n) ? `${str.substr(0, n - 1)}...` : str);
 
@@ -79,7 +80,7 @@ module.exports = class TicketsCommand extends Command {
       .addField('**Ach. Description**', json.AchievementDesc, true)
       .addField('**Game**', `${json.GameTitle} (${json.ConsoleName})`)
       .addField('**Reported by**', json.ReportedBy, true)
-      .addField('**Report Type**', json.ReportTypeDescription, true)
+      .addField('**Report Type**', json.ReportTypeDescription || '-', true)
       .addField('**Notes**', truncate(json.ReportNotes.replace(/<br>/i, '\n')));
 
     return embed;
