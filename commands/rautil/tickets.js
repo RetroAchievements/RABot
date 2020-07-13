@@ -63,9 +63,8 @@ module.exports = class TicketsCommand extends Command {
 
     const json = await this.getApiJson(`${apiUrl}&i=${id}`);
     if (!json) {
-      return `ERROR: failed to get info for ticket ${id}`;
+      return `**ERROR**: failed to get info for ticket ${id}`;
     }
-    console.log(json);
 
     const truncate = (str, n = 512) => ((str.length > n) ? `${str.substr(0, n - 1)}...` : str);
 
@@ -93,8 +92,8 @@ module.exports = class TicketsCommand extends Command {
     }
 
     const json = await this.getApiJson(`${apiUrl}&g=${id}`);
-    if (!json) {
-      return `ERROR: failed to get ticket info for game ID ${id}`;
+    if (!json || json.error) {
+      return `**ERROR**: failed to get ticket info for game ID ${id}`;
     }
 
     const embed = new RichEmbed()
@@ -114,7 +113,7 @@ module.exports = class TicketsCommand extends Command {
 
     const json = await this.getApiJson(`${apiUrl}&a=${id}`);
     if (!json) {
-      return `ERROR: failed to get ticket info for achievement ID ${id}`;
+      return `**ERROR**: failed to get ticket info for achievement ID ${id}`;
     }
 
     const embed = new RichEmbed()
