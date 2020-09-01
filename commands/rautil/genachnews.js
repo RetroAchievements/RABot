@@ -97,7 +97,7 @@ module.exports = class GenerateAchievementNewsCommand extends Command {
 
     const gameInfo = await this.getGameInfo(id);
     if (!gameInfo) {
-      return sentMsg.edit(`Unable to get info form the game ID \`${id}\`... :frowning:`);
+      return sentMsg.edit(`Unable to get info from the game ID \`${id}\`... :frowning:`);
     }
 
     const youtubeLink = await this.getLongplayLink(
