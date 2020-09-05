@@ -154,6 +154,5 @@ module.exports = class TimedPollCommand extends Command {
         msg.reply('**`poll` error**: Something went wrong with your poll.');
         console.error(collected);
       });
-    return true;
   }
 };
