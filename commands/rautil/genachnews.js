@@ -44,7 +44,7 @@ module.exports = class GenerateAchievementNewsCommand extends Command {
 
     const { results } = await ytSearch(searchTerms, opts);
 
-    return results[0].link;
+    return results[0] ? results[0].link : null;
   }
 
   async getGameInfo(gameId) {
