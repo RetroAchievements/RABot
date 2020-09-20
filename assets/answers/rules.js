@@ -1,4 +1,4 @@
-const one = '**1.** Promote a positive environment.';
+const one = "**1.** Don't be a jerk or generally obnoxious - nobody likes trolls.";
 const two = '**2.** Do NOT use this server to share copyrighted material or info about where they can be downloaded.';
 const three = '**3.** Keep the channels on-topic.';
 const four = '**4.** When in doubt, ask a @mod.';
