@@ -60,7 +60,7 @@ module.exports = class GenerateAchievementNewsCommand extends Command {
 
       const achievements = Object.keys(json.Achievements);
       achievements.forEach((cheevo) => dates.add(
-        json.Achievements[cheevo].DateCreated.replace(/ ..:..:..$/, ''),
+        json.Achievements[cheevo].DateModified.replace(/ ..:..:..$/, ''),
       ));
 
       const achievementSetDate = [...dates].reduce((d1, d2) => {
