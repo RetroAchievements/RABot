@@ -13,7 +13,7 @@ const path = require('path');
 const { CommandoClient } = require('discord.js-commando');
 const responses = require('./assets/answers/responses.js');
 // const checkFeed = require('./util/CheckFeed.js');
-const { getGameList } = require('./util/GetGameList.js');
+// const { getGameList } = require('./util/GetGameList.js');
 const { addMeme, removeMeme } = require('./util/MemeBoard.js');
 
 const badwordsRule2JSON = require('./assets/json/badwordsRule2.json');
@@ -55,9 +55,9 @@ client.once('ready', async () => {
   client.user.setUsername(BOT_NAME || 'RABot');
   logger.info(`[READY] Logged in as ${client.user.tag}! (${client.user.id})`);
   client.user.setActivity('if you need help', { type: 'WATCHING' });
-  logger.info('Populating the list of games...');
-  await getGameList();
-  logger.info('Games list has been populated!');
+  // logger.info('Populating the list of games...');
+  // await getGameList();
+  // logger.info('Games list has been populated!');
 });
 
 client.on('guildMemberAdd', async (member) => {
