@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const Command = require('../../structures/Command.js');
 
 const search_index_json = 'http://docs.retroachievements.org/search/search_index.json';
-const docsURL = 'https://docs.retroachievements.org';
+const docsURL = 'https://docs.retroachievements.org/';
 
 module.exports = class DocsCommand extends Command {
   constructor(client) {
