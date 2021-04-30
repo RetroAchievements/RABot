@@ -14,7 +14,7 @@ const { CommandoClient } = require('discord.js-commando');
 const responses = require('./assets/answers/responses.js');
 // const checkFeed = require('./util/CheckFeed.js');
 // const { getGameList } = require('./util/GetGameList.js');
-const { addMeme, removeMeme } = require('./util/MemeBoard.js');
+// const { addMeme, removeMeme } = require('./util/MemeBoard.js');
 
 const badwordsRule2JSON = require('./assets/json/badwordsRule2.json');
 
