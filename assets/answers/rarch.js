@@ -6,6 +6,8 @@ const netplay = 'guides/netplay-faq/';
 const cores = 'guides/retroachievements/#cores-compatibility';
 
 // answers
+const stable = '**Download the latest stable version of RetroArch here:\n<http://buildbot.libretro.com/stable/>**';
+
 const nightly = '**Download the most up to date version of RetroArch here:\n<http://buildbot.libretro.com/nightly/>**';
 
 const specific = '**We have a #retroarch channel, but for questions completely unrelated to RetroAchievements, maybe you can get more help at libretro discord server:\n<https://discordapp.com/invite/chjzzQx>**';
@@ -25,6 +27,7 @@ module.exports = {
   },
 
   answers: {
+    stable,
     nightly,
     specific,
     badges,
