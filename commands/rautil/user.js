@@ -47,7 +47,7 @@ module.exports = class User extends Command {
       '-1': 'Banned',
       0: 'Unregistered',
       1: 'Registered',
-      2: 'SuperUser',
+      2: 'JuniorDeveloper',
       3: 'Developer',
       4: 'Admin',
       5: 'Root',
