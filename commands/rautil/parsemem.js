@@ -31,6 +31,9 @@ const specialFlags = {
   n: 'AndNext',
   o: 'OrNext',
   q: 'MeasuredIf',
+  z: 'ResetNextIf',
+  d: 'SubHits',
+  t: 'Trigger',
   '': '',
 };
 
@@ -60,11 +63,12 @@ const memTypes = {
   p: 'Prior',
   m: 'Mem',
   v: 'Value',
+  b: 'BCD',
   '': '',
 };
 
 
-const operandRegex = `(d|p)?(${
+const operandRegex = `(d|p|b)?(${
   Object.keys(memSize).join('|')
   })?([0-9a-z+-]*)`;
 
@@ -73,7 +77,7 @@ const memRegex = new RegExp(
   Object.keys(specialFlags).join('')
   }]):)?${
   operandRegex
-  }(<=|>=|<|>|=|!=)?${
+  }(<=|>=|<|>|=|!=|\\*|\\/|&|)?${
   operandRegex
   }(?:[(.]([0-9a-z]+)[).])?`,
   'i',
@@ -208,21 +212,19 @@ module.exports = class ParseMemCommand extends Command {
         }
         rMemVal = `0x${rMemVal.substring(0, maxChars + 2).padStart(maxChars, '0')}`;
 
-        if (lType !== 'd' && lType !== 'p') {
+        if (lType !== 'd' && lType !== 'p' && lType !== 'b') {
           lType = (lSize === '' || lSize === 'h') ? 'v' : 'm';
         }
-        if (rType !== 'd' && rType !== 'p') {
+        if (rType !== 'd' && rType !== 'p' && rType !== 'b') {
           rType = (rSize === '' || rSize === 'h') ? 'v' : 'm';
         }
 
         res += `\n${reqNum.toString().padStart(2, ' ')}:`;
-        res += specialFlags[flag].padEnd(10, ' ');
+        res += specialFlags[flag].padEnd(12, ' ');
         res += memTypes[lType].padEnd(6, ' ');
         res += memSize[lSize].padEnd(7, ' ');
         res += `${lMemory} `;
-        if (flag === 'A' || flag === 'B') {
-          res += '\n';
-        } else {
+        if (!((flag === 'a' || flag === 'b' || flag === 'i') && (cmp != '*' && cmp != '/' && cmp != '&'))) {
           res += cmp.padEnd(3, ' ');
           res += memTypes[rType].padEnd(6, ' ');
           res += memSize[rSize].padEnd(7, ' ');
