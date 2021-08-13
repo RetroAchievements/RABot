@@ -4,6 +4,7 @@ module.exports = class ContactCommand extends Command {
   constructor(client) {
     super(client, {
       name: 'contact',
+      aliases: ['contactus', 'contact-us'],
       group: 'single',
       memberName: 'contact',
       description: 'How to contact the RetroAchievements staff.',
