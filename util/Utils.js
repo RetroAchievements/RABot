@@ -20,7 +20,7 @@ module.exports = class Utils {
     const res = await fetch(`${url}&c=${days}`);
     const $ = cheerio.load(await res.text());
 
-    const bestDays = $('table.smalltable').find('tr').map((i, element) => ({
+    const bestDays = $('#mainpage').find('table').find('tr').map((i, element) => ({
       date: $(element).find('td:nth-of-type(1)').text().trim(),
       achievements: $(element).find('td:nth-of-type(2)').text().trim(),
       score: $(element).find('td:nth-of-type(3)').text().trim(),
