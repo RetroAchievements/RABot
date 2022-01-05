@@ -23,7 +23,7 @@ module.exports = class CalculatorCommand extends Command {
   run(msg, { expression }) {
     try {
       const validExpression = expression.replace(',', '.');
-      return msg.say(`\`${validExpression}\` = \`${mathjs.eval(validExpression)}\``);
+      return msg.say(`\`${validExpression}\` = \`${mathjs.evaluate(validExpression)}\``);
     } catch (err) {
       return msg.reply(`Oh no, an error occurred: \`${err.message}\`! :frowning:`);
     }
