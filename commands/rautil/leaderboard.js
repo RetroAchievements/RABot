@@ -53,13 +53,13 @@ module.exports = class LeaderboardCommand extends Command {
 
         return `**Time:** ` + this.formatValues(hours, minutes, seconds) + "." +
           String(milliseconds).padStart(2, '0');
-      case 'TIMESEC': // Number of seconds
-        var hours = Math.trunc(score / 360);
+      case 'TIMESECS': // Number of seconds
+        var hours = Math.trunc(score / 3600);
         var minutes = Math.trunc((score / 60) - (hours * 60));
         var seconds = Math.trunc(score % 60);
 
         return `**Time:** ` + this.formatValues(hours, minutes, seconds);
-      case 'MILLISECS': // Number of milliseconds
+      case 'MILLISECS': // Hundredths of seconds
         var hours = Math.trunc(score / 360000);
         var minutes = Math.trunc((score / 6000) - (hours * 60));
         var seconds = Math.trunc((score % 6000) / 100);
@@ -67,7 +67,14 @@ module.exports = class LeaderboardCommand extends Command {
 
         return `**Time:** ` + this.formatValues(hours, minutes, seconds) + "." +
           String(milliseconds).padStart(2, '0');
-      default:
+      case 'MINUTES': // Number of minutes
+        var hours = Math.trunc(score / 60);
+        var minutes = Math.trunc(score % 60);
+
+        return `**Time:** ` + hours + "h" + String(minutes).padStart(2, '0');
+      case 'SCORE': // Number padded to six digits
+        return `**Score:** ` + String(score).padStart(6, '0');
+      default: // Raw number
         return `**Score:** ` + score;
     }
   }
