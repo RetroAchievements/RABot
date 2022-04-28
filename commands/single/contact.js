@@ -1,4 +1,5 @@
 const Command = require('../../structures/Command');
+const { RichEmbed } = require('discord.js');
 
 module.exports = class ContactCommand extends Command {
   constructor(client) {
@@ -12,34 +13,48 @@ module.exports = class ContactCommand extends Command {
   }
 
   async run(msg) {
-    const response =
-      "\n:e_mail: **Admins and Moderators**\n"
-      + "<https://retroachievements.org/createmessage.php?t=RAdmin>\n"
-      + "If you want to report things like:\n"
-      + "- offensive posts\n"
-      + "- copyrighted material sharing\n"
-      + "- cheating\n"
-      + "- or any breach of the Code of Conduct\n"
-      + "\n:e_mail: **RANews Team**\n"
-      + "<https://retroachievements.org/createmessage.php?t=RANews>\n"
-      + "If you want to:\n"
-      + "- write a play-this-set\n"
-      + "- submit a retrogaming article (anything)\n"
-      + "- help with the mag but don't know how\n"
-      + "\n:e_mail: **QA Team**\n"
-      + "<https://retroachievements.org/createmessage.php?t=QATeam>\n"
-      + "If you want to talk about:\n"
-      + "- unwelcome concepts\n"
-      + "- claim questions\n"
-      + "- DevQuest ideas\n"
-      + "- get involved in a QA sub-team\n"
-      + "- or any other Dev Code of Conduct related issue"
-
+    const embed = new RichEmbed()
+      // .setColor('#89CFF0')
+      .setColor('#0099ff')
+      .setTitle('Contact Us')
+      .setDescription('If you would like to contact us, please send a site message to the appropriate team below.')
+      // .setThumbnail('https://retroachievements.org/UserPic/_User.png')
+      .addField(`:e_mail: Admins and Moderators`,
+                `[Send a message to RAdmin](https://retroachievements.org/createmessage.php?t=RAdmin)
+                 - Report offensive behavior.
+                 - Report copyrighted material.
+                 - Report cheating to be investigated.
+                 - Any User Code of Conduct related issues.`)
+      .addField(`:e_mail: Developer Compliance`,
+                `[Send a message to Developer Compliance](https://retroachievements.org/createmessage.php?t=DevCompliance)
+                 - Request set approval or early set release.
+                 - Report achievements or sets with unwelcome concepts.
+                 - Report sets failing to cover basic progression.
+                 - Any Developer Code of Conduct related issues.`)
+      .addField(`:e_mail: Quality Assurance`,
+                `[Send a message to Quality Assurance](https://retroachievements.org/createmessage.php?t=QATeam)
+                 - Report a broken set, leaderboard, or Rich Presence.
+                 - Report achievements with grammar mistakes.
+                 - Request a set playtest or hash compatibility test.
+                 - Hash or Hub organization questions.
+                 - Get involved in a QA sub-team.`)
+      .addField(`:e_mail: RANews`,
+                `[Send a message to RANews](https://retroachievements.org/createmessage.php?t=RANews)
+                 - Submit a Play This Set, Wish This Set, or RAdvantage entry.
+                 - Submit a retrogaming article.
+                 - Propose a new article idea.
+                 - Get involved with RANews.`)
+      .addField(`:e_mail: DevQuest`,
+                `[Send a message to DevQuest](https://retroachievements.org/createmessage.php?t=DevQuest)
+                - DevQuest submissions, questions, ideas or any DevQuest related issues.`)
+      .addField(`:e_mail: QualityQuest`,
+                `[Send a message to QualityQuest](https://retroachievements.org/createmessage.php?t=QualityQuest)
+                - QualityQuest submissions, questions, ideas or any QualityQuest related issues.`)
     try {
       await msg.react('📧');
-      return msg.reply(response);
+      return msg.reply(embed);
     } catch (err) {
-      return msg.reply(response);
+      return msg.reply(embed);
     }
   }
 };
