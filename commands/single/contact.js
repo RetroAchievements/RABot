@@ -14,11 +14,9 @@ module.exports = class ContactCommand extends Command {
 
   async run(msg) {
     const embed = new RichEmbed()
-      // .setColor('#89CFF0')
       .setColor('#0099ff')
       .setTitle('Contact Us')
       .setDescription('If you would like to contact us, please send a site message to the appropriate team below.')
-      // .setThumbnail('https://retroachievements.org/UserPic/_User.png')
       .addField(`:e_mail: Admins and Moderators`,
                 `[Send a message to RAdmin](https://retroachievements.org/createmessage.php?t=RAdmin)
                  - Report offensive behavior.
