@@ -43,7 +43,7 @@ module.exports = class ContactCommand extends Command {
                  - Propose a new article idea.
                  - Get involved with RANews.`)
       .addField(`:e_mail: RAEvents`,
-                `[Send a message to RAEvents] (https://retroachievements.org/createmessage.php?t=RAEvents)
+                `[Send a message to RAEvents](https://retroachievements.org/createmessage.php?t=RAEvents)
                  - Submissions, questions, ideas, or reporting issues related to events.`)
       .addField(`:e_mail: DevQuest`,
                 `[Send a message to DevQuest](https://retroachievements.org/createmessage.php?t=DevQuest)
