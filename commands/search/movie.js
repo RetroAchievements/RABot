@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
-const { RichEmbed } = require('discord.js');
-const Command = require('../../structures/Command.js');
-const { shorten } = require('../../util/Utils.js');
+const { MessageEmbed } = require('discord.js');
+const Command = require('../../structures/Command');
+const { shorten } = require('../../util/Utils');
 
 const { TMDB_KEY } = process.env;
 
@@ -42,7 +42,7 @@ module.exports = class MovieCommand extends Command {
       res = await fetch(`https://api.themoviedb.org/3/movie/${body.results[0].id}?api_key=${TMDB_KEY}`);
       body = await res.json();
 
-      const response = new RichEmbed()
+      const response = new MessageEmbed()
         .setColor(0x00D474)
         .setTitle(body.title)
         .setURL(`https://www.themoviedb.org/movie/${body.id}`)

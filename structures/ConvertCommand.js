@@ -1,4 +1,4 @@
-const Command = require('./Command.js');
+const Command = require('./Command');
 
 module.exports = class ConvertCommand extends Command {
   constructor(client, info, base) {
@@ -38,7 +38,7 @@ module.exports = class ConvertCommand extends Command {
       }
 
       // this logic is able to deal with hex and decimals
-      if (!isNaN(num)) {
+      if (!Number.isNaN(num)) {
         if (num < 0) {
           response += `${num} = negative`;
           outOfRangeFlag = true;
@@ -51,7 +51,7 @@ module.exports = class ConvertCommand extends Command {
           continue;
         }
 
-        if (nStr.startsWith('0x')) response += `0x${num.toString(16)} = ${this.base == 2 ? `0b${num.toString(2)}` : num}`;
+        if (nStr.startsWith('0x')) response += `0x${num.toString(16)} = ${this.base === 2 ? `0b${num.toString(2)}` : num}`;
         else response += `${num} = ${basePrefix}${num.toString(this.base)}`;
         continue;
       }

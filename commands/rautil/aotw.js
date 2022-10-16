@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 
 const { RA_USER, RA_WEB_API_KEY } = process.env;
 

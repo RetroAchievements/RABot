@@ -3,7 +3,7 @@
  * https://github.com/dragonfire535/xiao
  */
 const request = require('node-superfetch');
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const { stripIndents } = require('common-tags');
 const Command = require('../../structures/Command');
 const { shorten } = require('../../util/Utils');
@@ -61,7 +61,7 @@ module.exports = class AnimeCommand extends Command {
 
       const anime = await this.fetchAnime(id);
 
-      const response = new RichEmbed()
+      const response = new MessageEmbed()
         .setColor(0x02A9FF)
         .setAuthor('AniList', 'https://i.imgur.com/iUIRC7v.png', 'https://anilist.co/')
         .setURL(`https://anilist.co/anime/${anime.id}`)

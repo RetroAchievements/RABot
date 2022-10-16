@@ -1,5 +1,5 @@
 const ytSearch = require('youtube-search');
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 
 const { YOUTUBE_API_KEY } = process.env;
 
@@ -7,7 +7,6 @@ const opts = {
   maxResults: 1,
   key: YOUTUBE_API_KEY,
 };
-
 
 module.exports = class YoutubeCommand extends Command {
   constructor(client) {

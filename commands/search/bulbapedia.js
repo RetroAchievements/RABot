@@ -1,4 +1,4 @@
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const request = require('node-superfetch');
 const Command = require('../../structures/Command');
 const { shorten } = require('../../util/Utils');
@@ -42,7 +42,7 @@ module.exports = class BulbapediaCommand extends Command {
 
       if (data.missing) return sentMsg.edit("Didn't find anything... :frowning:");
 
-      const response = new RichEmbed()
+      const response = new MessageEmbed()
         .setColor(0x3E7614)
         .setTitle(data.title)
         .setAuthor('Bulbapedia', 'https://i.imgur.com/ePpoeFA.png', 'https://bulbapedia.bulbagarden.net/')

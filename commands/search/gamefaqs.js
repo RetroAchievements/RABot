@@ -1,8 +1,7 @@
-const GoogleCommand = require('../../structures/GoogleCommand.js');
+const GoogleCommand = require('../../structures/GoogleCommand');
 
 const site = 'gamefaqs.com';
-const regex = /www\.gamefaqs\.com\/(?!boards)[^\/]+\/[^"&\/]+/;
-
+const regex = /www\.gamefaqs\.com\/(?!boards)[^/]+\/[^"&/]+/;
 
 module.exports = class GamefaqsCommand extends GoogleCommand {
   constructor(client) {

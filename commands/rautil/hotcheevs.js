@@ -4,38 +4,44 @@ const Canvas = require('canvas');
 // const { MessageAttachment } = require('discord.js'); // <-- this works only on djs v12
 const { Attachment } = require('discord.js');
 
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 
 const { RA_USER, RA_WEB_API_KEY } = process.env;
 
 // TODO: this kind of info seems to fit better in the /assets directory...
 const abbreviations = {
+  '3DO Interactive Multiplayer': '3DO',
+  'Apple II': 'AII',
+  Arcade: 'Arc',
   'Atari 2600': '2600',
   'Atari 7800': '7800',
   'Atari Jaguar': 'Jag',
+  'Atari Lynx': 'Lynx',
   ColecoVision: 'Col',
-  'Virtual Boy': 'VB',
-  'Nintendo 64': 'N64',
-  'SG-1000': 'SG',
+  Dreamcast: 'DC',
+  'Game Boy Advance': 'GBA',
+  'Game Boy Color': 'GBC',
+  'Game Boy': 'GB',
+  'Game Gear': 'GG',
+  Intellivision: 'INTV',
+  'Magnavox Odyssey 2': 'MO2',
   'Master System': 'SMS',
   'Mega Drive': 'MD',
-  'Sega CD': 'SCD',
-  'Sega Saturn': 'SAT',
-  'PC Engine': 'PCE',
-  PlayStation: 'PS1',
-  Arcade: 'Arc',
-  'Apple II': 'AII',
-  'PC-8000/8800': 'PC88',
-  'Atari Lynx': 'Lynx',
-  WonderSwan: 'WS',
-  'Game Boy': 'GB',
-  'Game Boy Color': 'GBC',
-  'Game Boy Advance': 'GBA',
-  'Nintendo DS': 'DS',
-  'Pokemon Mini': 'PM',
-  'Game Gear': 'GG',
   'Neo Geo Pocket': 'NGP',
-  Intellivision: 'INTV',
+  'Nintendo 64': 'N64',
+  'Nintendo DS': 'DS',
+  'PC Engine': 'PCE',
+  'PC-8000/8800': 'PC88',
+  'PlayStation Portable': 'PSP',
+  PlayStation: 'PS1',
+  'Pokemon Mini': 'PM',
+  Saturn: 'SAT',
+  'Sega CD': 'SCD',
+  'SG-1000': 'SG',
+  Vectrex: 'VTX',
+  'Virtual Boy': 'VB',
+  'Watara Supervision': 'WSV',
+  WonderSwan: 'WS',
 };
 
 module.exports = class HotCheevsCommand extends Command {

@@ -1,0 +1,13 @@
+blank_issues_enabled: false
+contact_links:
+    - name: Feature Request
+      url: https://github.com/RetroAchievements/RABot/discussions/new?category=ideas
+      about: Share ideas for new bot features or enhancements
+
+    - name: Report a security vulnerability
+      url: https://retroachievements.org/createmessage.php?t=RAdmin&s=Security%20Vulnerability
+      about: Contact RAdmin for security matters
+
+    - name: Ask for help
+      url: https://discord.gg/UEECgxrqyH
+      about: Join the RetroAchievements.org Discord if you need help with anything related to your account or setup

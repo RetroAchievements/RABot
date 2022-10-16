@@ -4,22 +4,19 @@ const {
   BOT_TOKEN, OWNERS, BOT_PREFIX, INVITE, BOT_NAME,
 } = process.env;
 
-const Discord = require('discord.js');
 const logger = require('pino')({
   useLevelLabels: true,
   timestamp: () => `,"time":"${new Date()}"`,
 });
 const path = require('path');
 const { CommandoClient } = require('discord.js-commando');
-const responses = require('./assets/answers/responses.js');
-// const checkFeed = require('./util/CheckFeed.js');
-// const { getGameList } = require('./util/GetGameList.js');
+const responses = require('./assets/answers/responses');
 
+// eslint-disable-next-line
 const badwordsRule2JSON = require('./assets/json/badwordsRule2.json');
 
 const regexRule2 = new RegExp(`(${badwordsRule2JSON.join('|')})`, 'i');
 const talkedRecently = new Set();
-
 
 const client = new CommandoClient({
   commandPrefix: BOT_PREFIX,
@@ -50,13 +47,10 @@ client.registry
   })
   .registerCommandsIn(path.join(__dirname, 'commands'));
 
-client.once('ready', async () => {
+client.once('ready', () => {
   client.user.setUsername(BOT_NAME || 'RABot');
   logger.info(`[READY] Logged in as ${client.user.tag}! (${client.user.id})`);
   client.user.setActivity('if you need help', { type: 'WATCHING' });
-  // logger.info('Populating the list of games...');
-  // await getGameList();
-  // logger.info('Games list has been populated!');
 });
 
 client.on('guildMemberAdd', async (member) => {

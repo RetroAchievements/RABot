@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 const cheerio = require('cheerio');
-const Command = require('./Command.js');
+const Command = require('./Command');
 
 class GoogleCommand extends Command {
   constructor(client, info, site, regex) {

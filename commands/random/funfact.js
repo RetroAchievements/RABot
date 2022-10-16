@@ -1,4 +1,4 @@
-const RandomFactCommand = require('../../structures/RandomFactCommand.js');
+const RandomFactCommand = require('../../structures/RandomFactCommand');
 
 module.exports = class FunFactCommand extends RandomFactCommand {
   constructor(client) {

@@ -1,7 +1,8 @@
 const Command = require('../../structures/Command');
 
-const { CHANNEL_BOTGAMES, CHANNEL_BOTSPAM, CHANNEL_HOTBOX, CHANNEL_STREAMING_TEXT } = process.env;
-
+const {
+  CHANNEL_BOTGAMES, CHANNEL_BOTSPAM, CHANNEL_HOTBOX, CHANNEL_STREAMING_TEXT,
+} = process.env;
 
 module.exports = class PruneCommand extends Command {
   constructor(client) {

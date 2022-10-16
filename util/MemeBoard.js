@@ -1,6 +1,6 @@
 // TODO: assure bot has permissions to manage messages in the meme-board channel
 const { CHANNEL_MEME, ROLE_MOD, MAX_MEMES } = process.env;
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const logger = require('pino')({
   useLevelLabels: true,
   timestamp: () => `,"time":"${new Date()}"`,
@@ -21,7 +21,6 @@ function isValidReaction(reaction, user) {
         && !message.author.bot; // author is not a bot
 }
 
-
 // Here we add the extension function to check if there's anything attached to the message.
 function extension(reaction, attachment) {
   const imageLink = attachment.split('.');
@@ -30,7 +29,6 @@ function extension(reaction, attachment) {
   if (!image) return '';
   return attachment;
 }
-
 
 async function addMeme(reaction, user) {
   const { message } = reaction;
@@ -82,7 +80,7 @@ async function addMeme(reaction, user) {
     // the extension function checks if there is anything attached to the message.
     const image = message.attachments.size > 0 ? await extension(reaction, message.attachments.array()[0].url) : '';
     try {
-      const embed = new RichEmbed()
+      const embed = new MessageEmbed()
         .setColor(foundMeme.color)
         .setTitle(foundMeme.title)
         .setAuthor(message.author.tag, message.author.displayAvatarURL)
@@ -92,10 +90,9 @@ async function addMeme(reaction, user) {
         .setImage(image)
         .setURL(message.url);
 
-
       // edit the message with the new embed
       await memeMsg.edit({ embed });
-    } catch (error){
+    } catch (error) {
       logger.error(error);
     }
     return;
@@ -138,7 +135,7 @@ async function addMeme(reaction, user) {
       return;
     }
     try {
-      const embed = new RichEmbed()
+      const embed = new MessageEmbed()
       // nice yellow
         .setColor(15844367)
       // Here we use cleanContent, which replaces all mentions in the message with
@@ -151,10 +148,10 @@ async function addMeme(reaction, user) {
         .setTimestamp(new Date())
         .setDescription(`${message.cleanContent}\n---\n[link](${message.url})`)
         .setFooter(`${memoji} ${reactionCounter} | ${message.id}`)
-        .setImage(image)
+        .setImage(image);
 
       await memeChannel.send({ embed });
-    } catch(error){
+    } catch (error) {
       logger.error(error);
     }
   }
@@ -181,7 +178,7 @@ async function removeMeme(reaction, user) {
     const memeCounter = memeRegex.exec(memes.embeds[0].footer.text);
     const foundMeme = memes.embeds[0];
     const image = message.attachments.size > 0 ? await extension(reaction, message.attachments.array()[0].url) : '';
-    const embed = new RichEmbed()
+    const embed = new MessageEmbed()
       .setColor(foundMeme.color)
       .setTitle(foundMeme.title)
       .setDescription(`[link](${message.url})`)

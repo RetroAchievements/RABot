@@ -1,5 +1,5 @@
-const Command = require('../../structures/Command.js');
-const { bestDays, bestScoreComment } = require('../../util/Utils.js');
+const Command = require('../../structures/Command');
+const { bestDays, bestScoreComment } = require('../../util/Utils');
 
 module.exports = class BestDaysCommand extends Command {
   constructor(client) {

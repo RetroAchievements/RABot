@@ -1,8 +1,7 @@
-const Command = require('../../structures/Command.js');
+const { MessageEmbed } = require('discord.js');
+const Command = require('../../structures/Command');
 
 const { CHANNEL_MEME, MAX_MEMES } = process.env;
-const { RichEmbed } = require('discord.js');
-
 
 module.exports = class MemeFactCommand extends Command {
   constructor(client) {
@@ -37,10 +36,10 @@ module.exports = class MemeFactCommand extends Command {
     let memeEmbed;
     if (number < 1 || number > count) {
       originalMemeEmbed = memes.random().embeds[0];
-      memeEmbed = new RichEmbed(originalMemeEmbed).addField('-', `random meme | see more in ${memeChannel}`);
+      memeEmbed = new MessageEmbed(originalMemeEmbed).addField('-', `random meme | see more in ${memeChannel}`);
     } else {
       originalMemeEmbed = memes.array()[count - number].embeds[0];
-      memeEmbed = new RichEmbed(originalMemeEmbed).addField('-', `meme #${number} | see more in ${memeChannel}`);
+      memeEmbed = new MessageEmbed(originalMemeEmbed).addField('-', `meme #${number} | see more in ${memeChannel}`);
     }
 
     return msg.embed(memeEmbed);

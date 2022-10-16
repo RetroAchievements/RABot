@@ -1,4 +1,4 @@
-const Command = require('./Command.js');
+const Command = require('./Command');
 
 class SelfRoleCommand extends Command {
   constructor(client, info, roleid) {
