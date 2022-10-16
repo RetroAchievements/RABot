@@ -20,11 +20,12 @@ module.exports = class Utils {
     const res = await fetch(`${url}&c=${days}`);
     const $ = cheerio.load(await res.text());
 
-    const bestDays = $('table.smalltable').find('tr').map((i, element) => ({
+    const bestDays = $('#mainpage').find('table').find('tr').map((i, element) => ({
       date: $(element).find('td:nth-of-type(1)').text().trim(),
       achievements: $(element).find('td:nth-of-type(2)').text().trim(),
       score: $(element).find('td:nth-of-type(3)').text().trim(),
-    })).get();
+    }))
+      .get();
 
     if (bestDays.length <= 2) {
       return false;
@@ -62,7 +63,6 @@ module.exports = class Utils {
     return scoreComment;
   }
 
-
   static async googleGameId(terms) {
     const regex = /retroachievements\.org\/game\/([0-9]+)/i;
     const site = 'retroachievements.org/game';
@@ -83,11 +83,9 @@ module.exports = class Utils {
     return gameid;
   }
 
-
   static shorten(text, maxLength = 2000) {
     return text.length > maxLength ? `${text.substr(0, maxLength - 3)}...` : text;
   }
-
 
   static randomRange(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;

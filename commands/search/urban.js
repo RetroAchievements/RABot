@@ -2,7 +2,7 @@
  * The inspiration for this came from Xiao bot's code:
  * https://github.com/dragonfire535/xiao
  */
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const request = require('node-superfetch');
 const Command = require('../../structures/Command');
 const { shorten } = require('../../util/Utils');
@@ -38,7 +38,7 @@ module.exports = class UrbanCommand extends Command {
 
       const data = body.list[0];
 
-      const response = new RichEmbed()
+      const response = new MessageEmbed()
         .setColor(0x32A8F0)
         .setAuthor('Urban Dictionary', 'https://i.imgur.com/Fo0nRTe.png', 'https://www.urbandictionary.com/')
         .setURL(data.permalink)

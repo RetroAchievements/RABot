@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 
 module.exports = class Md5Command extends Command {
   constructor(client) {

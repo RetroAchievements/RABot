@@ -1,9 +1,9 @@
 const lunr = require('lunr');
 const fetch = require('node-fetch');
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 
-const search_index_json = 'http://docs.retroachievements.org/search/search_index.json';
-const docsURL = 'https://docs.retroachievements.org';
+const searchIndexJson = 'https://docs.retroachievements.org/search/search_index.json';
+const docsURL = 'https://docs.retroachievements.org/';
 
 module.exports = class DocsCommand extends Command {
   constructor(client) {
@@ -26,15 +26,14 @@ module.exports = class DocsCommand extends Command {
     });
   }
 
-
   async run(msg, { terms }) {
-    const res = await fetch(search_index_json);
-    const docjson = await res.json();
+    const res = await fetch(searchIndexJson);
+    const docJson = await res.json();
 
     const idx = lunr(function () {
       this.ref('location');
       this.field('title');
-      docjson.docs.forEach((doc) => this.add(doc), this);
+      docJson.docs.forEach((doc) => this.add(doc), this);
     });
 
     const results = await idx.search(terms.join(' '));

@@ -1,6 +1,4 @@
-const Command = require('./Command.js');
-
-let facts;
+const Command = require('./Command');
 
 module.exports = class RandomFactCommand extends Command {
   constructor(client, info, factsFile) {
@@ -15,9 +13,9 @@ module.exports = class RandomFactCommand extends Command {
     let i;
     let prefix = '';
 
-    if (isNaN(num--) || num < 0 || num > length - 1) {
+    if (Number.isNaN(num--) || num < 0 || num > length - 1) {
       i = Math.floor(Math.random() * length);
-      if (number != '~NOARGS~') prefix = 'random: ';
+      if (number !== '~NOARGS~') prefix = 'random: ';
       // return msg.say( ( number != ? 'random: ' : '' ) + '**' + this.facts[ Math.floor(Math.random() * length) ] + '**');
     } else {
       i = num;

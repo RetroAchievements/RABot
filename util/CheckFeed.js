@@ -15,9 +15,9 @@ const {
   // NEWS_FEED_INTERVAL,
 } = process.env;
 
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const Parser = require('rss-parser');
-const { bestScoreComment } = require('./Utils.js');
+const { bestScoreComment } = require('./Utils');
 
 const parser = new Parser();
 const raorg = 'https://retroachievements.org';
@@ -41,10 +41,11 @@ const regexTicket = /org\/userpic\/([^'"]+).*org\/user\/([^'"]+).* (opened|close
 const regexCompleted = /org\/userpic\/([^'"]+).*org\/user\/([^'"]+).* completed .*org\/game\/([0-9]+)['"]>([^<]+).*\(([ a-zA-Z0-9]+)\)/is;
 
 let lastActivity = new Date('2018');
-let masteryChannel; let unlocksChannel; let ticketsChannel; let
-  cheatingChannel;
+let masteryChannel;
+let unlocksChannel;
+let ticketsChannel;
+let cheatingChannel;
 const counterMap = new Map();
-
 
 async function checkGlobalFeed() {
   const feed = await parser.parseURL(globalFeed);
@@ -73,7 +74,9 @@ async function checkGlobalFeed() {
         userCheevoGames.set(user, [game]);
       } else {
         userCheevoTimes.get(user).push(pubDate);
-        if (!userCheevoGames.get(user).includes(game)) userCheevoGames.get(user).push(game);
+        if (!userCheevoGames.get(user).includes(game)) {
+          userCheevoGames.get(user).push(game);
+        }
       }
       continue; // if it's an 'earned' item, no need to check for mastery
     }
@@ -91,7 +94,7 @@ async function checkGlobalFeed() {
       const system = parsedString[5];
 
       // announce mastery
-      msg = new RichEmbed()
+      msg = new MessageEmbed()
         .setTitle('Mastery!')
         .setURL(`${raorg}/user/${currentUser}`)
         .setThumbnail(`${raorg}/UserPic/${userPic}`)
@@ -101,7 +104,7 @@ async function checkGlobalFeed() {
 
       const botComment = await bestScoreComment(currentUser);
       if (botComment) {
-        msg.addField("RABot's comment", botComment);
+        msg.addField('RABot\'s comment', botComment);
         cheatingChannel.send(msg);
       }
 
@@ -120,7 +123,7 @@ async function checkGlobalFeed() {
       const gameName = parsedString[6];
 
       // announce ticket activity
-      msg = new RichEmbed()
+      msg = new MessageEmbed()
         .setTitle(`Ticket ${ticketActivity.toUpperCase()}`)
         .setURL(`${raorg}/ticketmanager.php?a=${cheevoId}`) // TODO: gonna change in v2
         .setColor(ticketActivity === 'closed' ? 'BLUE' : 'RED')
@@ -147,17 +150,18 @@ async function checkGlobalFeed() {
     if (value.length >= CHEEVO_WARNING_NUM) {
       // avoiding reporting the same user in a short period of time
       if (!counterMap.has(user)) {
-        msg = new RichEmbed()
+        msg = new MessageEmbed()
           .setTitle(value.length >= CHEEVO_SUSPICIOUS_NUM ? 'IMPRESSIVE!!!' : 'wow!')
           .setURL(`${userHistoryUrl}${user}`)
           .setThumbnail(`${raorg}/UserPic/${user}.png`)
-          .setDescription(`**${user}** earned **${value.length}** achievements in less than ${timeIntervalMin} minutes\n**Game**: "${userCheevoGames.get(user).join('", "')}"`);
+          .setDescription(`**${user}** earned **${value.length}** achievements in less than ${timeIntervalMin} minutes\n**Game**: "${userCheevoGames.get(user)
+            .join('", "')}"`);
 
         unlocksChannel.send(msg);
 
         const botComment = await bestScoreComment(user);
         if (botComment) {
-          msg.addField("RABot's comment", botComment);
+          msg.addField('RABot\'s comment', botComment);
           cheatingChannel.send(msg);
         }
 

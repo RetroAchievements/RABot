@@ -1,5 +1,5 @@
 const ytSearch = require('youtube-search');
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 
 require('dotenv').config({ path: `${__dirname}../../.env` });
 
@@ -9,7 +9,6 @@ const opts = {
   maxResults: 1,
   key: YOUTUBE_API_KEY,
 };
-
 
 module.exports = class LongPlayCommand extends Command {
   constructor(client) {
@@ -36,16 +35,19 @@ module.exports = class LongPlayCommand extends Command {
   }
 
   async run(msg, { terms }) {
-    let searchTerms = 'longplay';
-    let response;
-
-    terms.forEach((term) => searchTerms += ` ${term}`);
+    const searchTerms = `longplay ${terms.join(' ')}`;
 
     const sentMsg = await msg.reply(':mag: Searching the longplay, please wait...');
 
     ytSearch(searchTerms, opts, (err, results) => {
-      if (err) return sentMsg.edit(`${msg.author}, **error**: Something went wrong...`);
-      if (!results) return sentMsg.edit(`${msg.author} , Didn't find anything... :frowning:`);
+      if (err) {
+        return sentMsg.edit(`${msg.author}, **error**: Something went wrong...`);
+      }
+
+      if (!results) {
+        return sentMsg.edit(`${msg.author} , Didn't find anything... :frowning:`);
+      }
+
       return sentMsg.edit(`${msg.author}, ${results[0].link}`);
     });
   }

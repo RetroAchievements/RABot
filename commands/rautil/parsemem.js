@@ -1,6 +1,6 @@
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const fetch = require('node-fetch');
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 
 const { RA_USER, RA_TOKEN, RA_WEB_API_KEY } = process.env;
 
@@ -26,13 +26,19 @@ const specialFlags = {
   a: 'AddSource',
   b: 'SubSource',
   c: 'AddHits',
-  n: 'AndNext',
-  m: 'Measured',
   i: 'AddAddress',
+  m: 'Measured',
+  n: 'AndNext',
+  o: 'OrNext',
+  q: 'MeasuredIf',
+  z: 'ResetNextIf',
+  d: 'SubHits',
+  t: 'Trigger',
   '': '',
 };
 
 const memSize = {
+  '0xk': 'BitCount',
   '0xm': 'Bit0',
   '0xn': 'Bit1',
   '0xo': 'Bit2',
@@ -57,11 +63,11 @@ const memTypes = {
   p: 'Prior',
   m: 'Mem',
   v: 'Value',
+  b: 'BCD',
   '': '',
 };
 
-
-const operandRegex = `(d|p)?(${
+const operandRegex = `(d|p|b)?(${
   Object.keys(memSize).join('|')
 })?([0-9a-z+-]*)`;
 
@@ -70,12 +76,11 @@ const memRegex = new RegExp(
     Object.keys(specialFlags).join('')
   }]):)?${
     operandRegex
-  }(<=|>=|<|>|=|!=)?${
+  }(<=|>=|<|>|=|!=|\\*|\\/|&|)?${
     operandRegex
   }(?:[(.]([0-9a-z]+)[).])?`,
   'i',
 );
-
 
 module.exports = class ParseMemCommand extends Command {
   constructor(client) {
@@ -177,7 +182,7 @@ module.exports = class ParseMemCommand extends Command {
 
       reqs = groups[i].split('_');
       countLines += reqs.length;
-      if (countLines > 20) return "I'm unable to handle this, it's TOO BIG!";
+      if (countLines > 25) return "I'm unable to handle this, it's TOO BIG!";
 
       for (let j = 0; j < reqs.length; j += 1) {
         reqNum = j + 1;
@@ -195,31 +200,29 @@ module.exports = class ParseMemCommand extends Command {
         hits = parsedReq[9] || '0';
 
         if (lSize === '') {
-          num = parseInt(lMemory).toString(16);
+          num = parseInt(lMemory, 10).toString(16);
           if (!Number.isNaN(`0x${num}`)) lMemory = num;
         }
         lMemory = `0x${lMemory.substring(0, maxChars + 2).padStart(maxChars, '0')}`;
         if (rSize === '') {
-          num = parseInt(rMemVal).toString(16);
+          num = parseInt(rMemVal, 10).toString(16);
           if (!Number.isNaN(`0x${num}`)) rMemVal = num;
         }
         rMemVal = `0x${rMemVal.substring(0, maxChars + 2).padStart(maxChars, '0')}`;
 
-        if (lType !== 'd' && lType !== 'p') {
+        if (lType !== 'd' && lType !== 'p' && lType !== 'b') {
           lType = (lSize === '' || lSize === 'h') ? 'v' : 'm';
         }
-        if (rType !== 'd' && rType !== 'p') {
+        if (rType !== 'd' && rType !== 'p' && rType !== 'b') {
           rType = (rSize === '' || rSize === 'h') ? 'v' : 'm';
         }
 
         res += `\n${reqNum.toString().padStart(2, ' ')}:`;
-        res += specialFlags[flag].padEnd(10, ' ');
+        res += specialFlags[flag].padEnd(12, ' ');
         res += memTypes[lType].padEnd(6, ' ');
         res += memSize[lSize].padEnd(7, ' ');
         res += `${lMemory} `;
-        if (flag === 'A' || flag === 'B') {
-          res += '\n';
-        } else {
+        if (!((flag === 'a' || flag === 'b' || flag === 'i') && (cmp !== '*' && cmp !== '/' && cmp !== '&'))) {
           res += cmp.padEnd(3, ' ');
           res += memTypes[rType].padEnd(6, ' ');
           res += memSize[rSize].padEnd(7, ' ');
@@ -241,7 +244,6 @@ module.exports = class ParseMemCommand extends Command {
     return res;
   }
 
-
   async getGameId(achievementId) {
     const achievementUnlocksUrl = `${baseUrl}API/API_GetAchievementUnlocks.php?z=${RA_USER}&y=${RA_WEB_API_KEY}&a=${achievementId}`;
     return fetch(achievementUnlocksUrl)
@@ -249,7 +251,6 @@ module.exports = class ParseMemCommand extends Command {
       .then((res) => parseInt(res.Game.ID, 10))
       .catch(() => null);
   }
-
 
   async getMemAddr(gameId, achievementId) {
     const dorequestPatchUrl = `${baseUrl}dorequest.php?r=patch&g=${gameId}&u=${RA_USER}&t=${RA_TOKEN}`;
@@ -259,7 +260,6 @@ module.exports = class ParseMemCommand extends Command {
       .catch(() => null);
   }
 
-
   async getCodeNotes(gameId) {
     const dorequestCodeNotesUrl = `${baseUrl}dorequest.php?r=codenotes2&g=${gameId}&u=${RA_USER}&t=${RA_TOKEN}`;
     return fetch(dorequestCodeNotesUrl)
@@ -268,11 +268,10 @@ module.exports = class ParseMemCommand extends Command {
       .catch(() => null);
   }
 
-
   async getCodeNotesEmbed(gameId, addresses) {
     let hasNote = false;
     const codeNotes = await this.getCodeNotes(gameId);
-    const codeNotesEmbed = new RichEmbed()
+    const codeNotesEmbed = new MessageEmbed()
       .setColor('#3498DB')
       .setTitle('Code Notes')
       .setURL(`${baseUrl}codenotes.php?g=${gameId}`);

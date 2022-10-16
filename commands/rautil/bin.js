@@ -1,4 +1,4 @@
-const ConvertCommand = require('../../structures/ConvertCommand.js');
+const ConvertCommand = require('../../structures/ConvertCommand');
 
 module.exports = class BinCommand extends ConvertCommand {
   constructor(client) {

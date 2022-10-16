@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 
 const { RA_USER, RA_WEB_API_KEY } = process.env;
 
@@ -10,7 +10,7 @@ module.exports = class AotwCommand extends Command {
       group: 'rautil',
       memberName: 'aotw',
       description: 'Show the current Achievement of the Week and the recent winners.',
-      examples: ['`aotw`, `aotw 2018-05-29`'],
+      examples: ['`aotw`'],
       throttling: {
         usages: 2,
         duration: 120,

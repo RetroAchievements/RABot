@@ -1,7 +1,8 @@
 const Command = require('../../structures/Command');
 
-const { CHANNEL_BOTGAMES, CHANNEL_BOTSPAM } = process.env;
-
+const {
+  CHANNEL_BOTGAMES, CHANNEL_BOTSPAM, CHANNEL_HOTBOX, CHANNEL_STREAMING_TEXT,
+} = process.env;
 
 module.exports = class PruneCommand extends Command {
   constructor(client) {
@@ -33,7 +34,22 @@ module.exports = class PruneCommand extends Command {
   }
 
   async run(msg, { count }) {
-    if (msg.channel.id !== CHANNEL_BOTGAMES && msg.channel.id !== CHANNEL_BOTSPAM) return msg.reply(`This command is only available to be used in ${this.client.channels.get(CHANNEL_BOTGAMES)} and ${this.client.channels.get(CHANNEL_BOTSPAM)}`);
+    let isAllowed = false;
+
+    switch (msg.channel.id) {
+      case CHANNEL_BOTGAMES:
+      case CHANNEL_BOTSPAM:
+      case CHANNEL_HOTBOX:
+      case CHANNEL_STREAMING_TEXT:
+        isAllowed = true;
+        break;
+      default:
+        isAllowed = false;
+    }
+
+    if (!isAllowed) {
+      return msg.reply('This command is not available in this channel');
+    }
 
     try {
       const messages = await msg.channel.fetchMessages({ limit: count + 1 });

@@ -1,18 +1,17 @@
 // TODO: assure bot has permissions to manage messages in the meme-board channel
 const { CHANNEL_MEME, ROLE_MOD, MAX_MEMES } = process.env;
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const logger = require('pino')({
   useLevelLabels: true,
   timestamp: () => `,"time":"${new Date()}"`,
 });
 
-const minimumReactions = 5;
+const minimumReactions = 10;
 
 const modEmoji = '🚫';
 const memoji = '🤖';
 // regex: memoji followed by the number of votes followed '| message.id'
 const memeRegex = /^🤖\s([0-9]{1,3})\s\|\s([0-9]{17,20})/;
-
 
 function isValidReaction(reaction, user) {
   const { message } = reaction;
@@ -21,7 +20,6 @@ function isValidReaction(reaction, user) {
         && !user.bot // reaction not sent by a bot
         && !message.author.bot; // author is not a bot
 }
-
 
 // Here we add the extension function to check if there's anything attached to the message.
 function extension(reaction, attachment) {
@@ -32,15 +30,15 @@ function extension(reaction, attachment) {
   return attachment;
 }
 
-
 async function addMeme(reaction, user) {
   const { message } = reaction;
 
   // checking if a mod flagged this message
   let deleteMsg = false;
+  const member = await message.guild.fetchMember(user);
+  const roleModId = ROLE_MOD;
   if (reaction.emoji.name === modEmoji) {
-    const member = await message.guild.fetchMember(user);
-    if (member) deleteMsg = member.roles.has(ROLE_MOD);
+    if (member) deleteMsg = await member.roles.has(roleModId);
   } else if (!isValidReaction(reaction, user)) return;
 
   const memeChannel = message.guild.channels.get(CHANNEL_MEME);
@@ -55,20 +53,22 @@ async function addMeme(reaction, user) {
 
   // check the messages within the fetch object to see if the message
   // that was reacted to is already in the meme-board
-  const memes = fetch.find((m) => m.embeds[0]
-            && m.embeds[0].footer
-            && m.embeds[0].footer.text.startsWith(memoji)
-            && m.embeds[0].footer.text.endsWith(message.id));
-
+  const memes = fetch.find((m) => typeof m.embeds[0] !== 'undefined'
+  && m.embeds[0].footer !== null
+  && m.embeds[0].footer.text.startsWith(memoji)
+  && m.embeds[0].footer.text.endsWith(message.id));
   // if the message is found within the memeboard.
   if (memes) {
     // fetch the ID of the message already on the memeboard.
     const memeMsg = await memeChannel.fetchMessage(memes.id);
-
     if (deleteMsg) {
-      memeMsg.delete(1000)
+      await memeMsg.delete(1000)
         .then(() => logger.info('Deleted a meme entry'))
         .catch(logger.error);
+      return;
+    }
+
+    if (reaction.emoji.name === modEmoji) {
       return;
     }
 
@@ -79,19 +79,30 @@ async function addMeme(reaction, user) {
 
     // the extension function checks if there is anything attached to the message.
     const image = message.attachments.size > 0 ? await extension(reaction, message.attachments.array()[0].url) : '';
+    try {
+      const embed = new MessageEmbed()
+        .setColor(foundMeme.color)
+        .setTitle(foundMeme.title)
+        .setAuthor(message.author.tag, message.author.displayAvatarURL)
+        .setTimestamp()
+        .setDescription()
+        .setFooter(`${memoji} ${parseInt(memeCounter[1], 10) + 1} | ${message.id})`)
+        .setImage(image)
+        .setURL(message.url);
 
-    const embed = new RichEmbed()
-      .setColor(foundMeme.color)
-      .setTitle(foundMeme.title)
-      .setAuthor(message.author.tag, message.author.displayAvatarURL)
-      .setTimestamp()
-      .setDescription(`[link](${message.url})`)
-      .setFooter(`${memoji} ${parseInt(memeCounter[1], 10) + 1} | ${message.id}`)
-      .setImage(image);
-
-    // edit the message with the new embed
-    await memeMsg.edit({ embed });
+      // edit the message with the new embed
+      await memeMsg.edit({ embed });
+    } catch (error) {
+      logger.error(error);
+    }
     return;
+  }
+
+  const msgReactionDeny = await message.reactions.find((r) => r.emoji.name === modEmoji);
+  if (!memes && msgReactionDeny) {
+    if (member) {
+      return;
+    }
   }
 
   // if the message is not on the memeboard yet
@@ -99,20 +110,18 @@ async function addMeme(reaction, user) {
     // checking if a mod flagged this message
     let msgReaction = await message.reactions.find((r) => r.emoji.name === modEmoji);
     if (msgReaction) {
-      for (const u of msgReaction.users.values()) {
-        const member = await message.guild.fetchMember(user);
-        if (member && member.roles.has(ROLE_MOD)) return;
-      }
+      if (member && member.roles.has(roleModId)) return;
     }
 
     // message only goes to the meme-board after 5 memoji reactions by non-bot users
     let reactionCounter = 0;
     msgReaction = await message.reactions.find((r) => r.emoji.name === memoji);
-    for (const u of msgReaction.users.values()) {
+    const reactionsUser = msgReaction.users.values();
+    Array.from(reactionsUser).forEach((u) => {
       if (!u.bot) {
         reactionCounter += 1;
       }
-    }
+    });
 
     if (reactionCounter < minimumReactions) {
       return;
@@ -125,24 +134,26 @@ async function addMeme(reaction, user) {
       message.channel.send(`${user}, you cannot meme an empty message.`);
       return;
     }
+    try {
+      const embed = new MessageEmbed()
+      // nice yellow
+        .setColor(15844367)
+      // Here we use cleanContent, which replaces all mentions in the message with
+      // their equivalent text. For example, an @everyone ping will just display
+      // as @everyone, without tagging you!
+      // At the date of this edit (31/Jan/19) embeds do not mention yet.
+      // But nothing is stopping Discord from enabling mentions from embeds
+      // in a future update.
+        .setAuthor(message.author.tag, message.author.displayAvatarURL)
+        .setTimestamp(new Date())
+        .setDescription(`${message.cleanContent}\n---\n[link](${message.url})`)
+        .setFooter(`${memoji} ${reactionCounter} | ${message.id}`)
+        .setImage(image);
 
-    const embed = new RichEmbed()
-    // nice yellow
-      .setColor(15844367)
-    // Here we use cleanContent, which replaces all mentions in the message with
-    // their equivalent text. For example, an @everyone ping will just display
-    // as @everyone, without tagging you!
-    // At the date of this edit (31/Jan/19) embeds do not mention yet.
-    // But nothing is stopping Discord from enabling mentions from embeds
-    // in a future update.
-      .setTitle(message.cleanContent)
-      .setAuthor(message.author.tag, message.author.displayAvatarURL)
-      .setTimestamp(new Date())
-      .setDescription(`[link](${message.url})`)
-      .setFooter(`${memoji} ${reactionCounter} | ${message.id}`)
-      .setImage(image);
-
-    await memeChannel.send({ embed });
+      await memeChannel.send({ embed });
+    } catch (error) {
+      logger.error(error);
+    }
   }
 }
 
@@ -158,17 +169,16 @@ async function removeMeme(reaction, user) {
   }
 
   const fetchedMessages = await memeChannel.fetchMessages({ limit: MAX_MEMES });
-  const memes = fetchedMessages.find(
-    (m) => typeof m.embeds[0]
-            && m.embeds[0].footer
-            && m.embeds[0].footer.text.startsWith(memoji)
-            && m.embeds[0].footer.text.endsWith(reaction.message.id),
-  );
+  const memes = fetchedMessages.find((m) => typeof m.embeds[0] !== 'undefined'
+  && m.embeds[0].footer !== null
+  && m.embeds[0].footer.text.startsWith(memoji)
+  && m.embeds[0].footer.text.endsWith(message.id));
+
   if (memes) {
     const memeCounter = memeRegex.exec(memes.embeds[0].footer.text);
     const foundMeme = memes.embeds[0];
     const image = message.attachments.size > 0 ? await extension(reaction, message.attachments.array()[0].url) : '';
-    const embed = new RichEmbed()
+    const embed = new MessageEmbed()
       .setColor(foundMeme.color)
       .setTitle(foundMeme.title)
       .setDescription(`[link](${message.url})`)
@@ -179,9 +189,10 @@ async function removeMeme(reaction, user) {
 
     const memeMsg = await memeChannel.fetchMessage(memes.id);
     await memeMsg.edit({ embed });
-
     if (parseInt(memeCounter[1], 10) - 1 === 0) {
-      memeMsg.delete(1000);
+      await memeMsg.delete(1000)
+        .then(() => logger.info('Deleted a meme entry'))
+        .catch(logger.error);
     }
   }
 }

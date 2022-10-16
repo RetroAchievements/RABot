@@ -1,5 +1,5 @@
 const ytSearch = require('youtube-search');
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 
 const { YOUTUBE_API_KEY } = process.env;
 
@@ -8,8 +8,7 @@ const opts = {
   key: YOUTUBE_API_KEY,
 };
 
-
-module.exports = class LongPlayCommand extends Command {
+module.exports = class YoutubeCommand extends Command {
   constructor(client) {
     super(client, {
       name: 'youtube',
@@ -35,13 +34,18 @@ module.exports = class LongPlayCommand extends Command {
 
   async run(msg, { terms }) {
     const searchTerms = terms.join(' ');
-    let response;
 
     const sentMsg = await msg.reply(':mag: Searching for your video, please wait...');
 
     ytSearch(searchTerms, opts, (err, results) => {
-      if (err) return sentMsg.edit(`${msg.author}, **error**: Something went wrong...`);
-      if (!results) return sentMsg.edit(`${msg.author} , Didn't find anything... :frowning:`);
+      if (err) {
+        return sentMsg.edit(`${msg.author}, **error**: Something went wrong...`);
+      }
+
+      if (!results) {
+        return sentMsg.edit(`${msg.author} , Didn't find anything... :frowning:`);
+      }
+
       return sentMsg.edit(`${msg.author}, ${results[0].link}`);
     });
   }
