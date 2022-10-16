@@ -10,7 +10,7 @@ If you are used to those technologies and would like to contribute, PRs are welc
 
 ### :memo: Requirements
 
-- Node.js 12+
+- Node.js 16+
 
 
 ### Install:wrench::hammer: 

@@ -1,7 +1,7 @@
 const { RichEmbed } = require('discord.js');
 const fetch = require('node-fetch');
 
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 const { isValidUsername } = require('../../util/Utils');
 
 const { RA_USER, RA_WEB_API_KEY } = process.env;
@@ -53,7 +53,6 @@ module.exports = class TicketsCommand extends Command {
       .then((res) => res.json())
       .catch(() => null);
   }
-
 
   async getTicketIdEmbed(givenId) {
     const id = Number.parseInt(givenId, 10);

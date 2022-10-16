@@ -1,7 +1,6 @@
 const Command = require('../../structures/Command');
 
-const rules = require('../../assets/answers/rules.js');
-
+const rules = require('../../assets/answers/rules');
 
 module.exports = class RulesCommand extends Command {
   constructor(client) {

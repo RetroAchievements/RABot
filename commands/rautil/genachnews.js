@@ -1,14 +1,13 @@
 const ytSearch = require('youtube-search');
 const fetch = require('node-fetch');
 
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 
 const { YOUTUBE_API_KEY, RA_USER, RA_WEB_API_KEY } = process.env;
 const opts = {
   maxResults: 1,
   key: YOUTUBE_API_KEY,
 };
-
 
 module.exports = class GenerateAchievementNewsCommand extends Command {
   constructor(client) {

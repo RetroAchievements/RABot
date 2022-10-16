@@ -1,7 +1,7 @@
 const moment = require('moment-timezone');
 const cityTimezones = require('city-timezones');
 const Command = require('../../structures/Command');
-const { firstUpperCase } = require('../../util/Utils.js');
+const { firstUpperCase } = require('../../util/Utils');
 
 module.exports = class TimeCommand extends Command {
   constructor(client) {

@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 const cheerio = require('cheerio');
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 
 const url = 'https://www.vgmaps.com/Atlas/';
 
@@ -70,7 +70,6 @@ module.exports = class VGMapsCommand extends Command {
     });
   }
 
-
   async run(msg, { system, game }) {
     msg.say(':hourglass: Getting info, please wait...');
 
@@ -133,7 +132,6 @@ module.exports = class VGMapsCommand extends Command {
     }
   }
 
-
   /*
      * returns a negative number if choice is invalid.
      * -1 means "time is up!"
@@ -156,7 +154,7 @@ module.exports = class VGMapsCommand extends Command {
     const filter = (res) => {
       const choice = parseInt(res.content);
       return res.author.id === msg.author.id
-                && !isNaN(choice)
+                && !Number.isNaN(choice)
                 && choice > 0
                 && choice < array.length + 1;
     };
