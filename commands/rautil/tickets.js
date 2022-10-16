@@ -1,4 +1,4 @@
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const fetch = require('node-fetch');
 
 const Command = require('../../structures/Command');
@@ -67,7 +67,7 @@ module.exports = class TicketsCommand extends Command {
 
     const truncate = (str, n = 512) => ((str.length > n) ? `${str.substr(0, n - 1)}...` : str);
 
-    const embed = new RichEmbed()
+    const embed = new MessageEmbed()
       .setColor('#ff0000')
       .setTitle(`Ticket ID ${id}`)
       .setURL(json.URL)
@@ -95,7 +95,7 @@ module.exports = class TicketsCommand extends Command {
       return `**ERROR**: failed to get ticket info for game ID ${id}`;
     }
 
-    const embed = new RichEmbed()
+    const embed = new MessageEmbed()
       .setColor('#ff0000')
       .setTitle(`${json.GameTitle} (${json.ConsoleName})`)
       .setURL(json.URL)
@@ -115,7 +115,7 @@ module.exports = class TicketsCommand extends Command {
       return `**ERROR**: failed to get ticket info for achievement ID ${id}`;
     }
 
-    const embed = new RichEmbed()
+    const embed = new MessageEmbed()
       .setColor('#ff0000')
       .setTitle(`${json.GameTitle} (${json.ConsoleName})`)
       .setURL(json.URL)
@@ -134,7 +134,7 @@ module.exports = class TicketsCommand extends Command {
       return `**ERROR**: failed to get ticket info for user R${user}`;
     }
 
-    const embed = new RichEmbed()
+    const embed = new MessageEmbed()
       .setColor('#ff0000')
       .setTitle(`Ticket info for user "${json.User}"`)
       .setURL(json.URL)
@@ -152,7 +152,7 @@ module.exports = class TicketsCommand extends Command {
       return '**ERROR**: failed to get ticket ranking';
     }
 
-    const embed = new RichEmbed()
+    const embed = new MessageEmbed()
       .setColor('#ff0000')
       .setTitle('Most Reported Games')
       .setURL(json.URL);
@@ -176,7 +176,7 @@ module.exports = class TicketsCommand extends Command {
 
     const reportTypes = ['', 'Triggered at a wrong time', "Doesn't trigger"];
 
-    const embed = new RichEmbed()
+    const embed = new MessageEmbed()
       .setColor('#ff0000')
       .setTitle(`Recent Tickets (Total Open: ${json.OpenTickets})`)
       .setURL(json.URL);

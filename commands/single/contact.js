@@ -1,4 +1,4 @@
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const Command = require('../../structures/Command');
 
 module.exports = class ContactCommand extends Command {
@@ -13,7 +13,7 @@ module.exports = class ContactCommand extends Command {
   }
 
   async run(msg) {
-    const embed = new RichEmbed()
+    const embed = new MessageEmbed()
       .setColor('#0099ff')
       .setTitle('Contact Us')
       .setDescription('If you would like to contact us, please send a site message to the appropriate team below.')

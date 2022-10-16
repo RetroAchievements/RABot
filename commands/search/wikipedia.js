@@ -3,7 +3,7 @@
  * https://github.com/dragonfire535/xiao
  */
 const fetch = require('node-fetch');
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const Command = require('../../structures/Command');
 const { shorten } = require('../../util/Utils');
 
@@ -62,7 +62,7 @@ module.exports = class WikipediaCommand extends Command {
 
       if (data.missing) return sentMsg.edit("Didn't find anything... :frowning:");
 
-      const response = new RichEmbed()
+      const response = new MessageEmbed()
         .setColor(0xE7E7E7)
         .setTitle(data.title)
         .setAuthor('Wikipedia', 'https://i.imgur.com/Z7NJBK2.png', 'https://www.wikipedia.org/')

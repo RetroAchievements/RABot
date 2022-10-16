@@ -15,7 +15,7 @@ const {
   // NEWS_FEED_INTERVAL,
 } = process.env;
 
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const Parser = require('rss-parser');
 const { bestScoreComment } = require('./Utils');
 
@@ -94,7 +94,7 @@ async function checkGlobalFeed() {
       const system = parsedString[5];
 
       // announce mastery
-      msg = new RichEmbed()
+      msg = new MessageEmbed()
         .setTitle('Mastery!')
         .setURL(`${raorg}/user/${currentUser}`)
         .setThumbnail(`${raorg}/UserPic/${userPic}`)
@@ -123,7 +123,7 @@ async function checkGlobalFeed() {
       const gameName = parsedString[6];
 
       // announce ticket activity
-      msg = new RichEmbed()
+      msg = new MessageEmbed()
         .setTitle(`Ticket ${ticketActivity.toUpperCase()}`)
         .setURL(`${raorg}/ticketmanager.php?a=${cheevoId}`) // TODO: gonna change in v2
         .setColor(ticketActivity === 'closed' ? 'BLUE' : 'RED')
@@ -150,7 +150,7 @@ async function checkGlobalFeed() {
     if (value.length >= CHEEVO_WARNING_NUM) {
       // avoiding reporting the same user in a short period of time
       if (!counterMap.has(user)) {
-        msg = new RichEmbed()
+        msg = new MessageEmbed()
           .setTitle(value.length >= CHEEVO_SUSPICIOUS_NUM ? 'IMPRESSIVE!!!' : 'wow!')
           .setURL(`${userHistoryUrl}${user}`)
           .setThumbnail(`${raorg}/UserPic/${user}.png`)

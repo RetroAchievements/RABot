@@ -1,4 +1,4 @@
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const fetch = require('node-fetch');
 const Command = require('../../structures/Command');
 
@@ -271,7 +271,7 @@ module.exports = class ParseMemCommand extends Command {
   async getCodeNotesEmbed(gameId, addresses) {
     let hasNote = false;
     const codeNotes = await this.getCodeNotes(gameId);
-    const codeNotesEmbed = new RichEmbed()
+    const codeNotesEmbed = new MessageEmbed()
       .setColor('#3498DB')
       .setTitle('Code Notes')
       .setURL(`${baseUrl}codenotes.php?g=${gameId}`);

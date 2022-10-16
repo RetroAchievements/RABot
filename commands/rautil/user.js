@@ -1,4 +1,4 @@
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const fetch = require('node-fetch');
 const Command = require('../../structures/Command');
 
@@ -60,17 +60,17 @@ module.exports = class User extends Command {
           return sentMsg.edit(`Couldn't find any user called **${userName}** on site.`);
         }
 
-        const richEmbed = new RichEmbed()
+        const embed = new MessageEmbed()
           .setColor('#3498DB')
           .setTitle(`Role: ${permissions[res.Permissions]}`)
           .setURL(`${baseUrl}user/${userName}`)
           .setAuthor(userName, baseUrl + res.UserPic);
 
         if (res.Motto) {
-          richEmbed.addField(':speech_balloon: Motto', `**${res.Motto}**`);
+          embed.addField(':speech_balloon: Motto', `**${res.Motto}**`);
         }
 
-        richEmbed
+        embed
           .addField(
             ':bust_in_silhouette: Member since',
             `**${res.MemberSince}**`,
@@ -85,13 +85,13 @@ module.exports = class User extends Command {
           );
 
         if (res.RichPresenceMsg && res.LastGame) {
-          richEmbed.addField(
+          embed.addField(
             ':clock4: Last seen in',
             `**${res.LastGame.Title} (${res.LastGame.ConsoleName})**:\n${res.RichPresenceMsg}`,
           );
         }
 
-        return sentMsg.edit(richEmbed);
+        return sentMsg.edit(embed);
       })
       .catch(() => sentMsg.edit('Ouch! An error occurred! :frowning2:\nPlease, contact a @mod.'));
   }
