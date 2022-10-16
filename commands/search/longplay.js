@@ -1,5 +1,5 @@
 const ytSearch = require('youtube-search');
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 
 require('dotenv').config({ path: `${__dirname}../../.env` });
 
@@ -9,7 +9,6 @@ const opts = {
   maxResults: 1,
   key: YOUTUBE_API_KEY,
 };
-
 
 module.exports = class LongPlayCommand extends Command {
   constructor(client) {

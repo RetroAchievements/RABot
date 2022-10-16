@@ -1,6 +1,6 @@
 const { RichEmbed } = require('discord.js');
 const fetch = require('node-fetch');
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 
 const { RA_USER, RA_TOKEN, RA_WEB_API_KEY } = process.env;
 
@@ -67,22 +67,20 @@ const memTypes = {
   '': '',
 };
 
-
 const operandRegex = `(d|p|b)?(${
   Object.keys(memSize).join('|')
-  })?([0-9a-z+-]*)`;
+})?([0-9a-z+-]*)`;
 
 const memRegex = new RegExp(
   `(?:([${
-  Object.keys(specialFlags).join('')
+    Object.keys(specialFlags).join('')
   }]):)?${
-  operandRegex
+    operandRegex
   }(<=|>=|<|>|=|!=|\\*|\\/|&|)?${
-  operandRegex
+    operandRegex
   }(?:[(.]([0-9a-z]+)[).])?`,
   'i',
 );
-
 
 module.exports = class ParseMemCommand extends Command {
   constructor(client) {
@@ -224,7 +222,7 @@ module.exports = class ParseMemCommand extends Command {
         res += memTypes[lType].padEnd(6, ' ');
         res += memSize[lSize].padEnd(7, ' ');
         res += `${lMemory} `;
-        if (!((flag === 'a' || flag === 'b' || flag === 'i') && (cmp != '*' && cmp != '/' && cmp != '&'))) {
+        if (!((flag === 'a' || flag === 'b' || flag === 'i') && (cmp !== '*' && cmp !== '/' && cmp !== '&'))) {
           res += cmp.padEnd(3, ' ');
           res += memTypes[rType].padEnd(6, ' ');
           res += memSize[rSize].padEnd(7, ' ');
@@ -246,7 +244,6 @@ module.exports = class ParseMemCommand extends Command {
     return res;
   }
 
-
   async getGameId(achievementId) {
     const achievementUnlocksUrl = `${baseUrl}API/API_GetAchievementUnlocks.php?z=${RA_USER}&y=${RA_WEB_API_KEY}&a=${achievementId}`;
     return fetch(achievementUnlocksUrl)
@@ -254,7 +251,6 @@ module.exports = class ParseMemCommand extends Command {
       .then((res) => parseInt(res.Game.ID, 10))
       .catch(() => null);
   }
-
 
   async getMemAddr(gameId, achievementId) {
     const dorequestPatchUrl = `${baseUrl}dorequest.php?r=patch&g=${gameId}&u=${RA_USER}&t=${RA_TOKEN}`;
@@ -264,7 +260,6 @@ module.exports = class ParseMemCommand extends Command {
       .catch(() => null);
   }
 
-
   async getCodeNotes(gameId) {
     const dorequestCodeNotesUrl = `${baseUrl}dorequest.php?r=codenotes2&g=${gameId}&u=${RA_USER}&t=${RA_TOKEN}`;
     return fetch(dorequestCodeNotesUrl)
@@ -272,7 +267,6 @@ module.exports = class ParseMemCommand extends Command {
       .then((res) => res.CodeNotes)
       .catch(() => null);
   }
-
 
   async getCodeNotesEmbed(gameId, addresses) {
     let hasNote = false;

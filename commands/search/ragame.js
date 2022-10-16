@@ -1,8 +1,7 @@
-const GoogleCommand = require('../../structures/GoogleCommand.js');
+const GoogleCommand = require('../../structures/GoogleCommand');
 
 const site = 'retroachievements.org/game';
 const regex = /retroachievements\.org\/game\/[0-9]+/i;
-
 
 module.exports = class RAGameCommand extends GoogleCommand {
   constructor(client) {

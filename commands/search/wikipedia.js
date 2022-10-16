@@ -4,8 +4,8 @@
  */
 const fetch = require('node-fetch');
 const { RichEmbed } = require('discord.js');
-const Command = require('../../structures/Command.js');
-const { shorten } = require('../../util/Utils.js');
+const Command = require('../../structures/Command');
+const { shorten } = require('../../util/Utils');
 
 module.exports = class WikipediaCommand extends Command {
   constructor(client) {

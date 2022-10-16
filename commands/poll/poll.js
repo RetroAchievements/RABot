@@ -1,7 +1,4 @@
-const { Collection } = require('discord.js');
-const Command = require('../../structures/Command.js');
-
-const allOptions = Object.values(require('../../assets/json/emoji-alphabet.json'));
+const Command = require('../../structures/Command');
 
 module.exports = class PollCommand extends Command {
   constructor(client) {

@@ -1,0 +1,15 @@
+on: [pull_request]
+
+jobs:
+  eslint:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: true
+    name: eslint
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install
+        run: npm install
+      - name: Lint
+        run: npm run lint

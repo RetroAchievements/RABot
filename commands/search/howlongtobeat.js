@@ -1,8 +1,7 @@
-const GoogleCommand = require('../../structures/GoogleCommand.js');
+const GoogleCommand = require('../../structures/GoogleCommand');
 
 const site = 'howlongtobeat.com';
 const regex = /howlongtobeat\.com\/game\.php%3Fid%3D[0-9]+/;
-
 
 module.exports = class HowLongToBeatCommand extends GoogleCommand {
   constructor(client) {

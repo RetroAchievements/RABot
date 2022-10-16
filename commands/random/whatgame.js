@@ -1,4 +1,4 @@
-const RandomGameCommand = require('../../structures/RandomGameCommand.js');
+const RandomGameCommand = require('../../structures/RandomGameCommand');
 
 const gameURL = 'https://retroachievements.org/game';
 
@@ -26,7 +26,7 @@ module.exports = class WhatGameCommand extends RandomGameCommand {
   run(msg, { terms }) {
     const chosenGame = this.getRandomGame(terms);
 
-    if (!chosenGame || !chosenGame instanceof Array || chosenGame.length == 0) return msg.reply("Didn't find anything... :frowning:");
+    if (!chosenGame || !(chosenGame instanceof Array) || chosenGame.length === 0) return msg.reply("Didn't find anything... :frowning:");
 
     return msg.reply(`**${chosenGame[1]}**\n${gameURL}/${chosenGame[0]}`);
   }

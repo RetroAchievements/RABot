@@ -3,7 +3,7 @@ const Command = require('../../structures/Command');
 
 const { YANDEX_KEY } = process.env;
 
-const codes = require('../../assets/json/translate');
+const codes = require('../../assets/json/translate.json');
 
 const codesList = `\`${Object.keys(codes).sort().join('`, `')}\``;
 

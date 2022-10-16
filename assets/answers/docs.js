@@ -1,5 +1,4 @@
 const site = 'https://docs.retroachievements.org/';
-const radocs = 'index.html';
 const dev = 'Developer-docs';
 const devstart = 'Getting-Started-as-an-Achievement-Developer';
 const meminspector = 'Memory-Inspector-Overview';
@@ -39,7 +38,6 @@ const devcoc = 'Developers-Code-of-Conduct';
 const badconcepts = 'Developers-Code-of-Conduct#unwelcome-concepts';
 const beadev = 'How-to-Become-an-Achievement-Developer';
 const revision = 'Achievement-Set-Revisions';
-
 
 module.exports = {
   site,

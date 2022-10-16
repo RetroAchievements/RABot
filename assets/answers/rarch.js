@@ -16,7 +16,6 @@ const badges = "This feature was implemented in RetroArch 1.7.7 (May/2019), howe
 
 const def = `**With RetroArch you can earn RetroAchievements on a wide range of computers and consoles.**\nMore info here: <${site}>`;
 
-
 module.exports = {
   site,
 
