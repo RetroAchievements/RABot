@@ -1,4 +1,4 @@
-const site = 'http://docs.retroachievements.org/FAQ/';
+const site = 'https://docs.retroachievements.org/FAQ/';
 const emulator = '#which-emulator-do-i-need-to-use';
 const psx = '#will-retroachievements-support-playstation';
 const roms = '#where-can-i-find-roms';
@@ -11,7 +11,6 @@ const cheat = '#whats-considered-cheating-for-hardcore-what-if-i-find-evidence-o
 const resetcheevo = '#what-if-i-got-an-achievement-i-didnt-earn';
 const resetpassword = '#how-do-i-reset-my-password-if-i-dont-remember-my-password';
 const rarchbadges = '#how-can-i-see-the-badge-when-i-earn-a-cheevo-on-retroarch';
-
 
 module.exports = {
   site,

@@ -89,7 +89,7 @@ async function getGameList() {
   setInterval(await getConsoles, 1000 * 60 * 60 * 12);
 }
 
-module.exports.gamelist = gamelist;
+module.exports.gameList = gamelist;
 module.exports.consoles = (() => {
   const consolesNames = [];
   consoles.forEach((c) => {

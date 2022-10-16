@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const RandomGameCommand = require('../../structures/RandomGameCommand.js');
+const RandomGameCommand = require('../../structures/RandomGameCommand');
 
 require('dotenv').config({ path: `${__dirname}../../.env` });
 
@@ -33,7 +33,9 @@ module.exports = class WhatCheevoCommand extends RandomGameCommand {
     let response = 'Uh-oh! I think I faced a problem... :frowning:';
     const chosenGame = this.getRandomGame(terms);
 
-    if (!chosenGame || !chosenGame instanceof Array || chosenGame.length == 0) return sentMsg.edit("Didn't find anything... :frowning:");
+    if (!chosenGame || !(chosenGame instanceof Array) || chosenGame.length === 0) {
+      return sentMsg.edit("Didn't find anything... :frowning:");
+    }
 
     sentMsg.edit(`:hourglass: picking a random achievement from "${chosenGame[1]}" set, please wait...`);
 
@@ -42,8 +44,11 @@ module.exports = class WhatCheevoCommand extends RandomGameCommand {
       .then((json) => {
         const cheevos = json.PatchData.Achievements;
 
-        if (!cheevos instanceof Array || cheevos.length == 0) response = `I picked the game "${chosenGame[1]}", but looks like it has no achievements... :frowning:`;
-        else response = cheevoUrl + cheevos[Math.floor(Math.random() * cheevos.length)].ID;
+        if (!(cheevos instanceof Array) || cheevos.length === 0) {
+          response = `I picked the game "${chosenGame[1]}", but looks like it has no achievements... :frowning:`;
+        } else {
+          response = cheevoUrl + cheevos[Math.floor(Math.random() * cheevos.length)].ID;
+        }
 
         return sentMsg.edit(response);
       })

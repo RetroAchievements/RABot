@@ -1,15 +1,25 @@
 {
     "name": "retroachievements-discord-bot",
-    "version": "1.1.1",
-    "description": "Retroachievements.org Discord Bot - www.retroachievements.org",
-    "homepage": "http://retroachievements.org",
+    "version": "0.0.0",
+    "description": "RetroAchievements Discord Bot",
+    "homepage": "https://retroachievements.org",
+    "author": "RetroAchievements",
+    "license": "ISC",
     "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "nodemon index.js",
+        "postinstall": "git config core.hooksPath ./.hooks",
+        "lint": "eslint --ignore-path .gitignore .",
+        "fix": "eslint --ignore-path .gitignore . --fix"
+    },
     "dependencies": {
         "canvas": "^2.6.1",
         "cheerio": "^1.0.0-rc.3",
         "city-timezones": "^1.2.0",
-        "discord.js": "^11.5.1",
-        "discord.js-commando": "^0.10.0",
+        "common-tags": "^1.8.2",
+        "discord.js": "^12.5.3",
+        "discord.js-commando": "^0.12.3",
         "dotenv": "^8.2.0",
         "erlpack": "^0.1.3",
         "lunr": "^2.3.8",
@@ -35,30 +45,8 @@
         "eslint-plugin-import": "^2.20.0",
         "nodemon": "^2.0.2"
     },
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "nodemon index.js",
-        "lint": "eslint --ignore-path .gitignore .",
-        "lintfix": "eslint --ignore-path .gitignore . --fix"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/RetroAchievements/RABot"
-    },
-    "author": "RetroAchievements",
-    "contributors": [
-        {
-            "name": "meleu",
-            "url": "https://meleu.dev/"
-        },
-        {
-            "name": "zapo",
-            "url": "http://victorz.me"
-        },
-        {
-            "name": "luchaos",
-            "url": "http://luchaos.at/"
-        }
-    ],
-    "license": "ISC"
+    "engines": {
+        "node": "v16.13.2",
+        "npm": "8.1.2"
+    }
 }

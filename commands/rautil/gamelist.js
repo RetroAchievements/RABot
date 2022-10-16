@@ -1,6 +1,6 @@
-const HelperCommand = require('../../structures/HelperCommand.js');
+const HelperCommand = require('../../structures/HelperCommand');
 
-const { site, pages, answers } = require('../../assets/answers/consoles.js');
+const { site, pages, answers } = require('../../assets/answers/consoles');
 
 module.exports = class GameListCommand extends HelperCommand {
   constructor(client) {

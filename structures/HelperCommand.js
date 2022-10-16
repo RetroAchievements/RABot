@@ -1,4 +1,4 @@
-const Command = require('./Command.js');
+const Command = require('./Command');
 
 class HelperCommand extends Command {
   constructor(client, info, site, pages, answers) {
@@ -14,7 +14,6 @@ class HelperCommand extends Command {
     this.helpMessage += `\n**Available options:** \`${options.sort().join('`, `')}\``
             + `\n**See also:** <${this.site}>`;
   }
-
 
   run(msg, { arg }) {
     let response = this.pages[arg.toLowerCase()];

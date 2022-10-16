@@ -1,6 +1,6 @@
 const { RichEmbed } = require('discord.js');
 const fetch = require('node-fetch');
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 
 module.exports = class User extends Command {
   constructor(client) {

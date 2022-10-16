@@ -15,15 +15,24 @@
         "sourceType": "module"
     },
     "rules": {
-        "class-methods-use-this": [
-            "off"
-        ],
-        "prefer-destructuring": [
-            "error",
-            {
-                "object": true,
-                "array": false
-            }
-        ]
+        // TODO try to get rid of all those exceptions...
+        "max-len": "off",
+        "no-console": "off",
+        "no-plusplus": "off",
+        "no-continue": "off",
+        "no-await-in-loop": "off",
+        "no-restricted-syntax": "off",
+        "class-methods-use-this": "off",
+        "prefer-destructuring": "off",
+        "radix": "off",
+        "import/no-dynamic-require": "off",
+        "global-require": "off",
+        "no-return-assign": "off",
+        "no-cond-assign": "off",
+        "no-nested-ternary": "off",
+        "no-param-reassign": "off",
+        "consistent-return": "off",
+        "array-callback-return": "off",
+        "func-names": "off"
     }
 }

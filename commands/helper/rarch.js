@@ -1,6 +1,6 @@
-const HelperCommand = require('../../structures/HelperCommand.js');
+const HelperCommand = require('../../structures/HelperCommand');
 
-const { site, pages, answers } = require('../../assets/answers/rarch.js');
+const { site, pages, answers } = require('../../assets/answers/rarch');
 
 module.exports = class RarchCommand extends HelperCommand {
   constructor(client) {

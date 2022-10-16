@@ -1,5 +1,5 @@
 const { Collection } = require('discord.js');
-const Command = require('../../structures/Command.js');
+const Command = require('../../structures/Command');
 
 const allOptions = Object.values(require('../../assets/json/emoji-alphabet.json'));
 

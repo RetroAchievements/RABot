@@ -1,9 +1,8 @@
-const SelfRoleCommand = require('../../structures/SelfRoleCommand.js');
+const SelfRoleCommand = require('../../structures/SelfRoleCommand');
 
 require('dotenv').config({ path: `${__dirname}/.env` });
 
 const { COMMUNITY_NEWS } = process.env;
-
 
 module.exports = class CommunityNewsCommand extends SelfRoleCommand {
   constructor(client) {

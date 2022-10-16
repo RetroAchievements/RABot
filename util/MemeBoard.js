@@ -21,7 +21,6 @@ function isValidReaction(reaction, user) {
         && !message.author.bot; // author is not a bot
 }
 
-
 // Here we add the extension function to check if there's anything attached to the message.
 function extension(reaction, attachment) {
   const imageLink = attachment.split('.');
@@ -30,7 +29,6 @@ function extension(reaction, attachment) {
   if (!image) return '';
   return attachment;
 }
-
 
 async function addMeme(reaction, user) {
   const { message } = reaction;
@@ -92,10 +90,9 @@ async function addMeme(reaction, user) {
         .setImage(image)
         .setURL(message.url);
 
-
       // edit the message with the new embed
       await memeMsg.edit({ embed });
-    } catch (error){
+    } catch (error) {
       logger.error(error);
     }
     return;
@@ -151,10 +148,10 @@ async function addMeme(reaction, user) {
         .setTimestamp(new Date())
         .setDescription(`${message.cleanContent}\n---\n[link](${message.url})`)
         .setFooter(`${memoji} ${reactionCounter} | ${message.id}`)
-        .setImage(image)
+        .setImage(image);
 
       await memeChannel.send({ embed });
-    } catch(error){
+    } catch (error) {
       logger.error(error);
     }
   }

@@ -1,8 +1,7 @@
-const Command = require('../../structures/Command.js');
+const { RichEmbed } = require('discord.js');
+const Command = require('../../structures/Command');
 
 const { CHANNEL_MEME, MAX_MEMES } = process.env;
-const { RichEmbed } = require('discord.js');
-
 
 module.exports = class MemeFactCommand extends Command {
   constructor(client) {
