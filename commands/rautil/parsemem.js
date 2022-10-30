@@ -281,7 +281,7 @@ module.exports = class ParseMemCommand extends Command {
         const codeNote = codeNotes.find((note) => note.Address === addr);
         if (codeNote) {
           hasNote = true;
-          codeNotesEmbed.addField(`**${addr}**`, codeNote.Note, true);
+          codeNotesEmbed.addField(`**${addr}**`, codeNote.Note.substring(0, 1024), true);
         }
       });
       return hasNote ? codeNotesEmbed : undefined;
