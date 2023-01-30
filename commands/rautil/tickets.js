@@ -1,14 +1,18 @@
 const { MessageEmbed } = require('discord.js');
+const { buildAuthorization, getTicketData } = require('@retroachievements/api');
 const fetch = require('node-fetch');
 
 const Command = require('../../structures/Command');
 const { isValidUsername } = require('../../util/Utils');
 
 const { RA_USER, RA_WEB_API_KEY } = process.env;
+const authorization = buildAuthorization({
+  userName: RA_USER,
+  webApiKey: RA_WEB_API_KEY,
+});
 
 const defaultArg = '~NOARGS~';
 const raUrl = 'https://retroachievements.org';
-const apiUrl = `${raUrl}/API/API_GetTicketData.php?z=${RA_USER}&y=${RA_WEB_API_KEY}`;
 
 module.exports = class TicketsCommand extends Command {
   constructor(client) {
@@ -60,7 +64,7 @@ module.exports = class TicketsCommand extends Command {
       return '**ERROR**: missing/invalid ticket ID';
     }
 
-    const json = await this.getApiJson(`${apiUrl}&i=${id}`);
+    const json = await getTicketData(authorization, { ticketId: id });
     if (!json) {
       return `**ERROR**: failed to get info for ticket ${id}`;
     }
@@ -70,16 +74,16 @@ module.exports = class TicketsCommand extends Command {
     const embed = new MessageEmbed()
       .setColor('#ff0000')
       .setTitle(`Ticket ID ${id}`)
-      .setURL(json.URL)
-      .addField('**Status**', json.ReportStateDescription, true)
-      .addField('**Resolved by**', json.ResolvedBy || '-', true)
-      .addField('**Ach. Author**', json.AchievementAuthor)
-      .addField('**Ach. Title**', json.AchievementTitle, true)
-      .addField('**Ach. Description**', json.AchievementDesc, true)
-      .addField('**Game**', `${json.GameTitle} (${json.ConsoleName})`)
-      .addField('**Reported by**', json.ReportedBy, true)
-      .addField('**Report Type**', json.ReportTypeDescription || '-', true)
-      .addField('**Notes**', truncate(json.ReportNotes.replace(/<br>/i, '\n')));
+      .setURL(json.url)
+      .addField('**Status**', json.reportStateDescription, true)
+      .addField('**Resolved by**', json.reportedBy || '-', true)
+      .addField('**Ach. Author**', json.achievementAuthor)
+      .addField('**Ach. Title**', json.achievementTitle, true)
+      .addField('**Ach. Description**', json.achievementDesc, true)
+      .addField('**Game**', `${json.gameTitle} (${json.consoleName})`)
+      .addField('**Reported by**', json.reportedBy, true)
+      .addField('**Report Type**', json.reportTypeDescription || '-', true)
+      .addField('**Notes**', truncate(json.reportNotes.replace(/<br>/i, '\n')));
 
     return embed;
   }
@@ -90,16 +94,16 @@ module.exports = class TicketsCommand extends Command {
       return '**ERROR**: missing/invalid game ID';
     }
 
-    const json = await this.getApiJson(`${apiUrl}&g=${id}`);
+    const json = await getTicketData(authorization, { gameId: id });
     if (!json || json.error) {
       return `**ERROR**: failed to get ticket info for game ID ${id}`;
     }
 
     const embed = new MessageEmbed()
       .setColor('#ff0000')
-      .setTitle(`${json.GameTitle} (${json.ConsoleName})`)
-      .setURL(json.URL)
-      .addField('**Open Tickets**', json.OpenTickets);
+      .setTitle(`${json.gameTitle} (${json.consoleName})`)
+      .setURL(json.url)
+      .addField('**Open Tickets**', json.openTickets);
 
     return embed;
   }
@@ -110,16 +114,16 @@ module.exports = class TicketsCommand extends Command {
       return '**ERROR**: missing/invalid achievement ID';
     }
 
-    const json = await this.getApiJson(`${apiUrl}&a=${id}`);
+    const json = await getTicketData(authorization, { achievementId: id });
     if (!json) {
       return `**ERROR**: failed to get ticket info for achievement ID ${id}`;
     }
 
     const embed = new MessageEmbed()
       .setColor('#ff0000')
-      .setTitle(`${json.GameTitle} (${json.ConsoleName})`)
-      .setURL(json.URL)
-      .addField('**Open Tickets**', json.OpenTickets);
+      .setTitle(`${json.gameTitle} (${json.consoleName})`)
+      .setURL(json.url)
+      .addField('**Open Tickets**', json.openTickets);
 
     return embed;
   }
@@ -129,25 +133,27 @@ module.exports = class TicketsCommand extends Command {
       return `**ERROR**: invalid username: ${user}`;
     }
 
-    const json = await this.getApiJson(`${apiUrl}&u=${user}`);
+    const json = await getTicketData(authorization, { userName: user });
     if (!json) {
       return `**ERROR**: failed to get ticket info for user R${user}`;
     }
 
     const embed = new MessageEmbed()
       .setColor('#ff0000')
-      .setTitle(`Ticket info for user "${json.User}"`)
-      .setURL(json.URL)
-      .addField('**Open**', json.Open, true)
-      .addField('**Resolved**', json.Resolved, true)
-      .addField('**Closed**', json.Closed, true)
-      .addField('**Total**', json.Total, true);
+      .setTitle(`Ticket info for user "${json.user}"`)
+      .setURL(json.url)
+      .addField('**Open**', json.open, true)
+      .addField('**Resolved**', json.resolved, true)
+      .addField('**Closed**', json.closed, true)
+      .addField('**Total**', json.total, true);
 
     return embed;
   }
 
   async getTicketRanking() {
-    const json = await this.getApiJson(`${apiUrl}&f=1`);
+    const json = await getTicketData(authorization, {
+      isGettingMostTicketedGames: true,
+    });
     if (!json) {
       return '**ERROR**: failed to get ticket ranking';
     }
@@ -155,13 +161,12 @@ module.exports = class TicketsCommand extends Command {
     const embed = new MessageEmbed()
       .setColor('#ff0000')
       .setTitle('Most Reported Games')
-      .setURL(json.URL);
+      .setURL(json.url);
 
-    const games = json.MostReportedGames;
-    for (let i = 0; i < games.length; i += 1) {
+    for (const game of json.mostReportedGames) {
       embed.addField(
-        `**${games[i].GameTitle} (${games[i].Console})**`,
-        `**[${games[i].OpenTickets}](${raUrl}/ticketmanager.php?g=${games[i].GameID})**`,
+        `**${game.gameTitle} (${game.console})**`,
+        `**[${game.openTickets}](${raUrl}/ticketmanager.php?g=${game.gameId})**`,
       );
     }
 
@@ -169,7 +174,7 @@ module.exports = class TicketsCommand extends Command {
   }
 
   async getRecentTickets() {
-    const json = await this.getApiJson(`${apiUrl}`);
+    const json = await getTicketData(authorization);
     if (!json) {
       return '**ERROR**: failed to get tickets info';
     }
@@ -178,20 +183,20 @@ module.exports = class TicketsCommand extends Command {
 
     const embed = new MessageEmbed()
       .setColor('#ff0000')
-      .setTitle(`Recent Tickets (Total Open: ${json.OpenTickets})`)
-      .setURL(json.URL);
+      .setTitle(`Recent Tickets (Total Open: ${json.openTickets})`)
+      .setURL(json.url);
 
-    const tickets = json.RecentTickets;
-    for (let i = 0; i < tickets.length; i += 1) {
+    for (const ticket of json.recentTickets) {
       embed
         .addField(
-          tickets[i].AchievementTitle,
-          `**Ticket**: [${tickets[i].ID}](${raUrl}/ticketmanager.php?i=${tickets[i].ID})`
-          + ` | **Type**: ${reportTypes[tickets[i].ReportType]}`
-          + ` | **Reported by**: ${tickets[i].ReportedBy}`
-          + ` | **Ach. Author**: ${tickets[i].AchievementAuthor}`,
+          ticket.achievementTitle,
+          `**Ticket**: [${ticket.id}](${raUrl}/ticketmanager.php?i=${ticket.id})`
+          + ` | **Type**: ${reportTypes[ticket.reportType]}`
+          + ` | **Reported by**: ${ticket.reportedBy}`
+          + ` | **Ach. Author**: ${ticket.achievementAuthor}`,
         );
     }
+
     return embed;
   }
 

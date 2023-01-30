@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
-const fetch = require('node-fetch');
 const Canvas = require('canvas');
+const { buildAuthorization, getGameExtended } = require('@retroachievements/api');
 // const { MessageAttachment } = require('discord.js'); // <-- this works only on djs v12
 const { Attachment } = require('discord.js');
 
@@ -84,8 +84,6 @@ module.exports = class HotCheevsCommand extends Command {
 
     const sentMsg = await msg.say(':hourglass: Getting info, please wait...');
 
-    const endpoint = `https://retroachievements.org/API/API_GetGameExtended.php?z=${RA_USER}&y=${RA_WEB_API_KEY}`;
-
     const templateMsg = ['```html\n'];
 
     const canvas = Canvas.createCanvas(468, 220);
@@ -94,25 +92,27 @@ module.exports = class HotCheevsCommand extends Command {
 
     try {
       for (let i = 0; i < gameIds.length && i < 6; i += 1) {
-        const id = Number.parseInt(gameIds[i], 10);
-        if (id <= 0) {
+        const gameId = Number.parseInt(gameIds[i], 10);
+        if (gameId <= 0) {
           return sentMsg.edit(`**ERROR**: invalid game ID: \`${gameIds[i]}\``);
         }
 
-        const res = await fetch(`${endpoint}&i=${id}`);
-        const json = await res.json();
+        const authorization = buildAuthorization({
+          userName: RA_USER,
+          webApiKey: RA_WEB_API_KEY,
+        });
+        const gameExtended = await getGameExtended(authorization, { gameId });
 
-        const gameUri = `/game/${json.ID}`;
-        const gameTitle = `${json.Title} (${abbreviations[json.ConsoleName] || json.ConsoleName})`;
+        const gameUri = `/game/${gameExtended.id}`;
+        const gameTitle = `${gameExtended.title} (${abbreviations[gameExtended.consoleName] || gameExtended.consoleName})`;
 
         const authorSet = new Set();
         const dates = new Set();
 
-        const achievements = Object.keys(json.Achievements);
-        achievements.forEach((cheevo) => {
-          authorSet.add(json.Achievements[cheevo].Author);
-          dates.add(json.Achievements[cheevo].DateCreated.replace(/ ..:..:..$/, ''));
-        });
+        for (const achievement of Object.values(gameExtended.achievements)) {
+          authorSet.add(achievement.author);
+          dates.add(achievement.dateCreated.replace(/ ..:..:..$/, ''));
+        }
 
         const authorsMsg = [];
         [...authorSet].map((author) => authorsMsg.push(`<a href="/user/${author}">${author}</a>`));
@@ -126,7 +126,7 @@ module.exports = class HotCheevsCommand extends Command {
         templateMsg.push(`${releaseDate.replace(/-/g, '.')} <a href="${gameUri}">${gameTitle}</a> by ${authorsMsg.join(' and ')}<br />\n\n`);
 
         // creating the HotCheevs background
-        const titleScreenUrl = `https://retroachievements.org${json.ImageTitle}`;
+        const titleScreenUrl = `https://retroachievements.org${gameExtended.imageTitle}`;
         const titleScreen = await Canvas.loadImage(titleScreenUrl);
 
         // titleScreen position in the hotcheevs background grid image
@@ -134,7 +134,7 @@ module.exports = class HotCheevsCommand extends Command {
         const imgY = Math.trunc(i / 3) * grid.height;
 
         // Nintendo DS title screens needs an extra care
-        if (json.ConsoleName === 'Nintendo DS') {
+        if (gameExtended.consoleName === 'Nintendo DS') {
           let sourceX;
           let sourceY;
           let imgWidth;
