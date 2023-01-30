@@ -38,9 +38,9 @@ module.exports = class AotwCommand extends Command {
       winners.reverse();
 
       for (let i = 0; i < max && i < winners.length; i += 1) {
-        response += `\n[${winners[i].DateAwarded}]`;
-        response += `( ${winners[i].User} ) `;
-        response += winners[i].HardcoreMode === '1' ? '<hardcore> +1' : '+0.5';
+        response += `\n[${winners[i].dateAwarded}]`;
+        response += `( ${winners[i].user} ) `;
+        response += winners[i].hardcoreMode ? '<hardcore> +1' : '+0.5';
       }
       response += '\n```\n';
 
