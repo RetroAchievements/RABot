@@ -14,7 +14,7 @@
         "fix": "eslint --ignore-path .gitignore . --fix"
     },
     "dependencies": {
-        "@retroachievements/api": "^1.0.0-rc.4",
+        "@retroachievements/api": "^1.0.0",
         "canvas": "^2.6.1",
         "cheerio": "^1.0.0-rc.3",
         "city-timezones": "^1.2.0",
