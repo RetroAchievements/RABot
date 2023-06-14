@@ -21,7 +21,7 @@ module.exports = class User extends Command {
           type: 'string',
           prompt: 'What user would you like to fetch?',
           default: '',
-          parse: (username) => username.toLowerCase(),
+          parse: (username) => username,
         },
       ],
     });
