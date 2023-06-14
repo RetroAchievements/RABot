@@ -76,8 +76,8 @@ module.exports = class User extends Command {
             `**${res.MemberSince}**`,
           )
           .addField(
-            ':trophy: Rank | Points',
-            `Rank **${res.Rank}** | **${res.Points}** points`,
+            ':trophy: Rank | Hardcore Points | Softcore Points',
+            `Rank **${res.Rank}** | **${res.TotalPoints}** points | **${res.TotalSoftcorePoints}** points`,
           )
           .addField(
             `:video_game: Last game played (${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].LastPlayed : ''})`,
