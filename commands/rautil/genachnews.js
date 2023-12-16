@@ -1,5 +1,5 @@
 const ytSearch = require('youtube-search');
-const fetch = require('node-fetch');
+const { buildAuthorization, getGameExtended } = require('@retroachievements/api');
 
 const Command = require('../../structures/Command');
 
@@ -47,20 +47,21 @@ module.exports = class GenerateAchievementNewsCommand extends Command {
   }
 
   async getGameInfo(gameId) {
-    const endpoint = `https://retroachievements.org/API/API_GetGameExtended.php?z=${RA_USER}&y=${RA_WEB_API_KEY}&i=${gameId}`;
-
     let gameInfo = null;
 
     try {
-      const res = await fetch(endpoint);
-      const json = await res.json();
+      const authorization = buildAuthorization({
+        userName: RA_USER,
+        webApiKey: RA_WEB_API_KEY,
+      });
+
+      const gameExtended = await getGameExtended(authorization, { gameId });
 
       const dates = new Set();
 
-      const achievements = Object.keys(json.Achievements);
-      achievements.forEach((cheevo) => dates.add(
-        json.Achievements[cheevo].DateModified.replace(/ ..:..:..$/, ''),
-      ));
+      for (const achievement of Object.values(gameExtended.achievements)) {
+        dates.add(achievement.dateModified.replace(/ ..:..:..$/, ''));
+      }
 
       const achievementSetDate = [...dates].reduce((d1, d2) => {
         const date1 = new Date(d1);
@@ -70,11 +71,11 @@ module.exports = class GenerateAchievementNewsCommand extends Command {
 
       gameInfo = {
         id: gameId,
-        title: json.Title,
-        consoleName: json.ConsoleName,
-        genre: json.Genre,
-        developer: json.Developer,
-        releaseDate: json.Released,
+        title: gameExtended.title,
+        consoleName: gameExtended.consoleName,
+        genre: gameExtended.genre,
+        developer: gameExtended.developer,
+        releaseDate: gameExtended.released,
         achievementSetDate,
       };
     } catch (error) {

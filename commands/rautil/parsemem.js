@@ -1,4 +1,5 @@
 const { MessageEmbed } = require('discord.js');
+const { buildAuthorization, getAchievementUnlocks } = require('@retroachievements/api');
 const fetch = require('node-fetch');
 const Command = require('../../structures/Command');
 
@@ -245,11 +246,20 @@ module.exports = class ParseMemCommand extends Command {
   }
 
   async getGameId(achievementId) {
-    const achievementUnlocksUrl = `${baseUrl}API/API_GetAchievementUnlocks.php?z=${RA_USER}&y=${RA_WEB_API_KEY}&a=${achievementId}`;
-    return fetch(achievementUnlocksUrl)
-      .then((res) => res.json())
-      .then((res) => parseInt(res.Game.ID, 10))
-      .catch(() => null);
+    const authorization = buildAuthorization({
+      userName: RA_USER,
+      webApiKey: RA_WEB_API_KEY,
+    });
+
+    try {
+      const { game } = await getAchievementUnlocks(authorization, {
+        achievementId,
+      });
+
+      return game.id;
+    } catch (error) {
+      return null;
+    }
   }
 
   async getMemAddr(gameId, achievementId) {

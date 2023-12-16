@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js');
-const fetch = require('node-fetch');
+const { buildAuthorization, getUserSummary } = require('@retroachievements/api');
 const Command = require('../../structures/Command');
 
 module.exports = class User extends Command {
@@ -37,7 +37,6 @@ module.exports = class User extends Command {
       userName = msg.member ? (msg.member.nickname || msg.author.username) : msg.author.username;
     }
 
-    const url = `${baseUrl}API/API_GetUserSummary.php?z=${u}&y=${k}&u=${userName}`;
     const sentMsg = await msg.reply(`:hourglass: Getting ${userName}'s info, please wait...`);
 
     // permissions magic numbers
@@ -53,46 +52,52 @@ module.exports = class User extends Command {
       5: 'Root',
     };
 
-    fetch(url)
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.ID == null) {
-          return sentMsg.edit(`Couldn't find any user called **${userName}** on site.`);
-        }
+    try {
+      const authorization = buildAuthorization({
+        userName: u,
+        webApiKey: k,
+      });
 
-        const embed = new MessageEmbed()
-          .setColor('#3498DB')
-          .setTitle(`Role: ${permissions[res.Permissions]}`)
-          .setURL(`${baseUrl}user/${userName}`)
-          .setAuthor(userName, baseUrl + res.UserPic);
+      const userSummary = await getUserSummary(authorization, { userName });
 
-        if (res.Motto) {
-          embed.addField(':speech_balloon: Motto', `**${res.Motto}**`);
-        }
+      if (userSummary.id === null) {
+        return sentMsg.edit(`Couldn't find any user called **${userName}** on site.`);
+      }
 
-        embed
-          .addField(
-            ':bust_in_silhouette: Member since',
-            `**${res.MemberSince}**`,
-          )
-          .addField(
-            ':trophy: Rank | Points',
-            `Rank **${res.Rank}** | **${res.Points}** points`,
-          )
-          .addField(
-            `:video_game: Last game played (${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].LastPlayed : ''})`,
-            `**${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].Title : ''} (${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].ConsoleName : ''})**`,
-          );
+      const embed = new MessageEmbed()
+        .setColor('#3498DB')
+        .setTitle(`Role: ${permissions[userSummary.permissions]}`)
+        .setURL(`${baseUrl}user/${userName}`)
+        .setAuthor(userName, baseUrl + userSummary.userPic);
 
-        if (res.RichPresenceMsg && res.LastGame) {
-          embed.addField(
-            ':clock4: Last seen in',
-            `**${res.LastGame.Title} (${res.LastGame.ConsoleName})**:\n${res.RichPresenceMsg}`,
-          );
-        }
+      if (userSummary.motto) {
+        embed.addField(':speech_balloon: Motto', `**${userSummary.motto}**`);
+      }
 
-        return sentMsg.edit(embed);
-      })
-      .catch(() => sentMsg.edit('Ouch! An error occurred! :frowning2:\nPlease, contact a @mod.'));
+      embed
+        .addField(
+          ':bust_in_silhouette: Member since',
+          `**${userSummary.memberSince}**`,
+        )
+        .addField(
+          ':trophy: Rank | Points',
+          `Rank **${userSummary.rank}** | **${userSummary.points}** points`,
+        )
+        .addField(
+          `:video_game: Last game played (${userSummary.recentlyPlayed[0] ? userSummary.recentlyPlayed[0].lastPlayed : ''})`,
+          `**${userSummary.recentlyPlayed[0] ? userSummary.recentlyPlayed[0].title : ''} (${userSummary.recentlyPlayed[0] ? userSummary.recentlyPlayed[0].consoleName : ''})**`,
+        );
+
+      if (userSummary.richPresenceMsg && userSummary.lastGame) {
+        embed.addField(
+          ':clock4: Last seen in',
+          `**${userSummary.lastGame.title} (${userSummary.lastGame.consoleName})**:\n${userSummary.richPresenceMsg}`,
+        );
+      }
+
+      return sentMsg.edit(embed);
+    } catch (error) {
+      sentMsg.edit('Ouch! An error occurred! :frowning2:\nPlease, contact a @mod.');
+    }
   }
 };
