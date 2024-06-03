@@ -21,7 +21,7 @@ module.exports = class User extends Command {
           type: 'string',
           prompt: 'What user would you like to fetch?',
           default: '',
-          parse: (username) => username.toLowerCase(),
+          parse: (username) => username,
         },
       ],
     });
@@ -76,8 +76,8 @@ module.exports = class User extends Command {
             `**${res.MemberSince}**`,
           )
           .addField(
-            ':trophy: Rank | Points',
-            `Rank **${res.Rank}** | **${res.Points}** points`,
+            ':trophy: Rank | Hardcore Points | Softcore Points',
+            `Rank **${res.Rank}** | **${res.TotalPoints.toLocaleString()}** points | **${res.TotalSoftcorePoints.toLocaleString()}** points`,
           )
           .addField(
             `:video_game: Last game played (${res.RecentlyPlayed[0] ? res.RecentlyPlayed[0].LastPlayed : ''})`,
