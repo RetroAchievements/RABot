@@ -1,4 +1,11 @@
-import {Client, Collection, Events, GatewayIntentBits, MessageFlags, ModalSubmitInteraction} from "discord.js";
+import {
+  Client,
+  Collection,
+  Events,
+  GatewayIntentBits,
+  MessageFlags,
+  ModalSubmitInteraction,
+} from "discord.js";
 import figlet from "figlet";
 
 import { loadCommands } from "./commands";
@@ -10,7 +17,7 @@ import { AdminChecker } from "./utils/admin-checker";
 import { CommandAnalytics } from "./utils/command-analytics";
 import { CooldownManager } from "./utils/cooldown-manager";
 import { logError, logger } from "./utils/logger";
-import {GauntletCommand} from "./slash-commands/gauntlet.command.ts";
+import { GauntletCommand } from "./slash-commands/gauntlet.command.ts";
 
 /**
  * Validates that all required environment variables are set.
@@ -183,15 +190,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   // Handle modals
   if (interaction.isModalSubmit()) {
-    const modalInteraction = interaction as ModalSubmitInteraction // isModalSubmit() confirms it's this class
+    const modalInteraction = interaction as ModalSubmitInteraction; // isModalSubmit() confirms it's this class
 
     if (modalInteraction.customId.startsWith("gauntlet")) {
-      await new GauntletCommand().handleModalSubmit(modalInteraction)
+      await new GauntletCommand().handleModalSubmit(modalInteraction);
     } else {
-      logger.error(`No modal matching ${modalInteraction.customId} was found.`)
+      logger.error(`No modal matching ${modalInteraction.customId} was found.`);
     }
   } else {
-    logger.warn('Not a modal?')
+    logger.warn("Not a modal?");
   }
 
   if (!interaction.isChatInputCommand()) return;
