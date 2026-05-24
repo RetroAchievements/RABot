@@ -28,8 +28,8 @@ RABot utilizes:
 
 ## Requirements
 
-- [Bun](https://bun.sh) 1.3.6+
-- A Discord bot token
+- [Bun](https://bun.sh) 1.3.10+
+- A Discord application ID, bot token, and RetroAchievements Web API key
 
 ## Installation
 
@@ -55,12 +55,17 @@ Then edit `.env` with your configuration:
 - `DISCORD_APPLICATION_ID` - Your bot's application ID from Discord Developer Portal
 - `LEGACY_COMMAND_PREFIX` - Command prefix for legacy commands (default: `!`)
 - `RA_WEB_API_KEY` - Your RetroAchievements Web API key
+- `RA_CONNECT_API_KEY` - RetroAchievements Connect API key required for `!mem` achievement ID/URL lookups and code notes
+- `RA_CONNECT_API_USER` - RetroAchievements Connect API username (default: `RABot`)
 - `YOUTUBE_API_KEY` - Your YouTube Data API v3 key (optional, for `/gan` longplay searches)
-- `MAIN_GUILD_ID` - Discord guild ID for the main RetroAchievements server
-- `WORKSHOP_GUILD_ID` - Discord guild ID for the RetroAchievements Workshop server
+- `MAIN_GUILD_ID` - Discord guild ID for the main RetroAchievements server (optional, but recommended for production guild authorization)
+- `WORKSHOP_GUILD_ID` - Discord guild ID for the RetroAchievements Workshop server (required for Workshop-only features)
+- `GAMBLER_ROLE_ID` - Discord role ID managed by `/events gambler` (required for Gambler role commands)
+- `CHEAT_INVESTIGATION_CATEGORY_ID` - Category ID required for RACheats `/pingteam ping` restrictions
 - `UWC_VOTING_TAG_ID` - Forum tag ID for active UWC polls (optional)
 - `UWC_VOTE_CONCLUDED_TAG_ID` - Forum tag ID for completed UWC polls (optional)
 - `UWC_FORUM_CHANNEL_ID` - Forum channel ID for UWC auto-detection (optional)
+- `DEV_CHANNELS` - Comma-separated channel IDs where `!mem` may show code notes (optional)
 - `AUTO_PUBLISH_CHANNEL_IDS` - Comma-separated list of announcement channel IDs to auto-publish from (optional)
 - `NODE_ENV` - Environment mode: `development` or `production` (default: `development`)
 - `LOG_LEVEL` - Logging level: `trace`, `debug`, `info`, `warn`, `error`, `fatal` (default: `debug` in dev, `info` in prod)
@@ -70,17 +75,17 @@ Then edit `.env` with your configuration:
 Initialize the database:
 
 ```bash
-bun db:generate  # Generate migration files
-bun db:migrate   # Apply migrations
-bun db:seed      # Seed default teams (optional)
+bun run db:generate  # Generate migration files
+bun run db:migrate   # Apply migrations
+bun run db:seed      # Seed default teams (optional)
 ```
 
 ## Deploying Slash Commands
 
-After adding your bot to a server, deploy the slash commands:
+Deploy the application's global slash commands:
 
 ```bash
-bun deploy-commands
+bun run deploy-commands
 ```
 
 This needs to be run:
@@ -94,38 +99,40 @@ This needs to be run:
 ### Development
 
 ```bash
-bun dev  # Runs with auto-restart on file changes
+bun run dev  # Runs with auto-restart on file changes
 ```
 
 ### Production
 
 ```bash
-bun start  # Standard run
+bun run start  # Standard run
 ```
 
 For production deployments, the bot is automatically deployed via Forge when changes are merged to the main branch. The bot runs under a process supervisor on the production server.
 
 ## Available Scripts
 
-- `bun dev` - Run in development mode with hot reload
-- `bun start` - Run in production mode
-- `bun deploy-commands` - Deploy slash commands to Discord
-- `bun db:generate` - Generate database migrations
-- `bun db:migrate` - Apply database migrations
+- `bun run dev` - Run in development mode with hot reload
+- `bun run start` - Run in production mode
+- `bun run deploy-commands` - Deploy slash commands to Discord
+- `bun run db:generate` - Generate database migrations
+- `bun run db:migrate` - Apply database migrations
+- `bun run db:seed` - Seed default teams
 - `bun run format` - Format code with oxfmt
 - `bun run format:check` - Check formatting without writing
-- `bun lint` - Run oxlint
-- `bun lint:fix` - Run oxlint with auto-fix
-- `bun tsc` - Run TypeScript type checking (via tsgo)
+- `bun run lint` - Run oxlint
+- `bun run lint:fix` - Run oxlint with auto-fix
+- `bun run tsc` - Run TypeScript type checking (via tsgo)
 - `bun run test` - Run all tests
 - `bun run test:watch` - Run tests in watch mode
-- `bun verify` - Run format check, lint, type checking, and tests
+- `bun run verify` - Format, lint-fix, type check, and test locally
+- `bun run ci` - Run CI-safe format check, lint, type checking, and tests
 
 ## Commands
 
 ### 🆕 Migration Notice
 
-RABot is transitioning to slash commands! When you use a legacy prefix command (e.g., `!gan`), you'll see a migration notice encouraging you to use the modern slash command version (e.g., `/gan`). The legacy command will still work during the transition period.
+RABot is transitioning to slash commands. When you use a linked legacy prefix command (for example, `!gan`), you'll see a migration notice encouraging you to use the modern slash command version (for example, `/gan`). The legacy command will still work during the transition period.
 
 ### Slash Commands (Recommended)
 
@@ -138,20 +145,24 @@ RABot is transitioning to slash commands! When you use a legacy prefix command (
 - `/gan2 <game-id>` - Generate pretty achievement news template with colors
 - `/pingteam` - Team management system (Workshop server only)
   - `/pingteam ping <team>` - Ping all members of a team
-  - `/pingteam add <team> <user>` - Add user to team (admin only)
-  - `/pingteam remove <team> <user>` - Remove user from team (admin only)
-  - `/pingteam create <name>` - Create a new team (admin only)
-- `/uwc` - Create an Unwelcome Concept poll (Workshop server only, auto-manages forum tags)
+  - `/pingteam add <team> <user>` - Add user to team
+  - `/pingteam remove <team> <user>` - Remove user from team
+  - `/pingteam create <name>` - Create a new team
+- `/uwc` - Create an Unwelcome Concept poll (Workshop server only, requires UWC role or admin, auto-manages forum tags)
   - **Auto-detection**: When a new UWC thread is created in the configured forum channel with format `12345: Achievement Title (Game Name)`, the bot automatically posts links to previous discussions for that achievement
+- `/events gambler` - Manage the Gambler role (server only)
+  - `/events gambler reset` - Remove the Gambler role from all users
+  - `/events gambler award <user>` - Manually award the Gambler role
+  - `/events gambler award-all <ach1> <ach2> <ach3> [ach4]` - Award the role to users who unlocked at least 3 listed achievements
 - `/dadjoke` - Get a random dad joke
 - `/frames <input>` - Convert between time and frames at different frame rates
 
-### Legacy Prefix Commands (Being Migrated)
+### Legacy Prefix Commands
 
 The bot still supports the following legacy prefix commands (all prefixed with `!` by default):
 
 - `!topic` - Display the current channel topic
-- `!rule [number]` - Display server rules
+- `!rules [number|coc]` - Display server rules (`!rule`, `!rule2`, and `!rulecoc` aliases are also supported)
 - `!contact` - Show contact information for various RA teams
 - `!poll` - Create a simple poll
 - `!tpoll` - Create a timed poll
@@ -171,6 +182,7 @@ src/
 ├── handlers/        # Message and event handlers
 ├── models/          # TypeScript interfaces and types
 ├── services/        # Business logic services
+├── test/            # Shared test database and mocks
 └── utils/           # Utility functions and logging
 ```
 

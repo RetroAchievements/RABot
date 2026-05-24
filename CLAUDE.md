@@ -21,14 +21,12 @@ bun run lint            # Run oxlint
 bun run lint:fix        # Auto-fix linting issues (oxlint)
 bun run test            # Run all tests (vitest)
 bun run test:watch      # Run tests in watch mode (vitest)
-bun run verify          # Run format check, lint, type checking, and tests
+bun run verify          # Format, lint-fix, type check, and test locally
+bun run ci              # CI-safe checks without writing files
 
 # Deployment
 bun run deploy-commands # Deploy slash commands to Discord (required after adding/modifying slash commands)
 bun run start           # Production mode
-
-# Database management
-bun run db:studio       # Open Drizzle Studio GUI
 ```
 
 ## Architecture & Key Patterns
@@ -40,7 +38,7 @@ The bot supports both legacy prefix commands and modern slash commands during th
 1. **Legacy Commands** (`src/commands/*.command.ts`)
    - Use the `Command` interface
    - Accessed via prefix (default: `!`)
-   - Show migration notices encouraging slash command use
+   - May show migration notices when linked to slash command replacements
    - Example: `!gan 14402`
 
 2. **Slash Commands** (`src/slash-commands/*.command.ts`)
@@ -51,15 +49,16 @@ The bot supports both legacy prefix commands and modern slash commands during th
 
 ### Migration System
 
-When users use legacy commands that have slash equivalents:
+When users use legacy commands that are linked to slash equivalents via `legacyName`:
 
 - A temporary migration notice appears (15 seconds)
 - The legacy command still executes
-- Configured via `legacyName` property in slash commands
+- `!poll` currently keeps running without a migration notice
+- The mapping is configured via the `legacyName` property in slash commands
 
 ### Database Architecture
 
-- **Drizzle ORM** with SQLite (`bun:sqlite`)
+- **Drizzle ORM** with SQLite through the libSQL client
 - Schema defined in `src/database/schema.ts`
 - Services pattern for database operations (`src/services/*.service.ts`)
 - Tables: `teams`, `team_members`, `polls`, `poll_votes`, `uwc_polls`, `uwc_poll_results`
@@ -77,23 +76,32 @@ When users use legacy commands that have slash equivalents:
 - **UwcPollService**: Tracks UWC polls, stores results, enables searching by achievement/game
 - **UwcHistoryService**: Retrieves and formats previous UWC poll history for auto-detection
 - **AutoPublishService**: Automatically publishes messages in configured announcement channels
+- **GameInfoService**, **TemplateService**, and **YouTubeService**: Power GAN command data fetching and formatting
+- **AchievementUnlocksService** and **ConnectApiService**: Support events and memory parsing features
+- **GithubReleaseService**: Fetches release information for `/status`
 
 ### Environment Variables
 
-Required in `.env`:
+Required at startup:
 
 - `DISCORD_TOKEN`: Bot token (required)
 - `DISCORD_APPLICATION_ID`: Bot application ID (required)
 - `RA_WEB_API_KEY`: RetroAchievements Web API key (required)
+
+Feature-specific and optional configuration:
+
 - `LEGACY_COMMAND_PREFIX`: Prefix for legacy commands (default: `!`)
-- `RA_CONNECT_API_KEY`: RetroAchievements Connect API key (future use)
+- `RA_CONNECT_API_KEY`: RetroAchievements Connect API key required for `!mem` achievement ID/URL lookups and code notes
+- `RA_CONNECT_API_USER`: RetroAchievements Connect API username (default: `RABot`)
 - `YOUTUBE_API_KEY`: For longplay searches in gan commands (optional, but recommended)
-- `MAIN_GUILD_ID`: Discord guild ID for the main RetroAchievements server (optional, but recommended)
-- `WORKSHOP_GUILD_ID`: Discord guild ID for the RetroAchievements Workshop server (optional, but recommended)
+- `MAIN_GUILD_ID`: Discord guild ID for the main RetroAchievements server (optional, but recommended for production guild authorization)
+- `WORKSHOP_GUILD_ID`: Discord guild ID for the RetroAchievements Workshop server (required for Workshop-only features)
 - `CHEAT_INVESTIGATION_CATEGORY_ID`: Category ID for RACheats team restrictions
+- `GAMBLER_ROLE_ID`: Discord role ID managed by `/events gambler` (required for Gambler role commands)
 - `UWC_VOTING_TAG_ID`: Forum tag ID for active UWC polls (optional)
 - `UWC_VOTE_CONCLUDED_TAG_ID`: Forum tag ID for completed UWC polls (optional)
 - `UWC_FORUM_CHANNEL_ID`: Forum channel ID for UWC auto-detection feature (optional)
+- `DEV_CHANNELS`: Comma-separated channel IDs where `!mem` may show code notes (optional)
 - `AUTO_PUBLISH_CHANNEL_IDS`: Comma-separated list of announcement channel IDs to auto-publish from (optional)
 - `NODE_ENV`: Set to "production" in production (default: "development")
 - `LOG_LEVEL`: Logging level - trace, debug, info, warn, error, fatal (default: "debug" in dev, "info" in prod)
@@ -114,7 +122,7 @@ The bot automatically provides context when new UWC (Unwelcome Concept) reports 
 - Detects threads matching pattern: `12345: Achievement Title (Game Name)`
 - Queries database for previous UWC polls for the same achievement ID
 - Posts an automated message with links to up to 5 previous discussions
-- Shows poll dates, outcomes (Approved/Denied/Active/No Action), and vote results
+- Shows poll dates, active status when relevant, and the top vote result when available
 - Uses efficient database queries instead of Discord API calls for performance
 
 ### Auto-Publishing Feature
@@ -175,7 +183,7 @@ async execute(interaction, _client) {
 
 ## Logging System
 
-The bot uses Pino for structured logging with the following features:
+The bot uses a small custom structured JSON logger with the following features:
 
 ### Log Levels
 
@@ -223,10 +231,10 @@ The bot uses Pino for structured logging with the following features:
 - Runs under a process supervisor on the production server
 - No manual PM2 configuration needed
 
-### Database Performance
+### Database
 
-- SQLite WAL mode is enabled by default for better concurrent access
-- WAL mode allows concurrent reads during writes, ideal for Discord bot usage patterns
+- The database is a local SQLite file (`rabot.db`) accessed through Drizzle's libSQL adapter
+- Migrations live in `drizzle/` and are applied by `bun run db:migrate`
 
 ### Shutdown Handling
 
@@ -241,7 +249,7 @@ Tests use [Vitest](https://vitest.dev/) as the test runner (configured in `vites
 ## Common Gotchas
 
 - Always use Bun commands (`bun run`, `bun install`) not npm/yarn/pnpm
-- Deploy slash commands after changes (`bun deploy-commands`)
+- Deploy slash commands after changes (`bun run deploy-commands`)
 - Check channel type before accessing properties like `topic` or `parentId`
 - Use proper null checks for Discord.js properties
 - Remember to handle both team IDs and names in TeamService methods

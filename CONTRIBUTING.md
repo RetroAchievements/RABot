@@ -6,8 +6,9 @@ Thank you for your interest in contributing to RABot! This document provides gui
 
 ### Prerequisites
 
-- [Bun](https://bun.sh) 1.2.18 or higher
+- [Bun](https://bun.sh) 1.3.10 or higher
 - A Discord application for testing (create one at [Discord Developer Portal](https://discord.com/developers/applications))
+- A RetroAchievements Web API key for local bot startup
 - Basic knowledge of TypeScript and Discord.js
 
 ### Setting Up Your Development Environment
@@ -15,8 +16,8 @@ Thank you for your interest in contributing to RABot! This document provides gui
 1. **Fork and clone the repository**
 
    ```bash
-   git clone https://github.com/YOUR-USERNAME/RABot.git
-   cd RABot
+   git clone https://github.com/YOUR-USERNAME/RABot-Next.git
+   cd RABot-Next
    ```
 
 2. **Install dependencies**
@@ -36,20 +37,20 @@ Thank you for your interest in contributing to RABot! This document provides gui
 4. **Initialize the database**
 
    ```bash
-   bun db:generate
-   bun db:migrate
-   bun db:seed  # Optional: adds default teams
+   bun run db:generate
+   bun run db:migrate
+   bun run db:seed  # Optional: adds default teams
    ```
 
-5. **Deploy slash commands to your test server**
+5. **Deploy global slash commands**
 
    ```bash
-   bun deploy-commands
+   bun run deploy-commands
    ```
 
 6. **Run the bot in development mode**
    ```bash
-   bun dev
+   bun run dev
    ```
 
 ## Development Workflow
@@ -76,21 +77,24 @@ git checkout -b fix/issue-description
 Before committing, ensure your code passes all checks:
 
 ```bash
-bun run verify  # Runs lint, type checking, and tests
+bun run verify  # Formats, lint-fixes, type checks, and tests
 ```
+
+Use `bun run ci` when you want the non-mutating CI check sequence.
 
 Individual checks:
 
 ```bash
-bun lint        # Check code style
-bun lint:fix    # Auto-fix style issues
-bun tsc         # TypeScript type checking (via tsgo)
-bun run test    # Run tests (via vitest)
+bun run format:check  # Check formatting without writing
+bun run lint          # Check code style
+bun run lint:fix      # Auto-fix lint issues
+bun run tsc           # TypeScript type checking (via tsgo)
+bun run test          # Run tests (via vitest)
 ```
 
 ### 4. Commit Your Changes
 
-- Use **conventional commits** format:
+- Use **commitizen-style conventional commits** format:
   - `feat:` for new features
   - `fix:` for bug fixes
   - `docs:` for documentation changes
@@ -110,7 +114,7 @@ git commit -m "docs: update setup instructions for Bun 1.3"
 
 1. Push your branch to your fork
 2. Open a pull request against the `main` branch
-3. Fill out the pull request template with:
+3. Include in the pull request description:
    - Clear description of changes
    - Testing instructions
    - Any breaking changes
@@ -130,6 +134,7 @@ git commit -m "docs: update setup instructions for Bun 1.3"
 - **Commands** go in `src/commands/` (legacy) or `src/slash-commands/` (preferred).
 - **Business logic** belongs in `src/services/`.
 - **Shared utilities** go in `src/utils/`.
+- **Shared test helpers** go in `src/test/`.
 - **Database operations** use the service layer pattern.
 
 ### Command Development
@@ -145,6 +150,7 @@ When creating new commands:
 Example slash command structure:
 
 ```typescript
+import { SlashCommandBuilder } from "discord.js";
 import type { SlashCommand } from "../models";
 
 export default {
