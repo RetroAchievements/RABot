@@ -97,10 +97,9 @@ describe("SlashCommand: uwc", () => {
             text: "Is this an Unwelcome Concept?",
           },
           answers: [
-            { text: "No, leave as is" },
-            { text: "No, but can be improved by change to achievement" },
             { text: "Yes, demote" },
-            { text: "Yes, but can be salvaged by change to achievement" },
+            { text: "No, leave as is" },
+            { text: "No, transfer" },
             { text: "Need further discussion" },
           ],
           allowMultiselect: false,
@@ -188,10 +187,9 @@ describe("SlashCommand: uwc", () => {
             text: "Is this an Unwelcome Concept?",
           },
           answers: [
-            { text: "No, leave as is" },
-            { text: "No, but can be improved by change to achievement" },
             { text: "Yes, demote" },
-            { text: "Yes, but can be salvaged by change to achievement" },
+            { text: "No, leave as is" },
+            { text: "No, transfer" },
             { text: "Need further discussion" },
           ],
           allowMultiselect: false,
@@ -230,10 +228,9 @@ describe("SlashCommand: uwc", () => {
             text: "Is this an Unwelcome Concept?",
           },
           answers: [
-            { text: "No, leave as is" },
-            { text: "No, but can be improved by change to achievement" },
             { text: "Yes, demote" },
-            { text: "Yes, but can be salvaged by change to achievement" },
+            { text: "No, leave as is" },
+            { text: "No, transfer" },
             { text: "Need further discussion" },
           ],
           allowMultiselect: false,
@@ -296,10 +293,9 @@ describe("SlashCommand: uwc", () => {
             text: "Is this an Unwelcome Concept?",
           },
           answers: [
-            { text: "No, leave as is" },
-            { text: "No, but can be improved by change to achievement" },
             { text: "Yes, demote" },
-            { text: "Yes, but can be salvaged by change to achievement" },
+            { text: "No, leave as is" },
+            { text: "No, transfer" },
             { text: "Need further discussion" },
           ],
           allowMultiselect: false,
@@ -333,7 +329,7 @@ describe("SlashCommand: uwc", () => {
       expect(callArgs.poll.allowMultiselect).toBe(false);
     });
 
-    it("creates a poll with exactly 5 answer options", async () => {
+    it("creates a poll with exactly 4 answer options", async () => {
       // ARRANGE
       const member = createMockGuildMember({
         roles: {
@@ -354,7 +350,7 @@ describe("SlashCommand: uwc", () => {
 
       // ASSERT
       const callArgs = (interaction.reply as any).mock.calls[0][0];
-      expect(callArgs.poll.answers).toHaveLength(5);
+      expect(callArgs.poll.answers).toHaveLength(4);
     });
   });
 

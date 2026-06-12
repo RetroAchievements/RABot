@@ -60,10 +60,9 @@ const uwcSlashCommand: SlashCommand = {
           text: "Is this an Unwelcome Concept?",
         },
         answers: [
-          { text: "No, leave as is" },
-          { text: "No, but can be improved by change to achievement" },
           { text: "Yes, demote" },
-          { text: "Yes, but can be salvaged by change to achievement" },
+          { text: "No, leave as is" },
+          { text: "No, transfer" },
           { text: "Need further discussion" },
         ],
         allowMultiselect: false,
