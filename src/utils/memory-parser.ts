@@ -1,23 +1,4 @@
-export interface ParsedRequirement {
-  flag: string;
-  lType: string;
-  lSize: string;
-  lMemory: string;
-  cmp: string;
-  rType: string;
-  rSize: string;
-  rMemVal: string;
-  hits: string;
-}
-
-export interface MemoryParserResult {
-  groups: ParsedRequirement[][];
-  addresses: string[];
-}
-
-const MAX_CHARS = 6;
-
-const SPECIAL_FLAGS: Record<string, string> = {
+const SPECIAL_FLAGS = {
   r: "ResetIf",
   p: "Pause If",
   a: "AddSource",
@@ -34,9 +15,9 @@ const SPECIAL_FLAGS: Record<string, string> = {
   k: "Remember",
   g: "Measured%",
   "": "",
-};
+} as const satisfies Record<string, string>;
 
-const MEM_SIZE: Record<string, string> = {
+const MEM_SIZE = {
   "0xk": "BitCount",
   "0xm": "Bit0",
   "0xn": "Bit1",
@@ -64,9 +45,9 @@ const MEM_SIZE: Record<string, string> = {
   fl: "MBF32 LE",
   h: "",
   "": "",
-};
+} as const satisfies Record<string, string>;
 
-const MEM_TYPES: Record<string, string> = {
+const MEM_TYPES = {
   d: "Delta",
   p: "Prior",
   m: "Mem",
@@ -77,12 +58,82 @@ const MEM_TYPES: Record<string, string> = {
   recall: "Recall",
   variable: "Variable",
   "": "",
-};
+} as const satisfies Record<string, string>;
+
+type Flag = keyof typeof SPECIAL_FLAGS;
+type MemType = keyof typeof MEM_TYPES;
+type MemSize = keyof typeof MEM_SIZE;
+
+export interface ParsedRequirement {
+  flag: Flag;
+  lType: MemType;
+  lSize: MemSize;
+  lMemory: string;
+  cmp: string;
+  rType: MemType;
+  rSize: MemSize;
+  rMemVal: string;
+  hits: string;
+}
+
+export interface MemoryParserResult {
+  groups: ParsedRequirement[][];
+  addresses: string[];
+}
+
+const MAX_CHARS = 6;
+
+const SCALABLE_FLAGS = new Set<string>(["a", "b", "i", "k"]);
+const SCALAR_OPERATORS = new Set<string>(["*", "/", "&", "+", "-", "^", "%"]);
+
+const isScalableFlag = (flag: string): boolean => SCALABLE_FLAGS.has(flag);
+const isScalarOperator = (cmp: string): boolean => SCALAR_OPERATORS.has(cmp);
+
+// Main path historically excludes "false"; recall/variable paths include it.
+const MAIN_SPECIAL_CONSTANTS = ["n", "t", "true", "lvlintro"] as const;
+const RECALL_SPECIAL_CONSTANTS = ["n", "t", "true", "false", "lvlintro"] as const;
+
+function formatAddress(
+  value: string,
+  specials: readonly string[],
+  hadSizePrefix: boolean,
+  // Main path: preserve the original negative decimal instead of converting to hex.
+  keepNegativeDecimal: boolean,
+  // Main path right operand only: leave a leading "-" alone instead of padding it.
+  skipNegativePad: boolean,
+): string {
+  if (!value) return value;
+
+  if (
+    !hadSizePrefix &&
+    !specials.includes(value) &&
+    !value.includes(".") &&
+    !value.startsWith("0x")
+  ) {
+    const num = parseInt(value, 10);
+    if (!Number.isNaN(num) && (num >= 0 || !keepNegativeDecimal)) {
+      value = num.toString(16);
+    }
+  }
+
+  if (value.startsWith("0x")) {
+    value = value.substring(2);
+  }
+
+  if (specials.includes(value) || value.includes(".")) {
+    return value;
+  }
+  if (skipNegativePad && value.startsWith("-")) {
+    return value;
+  }
+
+  return `0x${value.padStart(MAX_CHARS, "0")}`;
+}
 
 export function parseMemory(mem: string): MemoryParserResult {
   const addresses: string[] = [];
 
-  // Split by S but not when preceded by 0x
+  // Split by S but not when preceded by 0x.
   const groups = mem.split(/(?<!0x)S/);
   const parsedGroups: ParsedRequirement[][] = [];
 
@@ -91,7 +142,7 @@ export function parseMemory(mem: string): MemoryParserResult {
     const parsedRequirements: ParsedRequirement[] = [];
 
     for (const req of requirements) {
-      if (!req) continue; // Skip empty requirements
+      if (!req) continue;
 
       const parsed = parseRequirement(req);
       if (!parsed) {
@@ -100,7 +151,6 @@ export function parseMemory(mem: string): MemoryParserResult {
 
       parsedRequirements.push(parsed);
 
-      // Collect addresses
       if (parsed.lType !== "v" && parsed.lMemory && !addresses.includes(parsed.lMemory)) {
         addresses.push(parsed.lMemory);
       }
@@ -109,7 +159,6 @@ export function parseMemory(mem: string): MemoryParserResult {
       }
     }
 
-    // If group is empty, add a default "0=0" requirement
     if (parsedRequirements.length === 0) {
       parsedRequirements.push({
         flag: "",
@@ -130,69 +179,57 @@ export function parseMemory(mem: string): MemoryParserResult {
   return { groups: parsedGroups, addresses };
 }
 
+const RECALL_OPERAND_RE =
+  /^(d|p|b)?(0xk|0xm|0xn|0xo|0xp|0xq|0xr|0xs|0xt|0xl|0xu|0xh|0xw|0xx|0xi|0xj|0xg|0x |0x|h)?([0-9a-z+-]*)$/i;
+
+const VARIABLE_OPERAND_RE =
+  /^(d|p|b|~|v|f)?(f[fbihlm]|0xk|0xm|0xn|0xo|0xp|0xq|0xr|0xs|0xt|0xl|0xu|0xh|0xw|0xx|0xi|0xj|0xg|0x |0x|h)?([0-9a-z+.-]*)$/i;
+
+function parseRecallOperand(operand: string): {
+  type: MemType;
+  size: MemSize;
+  value: string;
+} {
+  if (!operand) return { type: "", size: "", value: "" };
+
+  const m = operand.match(RECALL_OPERAND_RE);
+  if (!m) return { type: "", size: "", value: "" };
+
+  let type = (m[1] || "").toLowerCase();
+  const size = (m[2] || "").toLowerCase() as MemSize;
+  let value = m[3] || "";
+
+  if (type !== "d" && type !== "p" && type !== "b" && type !== "v") {
+    type = size !== "" ? "m" : "v";
+  }
+
+  value = formatAddress(value, RECALL_SPECIAL_CONSTANTS, size !== "", false, false);
+
+  return { type: type as MemType, size, value };
+}
+
 function parseRecallRequirement(req: string): ParsedRequirement | null {
-  // Parse expressions containing {recall}
-  // Examples: "K:{recall}+2", "K:{recall}", "I:0xG0045ba18+{recall}", etc.
   const specialFlags = Object.keys(SPECIAL_FLAGS).join("");
 
-  // Try left-side {recall} first: "K:{recall}+2"
   const leftRecallRegex = new RegExp(
     `^(?:([${specialFlags}]):)?\\{recall\\}(<=|>=|<|>|==|=|!=|\\*|\\/|&|\\+|\\-|\\^|%)?(.*)(?:[(.](\\w+)[).])?$`,
     "i",
   );
 
-  // Try right-side {recall}: "I:0xG0045ba18+{recall}"
   const rightRecallRegex = new RegExp(
     `^(?:([${specialFlags}]):)?(.*?)(<=|>=|<|>|==|=|!=|\\*|\\/|&|\\+|\\-|\\^|%)\\{recall\\}(?:[(.](\\w+)[).])?$`,
     "i",
   );
 
-  // Try left-side {recall} first
   let match = req.match(leftRecallRegex);
   if (match) {
-    const flag = (match[1] || "").toLowerCase();
+    const flag = (match[1] || "").toLowerCase() as Flag;
     const cmp = match[2] || "";
     const rightOperand = match[3] || "";
-    const hits = match[4] || (flag === "k" ? "" : "0"); // Remember flag usually has no hits
+    // The Remember (`k`) flag has no hits target.
+    const hits = match[4] || (flag === "k" ? "" : "0");
 
-    let rType = "";
-    let rSize = "";
-    let rMemVal = "";
-
-    if (rightOperand) {
-      // Parse the right operand using existing logic
-      const operandRegex = `(d|p|b)?(0xk|0xm|0xn|0xo|0xp|0xq|0xr|0xs|0xt|0xl|0xu|0xh|0xw|0xx|0xi|0xj|0xg|0x |0x|h)?([0-9a-z+-]*)`;
-      const operandMatch = rightOperand.match(new RegExp(`^${operandRegex}$`, "i"));
-      if (operandMatch) {
-        rType = operandMatch[1] || "";
-        rSize = operandMatch[2] || "";
-        rMemVal = operandMatch[3] || "";
-
-        // Convert to lowercase
-        rType = rType.toLowerCase();
-        rSize = rSize.toLowerCase();
-
-        // Handle type determination for right operand
-        if (rType !== "d" && rType !== "p" && rType !== "b" && rType !== "v") {
-          rType = rSize !== "" ? "m" : "v";
-        }
-
-        // Format memory values
-        if (rSize === "" && rMemVal && !["n", "t", "true", "false", "lvlintro"].includes(rMemVal)) {
-          const num = parseInt(rMemVal, 10);
-          if (!Number.isNaN(num)) {
-            rMemVal = num.toString(16);
-          }
-        }
-
-        if (rMemVal && rMemVal.startsWith("0x")) {
-          rMemVal = rMemVal.substring(2);
-        }
-        if (rMemVal && !["n", "t", "true", "false", "lvlintro"].includes(rMemVal)) {
-          rMemVal = `0x${rMemVal.padStart(MAX_CHARS, "0")}`;
-        }
-      }
-    }
+    const right = parseRecallOperand(rightOperand);
 
     return {
       flag,
@@ -200,65 +237,27 @@ function parseRecallRequirement(req: string): ParsedRequirement | null {
       lSize: "",
       lMemory: "",
       cmp,
-      rType,
-      rSize,
-      rMemVal,
+      rType: right.type,
+      rSize: right.size,
+      rMemVal: right.value,
       hits,
     };
   }
 
-  // Try right-side {recall}
   match = req.match(rightRecallRegex);
   if (match) {
-    const flag = (match[1] || "").toLowerCase();
+    const flag = (match[1] || "").toLowerCase() as Flag;
     const leftOperand = match[2] || "";
     const cmp = match[3] || "";
     const hits = match[4] || (flag === "k" ? "" : "0");
 
-    let lType = "";
-    let lSize = "";
-    let lMemory = "";
-
-    if (leftOperand) {
-      // Parse the left operand using existing logic
-      const operandRegex = `(d|p|b)?(0xk|0xm|0xn|0xo|0xp|0xq|0xr|0xs|0xt|0xl|0xu|0xh|0xw|0xx|0xi|0xj|0xg|0x |0x|h)?([0-9a-z+-]*)`;
-      const operandMatch = leftOperand.match(new RegExp(`^${operandRegex}$`, "i"));
-      if (operandMatch) {
-        lType = operandMatch[1] || "";
-        lSize = operandMatch[2] || "";
-        lMemory = operandMatch[3] || "";
-
-        // Convert to lowercase
-        lType = lType.toLowerCase();
-        lSize = lSize.toLowerCase();
-
-        // Handle type determination for left operand
-        if (lType !== "d" && lType !== "p" && lType !== "b" && lType !== "v") {
-          lType = lSize !== "" ? "m" : "v";
-        }
-
-        // Format memory addresses
-        if (lSize === "" && lMemory && !["n", "t", "true", "false", "lvlintro"].includes(lMemory)) {
-          const num = parseInt(lMemory, 10);
-          if (!Number.isNaN(num)) {
-            lMemory = num.toString(16);
-          }
-        }
-
-        if (lMemory && lMemory.startsWith("0x")) {
-          lMemory = lMemory.substring(2);
-        }
-        if (lMemory && !["n", "t", "true", "false", "lvlintro"].includes(lMemory)) {
-          lMemory = `0x${lMemory.padStart(MAX_CHARS, "0")}`;
-        }
-      }
-    }
+    const left = parseRecallOperand(leftOperand);
 
     return {
       flag,
-      lType,
-      lSize,
-      lMemory,
+      lType: left.type,
+      lSize: left.size,
+      lMemory: left.value,
       cmp,
       rType: "recall",
       rSize: "",
@@ -270,120 +269,89 @@ function parseRecallRequirement(req: string): ParsedRequirement | null {
   return null;
 }
 
+function parseVariableRightOperand(operand: string): {
+  type: MemType;
+  size: MemSize;
+  value: string;
+} {
+  if (!operand) return { type: "", size: "", value: "" };
+
+  const m = operand.match(VARIABLE_OPERAND_RE);
+  if (!m) return { type: "", size: "", value: "" };
+
+  let type = (m[1] || "").toLowerCase();
+  let size = (m[2] || "").toLowerCase();
+  let value = m[3] || "";
+
+  if (
+    type !== "d" &&
+    type !== "p" &&
+    type !== "b" &&
+    type !== "v" &&
+    type !== "~" &&
+    type !== "f"
+  ) {
+    if (size === "f" && value && value.includes(".")) {
+      type = "f";
+      size = "";
+    } else {
+      type = size !== "" ? "m" : "v";
+    }
+  }
+
+  if (!value.includes(".")) {
+    value = formatAddress(value, RECALL_SPECIAL_CONSTANTS, size !== "", false, false);
+  }
+
+  return { type: type as MemType, size: size as MemSize, value };
+}
+
 function parseVariableRequirement(req: string): ParsedRequirement | null {
-  // Parse expressions containing {variableName}
-  // Examples: "K:{varname}+2", "A:{varname}", etc.
   const specialFlags = Object.keys(SPECIAL_FLAGS).join("");
 
-  // Try variable expression: "K:{varname}+2"
   const variableRegex = new RegExp(
     `^(?:([${specialFlags}]):)?\\{([^}]+)\\}(<=|>=|<|>|==|=|!=|\\*|\\/|&|\\+|\\-|\\^|%)?(.*)(?:[(.](\\w+)[).])?$`,
     "i",
   );
 
   const match = req.match(variableRegex);
-  if (match) {
-    const flag = (match[1] || "").toLowerCase();
-    const variableName = match[2] || "";
-    const cmp = match[3] || "";
-    const rightOperand = match[4] || "";
-    const hits = match[5] || (flag === "k" ? "" : "0");
+  if (!match) return null;
 
-    let rType = "";
-    let rSize = "";
-    let rMemVal = "";
+  const flag = (match[1] || "").toLowerCase() as Flag;
+  const variableName = match[2] || "";
+  const cmp = match[3] || "";
+  const rightOperand = match[4] || "";
+  const hits = match[5] || (flag === "k" ? "" : "0");
 
-    if (rightOperand) {
-      // Parse the right operand using existing logic
-      const operandRegex = `(d|p|b|~|v|f)?(f[fbihlm]|0xk|0xm|0xn|0xo|0xp|0xq|0xr|0xs|0xt|0xl|0xu|0xh|0xw|0xx|0xi|0xj|0xg|0x |0x|h)?([0-9a-z+.-]*)`;
-      const operandMatch = rightOperand.match(new RegExp(`^${operandRegex}$`, "i"));
-      if (operandMatch) {
-        rType = (operandMatch[1] || "").toLowerCase();
-        rSize = (operandMatch[2] || "").toLowerCase();
-        rMemVal = operandMatch[3] || "";
+  const right = parseVariableRightOperand(rightOperand);
 
-        // Handle type determination for right operand
-        if (
-          rType !== "d" &&
-          rType !== "p" &&
-          rType !== "b" &&
-          rType !== "v" &&
-          rType !== "~" &&
-          rType !== "f"
-        ) {
-          // Special check for float literals
-          if (rSize === "f" && rMemVal && rMemVal.includes(".")) {
-            rType = "f";
-            rSize = "";
-          } else {
-            rType = rSize !== "" ? "m" : "v";
-          }
-        }
-
-        // Format memory values
-        if (
-          rSize === "" &&
-          rMemVal &&
-          !["n", "t", "true", "false", "lvlintro"].includes(rMemVal) &&
-          !rMemVal.includes(".")
-        ) {
-          const num = parseInt(rMemVal, 10);
-          if (!Number.isNaN(num)) {
-            rMemVal = num.toString(16);
-          }
-        }
-
-        if (rMemVal && rMemVal.startsWith("0x")) {
-          rMemVal = rMemVal.substring(2);
-        }
-        if (
-          rMemVal &&
-          !["n", "t", "true", "false", "lvlintro"].includes(rMemVal) &&
-          !rMemVal.includes(".")
-        ) {
-          rMemVal = `0x${rMemVal.padStart(MAX_CHARS, "0")}`;
-        }
-      }
-    }
-
-    return {
-      flag,
-      lType: "variable",
-      lSize: "",
-      lMemory: variableName,
-      cmp,
-      rType,
-      rSize,
-      rMemVal,
-      hits,
-    };
-  }
-
-  return null;
+  return {
+    flag,
+    lType: "variable",
+    lSize: "",
+    lMemory: variableName,
+    cmp,
+    rType: right.type,
+    rSize: right.size,
+    rMemVal: right.value,
+    hits,
+  };
 }
 
 function parseRequirement(req: string): ParsedRequirement | null {
-  // Handle special case for {recall} expressions first
   if (req.includes("{recall}")) {
     return parseRecallRequirement(req);
   }
 
-  // Handle {variable} expressions
   if (req.includes("{") && req.includes("}")) {
     return parseVariableRequirement(req);
   }
 
-  // Handle incomplete curly braces as invalid
   if (req.includes("{") || req.includes("}")) {
     return null;
   }
 
-  // More permissive regex that handles all operand types
-  // Note: order matters! f[fbihlm] must come before single f to match float sizes
-  // Note: dots are handled separately for hits parsing
-  // Handle invalid characters early - but allow valid operators
-  // Don't reject based on characters since we have complex operators
-
+  // `f[fbihlm]` must come before bare `f` so float sizes don't collapse onto the type prefix.
   const operandRegex = `(d|p|b|~|v|f)?(f[fbihlm]|0xk|0xm|0xn|0xo|0xp|0xq|0xr|0xs|0xt|0xl|0xu|0xh|0xw|0xx|0xi|0xj|0xg|0x |0x|h)?([0-9a-z+\\-]*(?:\\.[0-9a-z]*)?)`;
   const specialFlags = Object.keys(SPECIAL_FLAGS).join("");
   const memRegex = new RegExp(
@@ -391,66 +359,45 @@ function parseRequirement(req: string): ParsedRequirement | null {
     "i",
   );
   const match = req.match(memRegex);
-  if (!match) {
-    return null;
-  }
-  let flag = match[1] || "";
+  if (!match) return null;
+
+  let flag = (match[1] || "") as Flag;
   let lType = match[2] || "";
   let lSize = match[3] || "";
   let lMemory = match[4] || "";
   let cmp = match[5] || "=";
+  if (cmp === "==") cmp = "=";
 
-  // Normalize == to =
-  if (cmp === "==") {
-    cmp = "=";
-  }
   let rType = match[6] || "";
   let rSize = match[7] || "";
   let rMemVal = match[8] || "";
 
-  // Parse hits first before determining scalable flag behavior
   let hits = match[9] || "0";
 
-  // Scalable flags (Remember, AddSource, SubSource, AddAddress) handle operators differently
-  const scalableFlags = ["k", "a", "b", "i"];
-  const isScalableFlag = scalableFlags.includes(flag.toLowerCase());
-  const scalarOperators = ["*", "/", "&", "+", "-", "^", "%"];
-  const isScalarOperator = scalarOperators.includes(cmp);
-
-  if (isScalableFlag) {
+  if (isScalableFlag(flag.toLowerCase())) {
     hits = "";
-
-    // Scalable flags with comparison operators keep the parsed values
-    // but the formatting logic will ignore them
-    if (!isScalarOperator && cmp) {
-      // Keep the parsed values for now
-    }
   }
 
-  // Handle special parsing for float literals (f123.4, f-5.432)
-  // Left side float: if we have 'f' type and a numeric value in memory field
+  // Float-literal short-circuits intentionally skip opposite-operand type inference
+  // (eg: `0xH1234=f-100` keeps lType="" rather than inferring "m").
   if (lType === "f" && lSize === "" && lMemory.match(/^[+-]?\d*\.?\d+$/)) {
-    // This is a float literal like f123.4
     return {
-      flag: flag.toLowerCase(),
+      flag: flag.toLowerCase() as Flag,
       lType: "f",
       lSize: "",
       lMemory,
       cmp,
-      rType: rType.toLowerCase(),
-      rSize: rSize.toLowerCase(),
+      rType: rType.toLowerCase() as MemType,
+      rSize: rSize.toLowerCase() as MemSize,
       rMemVal,
       hits,
     };
   }
-
-  // Right side float: check if we parsed 'f' in the operand regex
   if (rType === "f" && rSize === "" && rMemVal.match(/^[+-]?\d*\.?\d+$/)) {
-    // Right side is a float literal
     return {
-      flag: flag.toLowerCase(),
-      lType: lType.toLowerCase(),
-      lSize: lSize.toLowerCase(),
+      flag: flag.toLowerCase() as Flag,
+      lType: lType.toLowerCase() as MemType,
+      lSize: lSize.toLowerCase() as MemSize,
       lMemory,
       cmp,
       rType: "f",
@@ -460,7 +407,7 @@ function parseRequirement(req: string): ParsedRequirement | null {
     };
   }
 
-  // Handle cases where the d/p/b/~/f prefix might be part of the memory address
+  // Re-split a `d`/`p`/`b`/`~` type prefix that bled into the right value field.
   if (
     rType === "" &&
     rSize === "" &&
@@ -470,7 +417,7 @@ function parseRequirement(req: string): ParsedRequirement | null {
       rMemVal.startsWith("~0x"))
   ) {
     rType = rMemVal[0] || "";
-    const rest = rMemVal.substring(1); // Remove prefix
+    const rest = rMemVal.substring(1);
     const sizeMatch = rest.match(/^(0x[a-z])/i);
     if (sizeMatch && sizeMatch[1]) {
       rSize = sizeMatch[1];
@@ -478,130 +425,59 @@ function parseRequirement(req: string): ParsedRequirement | null {
     }
   }
 
-  // Convert to lowercase first
-  flag = flag.toLowerCase();
+  flag = flag.toLowerCase() as Flag;
   lType = lType.toLowerCase();
   lSize = lSize.toLowerCase();
   rType = rType.toLowerCase();
   rSize = rSize.toLowerCase();
 
-  // Handle hex values with h prefix (h1234)
   if (!lType && lSize === "h" && lMemory) {
     lType = "v";
     lSize = "";
     lMemory = `0x${lMemory.padStart(MAX_CHARS, "0")}`;
   }
-
   if (!rType && rSize === "h" && rMemVal) {
     rType = "v";
     rSize = "";
     rMemVal = `0x${rMemVal.padStart(MAX_CHARS, "0")}`;
   }
 
-  // Handle special constants and format memory addresses
-  const specialConstants = ["n", "t", "true", "lvlintro"];
-
-  // Check if we're parsing an address without 0x prefix (like H1234)
   if (!lType && !lSize && lMemory && lMemory.match(/^[hH][0-9a-fA-F]+$/)) {
-    // This is H1234 format
     lType = "m";
     lSize = "0xh";
-    lMemory = lMemory.substring(1); // Remove H prefix
+    lMemory = lMemory.substring(1);
   }
 
-  if (
-    lSize === "" &&
-    lMemory &&
-    !specialConstants.includes(lMemory) &&
-    !lMemory.includes(".") &&
-    !lMemory.startsWith("0x")
-  ) {
-    const num = parseInt(lMemory, 10);
-    if (!Number.isNaN(num) && num >= 0) {
-      lMemory = num.toString(16);
-    }
-  }
+  lMemory = formatAddress(lMemory, MAIN_SPECIAL_CONSTANTS, lSize !== "", true, false);
+  rMemVal = formatAddress(rMemVal, MAIN_SPECIAL_CONSTANTS, rSize !== "", true, true);
 
-  // Handle the address formatting - remove 0x prefix if present, then add it back
-  if (lMemory && lMemory.startsWith("0x")) {
-    lMemory = lMemory.substring(2);
-  }
-  if (lMemory && !specialConstants.includes(lMemory) && !lMemory.includes(".")) {
-    lMemory = `0x${lMemory.padStart(MAX_CHARS, "0")}`;
-  }
-
-  if (
-    rSize === "" &&
-    rMemVal &&
-    !specialConstants.includes(rMemVal) &&
-    !rMemVal.includes(".") &&
-    !rMemVal.startsWith("0x")
-  ) {
-    const num = parseInt(rMemVal, 10);
-    if (!Number.isNaN(num) && num >= 0) {
-      rMemVal = num.toString(16);
-    }
-  }
-
-  // Handle the value formatting - remove 0x prefix if present, then add it back
-  if (rMemVal && rMemVal.startsWith("0x")) {
-    rMemVal = rMemVal.substring(2);
-  }
-  if (
-    rMemVal &&
-    !specialConstants.includes(rMemVal) &&
-    !rMemVal.includes(".") &&
-    !rMemVal.startsWith("-") // Don't format negative values
-  ) {
-    rMemVal = `0x${rMemVal.padStart(MAX_CHARS, "0")}`;
-  }
-
-  // Determine types
-  if (
-    lType !== "d" &&
-    lType !== "p" &&
-    lType !== "b" &&
-    lType !== "v" &&
-    lType !== "~" &&
-    lType !== "f" &&
-    lType !== "recall"
-  ) {
-    // Special case for float literals (size="f" and memory contains decimal point)
+  const isKnownLType = ["d", "p", "b", "v", "~", "f", "recall"].includes(lType);
+  if (!isKnownLType) {
     if (lSize === "f" && lMemory.includes(".")) {
       lType = "f";
       lSize = "";
     } else {
-      // If we have a size prefix (like 0xh, 0xm, etc), it's a memory address
       lType = lSize !== "" ? "m" : "v";
     }
   }
-  if (
-    rType !== "d" &&
-    rType !== "p" &&
-    rType !== "b" &&
-    rType !== "v" &&
-    rType !== "~" &&
-    rType !== "f" &&
-    rType !== "recall"
-  ) {
-    // Special case for float literals (size="f" and memory contains decimal point)
+  const isKnownRType = ["d", "p", "b", "v", "~", "f", "recall"].includes(rType);
+  if (!isKnownRType) {
     if (rSize === "f" && rMemVal.includes(".")) {
       rType = "f";
       rSize = "";
     } else {
-      // If we have a size prefix (like 0xh, 0xm, etc), it's a memory address
       rType = rSize !== "" ? "m" : "v";
     }
   }
 
   return {
     flag,
-    lType,
-    lSize,
+    lType: lType as MemType,
+    lSize: lSize as MemSize,
     lMemory,
     cmp,
-    rType,
-    rSize,
+    rType: rType as MemType,
+    rSize: rSize as MemSize,
     rMemVal,
     hits,
   };
@@ -609,25 +485,21 @@ function parseRequirement(req: string): ParsedRequirement | null {
 
 export function formatParsedRequirement(req: ParsedRequirement, index: number): string {
   let result = `${(index + 1).toString().padStart(2, " ")}:`;
-  result += (SPECIAL_FLAGS[req.flag] || "").padEnd(12, " ");
-  result += (MEM_TYPES[req.lType] || "").padEnd(6, " ");
-  result += (MEM_SIZE[req.lSize] || "").padEnd(7, " ");
-  // Pad memory field to maintain alignment (typical memory addresses are 8 chars + 1 space)
-  result += (req.lMemory || "").padEnd(9, " ");
+  result += SPECIAL_FLAGS[req.flag].padEnd(12, " ");
+  result += MEM_TYPES[req.lType].padEnd(6, " ");
+  result += MEM_SIZE[req.lSize].padEnd(7, " ");
+  result += req.lMemory.padEnd(9, " ");
 
-  // Handle comparison display logic
-  const isScalableFlag = ["a", "b", "i", "k"].includes(req.flag);
+  const scalable = isScalableFlag(req.flag);
+  const scalarOp = isScalarOperator(req.cmp);
 
-  // Show comparison for most cases, but not for scalable flags with non-scalar operators
-  const isScalarOperator = ["*", "/", "&", "+", "-", "^", "%"].includes(req.cmp);
-  if (!isScalableFlag || (isScalableFlag && isScalarOperator)) {
+  if (!scalable || scalarOp) {
     result += req.cmp.padEnd(3, " ");
-    result += (MEM_TYPES[req.rType] || "").padEnd(6, " ");
-    result += (MEM_SIZE[req.rSize] || "").padEnd(7, " ");
+    result += MEM_TYPES[req.rType].padEnd(6, " ");
+    result += MEM_SIZE[req.rSize].padEnd(7, " ");
     result += req.rMemVal.padEnd(10, " ");
 
-    // Only show hits for non-scalable flags (scalable flags never show hits)
-    if (!isScalableFlag && req.hits !== "") {
+    if (!scalable && req.hits !== "") {
       result += `(${req.hits})`;
     }
   }
