@@ -1289,6 +1289,34 @@ describe("Util: memory-parser", () => {
         },
       ],
       [
+        "-100=5",
+        {
+          flag: "",
+          lType: "v",
+          lSize: "",
+          lMemory: "0x00-100",
+          cmp: "=",
+          rType: "v",
+          rSize: "",
+          rMemVal: "0x000005",
+          hits: "0",
+        },
+      ],
+      [
+        "0xH1234=-100",
+        {
+          flag: "",
+          lType: "m",
+          lSize: "0xh",
+          lMemory: "0x001234",
+          cmp: "=",
+          rType: "v",
+          rSize: "",
+          rMemVal: "-100",
+          hits: "0",
+        },
+      ],
+      [
         "K:{recall}+-100",
         {
           flag: "k",

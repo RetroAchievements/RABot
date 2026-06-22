@@ -97,7 +97,10 @@ function formatAddress(
   value: string,
   specials: readonly string[],
   hadSizePrefix: boolean,
-  skipNegative: boolean,
+  // Main path: preserve the original negative decimal instead of converting to hex.
+  keepNegativeDecimal: boolean,
+  // Main path right operand only: leave a leading "-" alone instead of padding it.
+  skipNegativePad: boolean,
 ): string {
   if (!value) return value;
 
@@ -108,8 +111,7 @@ function formatAddress(
     !value.startsWith("0x")
   ) {
     const num = parseInt(value, 10);
-    // Main path refuses to reformat negatives; recall/variable convert and pad through the sign.
-    if (!Number.isNaN(num) && (num >= 0 || !skipNegative)) {
+    if (!Number.isNaN(num) && (num >= 0 || !keepNegativeDecimal)) {
       value = num.toString(16);
     }
   }
@@ -121,7 +123,7 @@ function formatAddress(
   if (specials.includes(value) || value.includes(".")) {
     return value;
   }
-  if (skipNegative && value.startsWith("-")) {
+  if (skipNegativePad && value.startsWith("-")) {
     return value;
   }
 
@@ -201,7 +203,7 @@ function parseRecallOperand(operand: string): {
     type = size !== "" ? "m" : "v";
   }
 
-  value = formatAddress(value, RECALL_SPECIAL_CONSTANTS, size !== "", false);
+  value = formatAddress(value, RECALL_SPECIAL_CONSTANTS, size !== "", false, false);
 
   return { type: type as MemType, size, value };
 }
@@ -298,7 +300,7 @@ function parseVariableRightOperand(operand: string): {
   }
 
   if (!value.includes(".")) {
-    value = formatAddress(value, RECALL_SPECIAL_CONSTANTS, size !== "", false);
+    value = formatAddress(value, RECALL_SPECIAL_CONSTANTS, size !== "", false, false);
   }
 
   return { type: type as MemType, size: size as MemSize, value };
@@ -446,8 +448,8 @@ function parseRequirement(req: string): ParsedRequirement | null {
     lMemory = lMemory.substring(1);
   }
 
-  lMemory = formatAddress(lMemory, MAIN_SPECIAL_CONSTANTS, lSize !== "", false);
-  rMemVal = formatAddress(rMemVal, MAIN_SPECIAL_CONSTANTS, rSize !== "", true);
+  lMemory = formatAddress(lMemory, MAIN_SPECIAL_CONSTANTS, lSize !== "", true, false);
+  rMemVal = formatAddress(rMemVal, MAIN_SPECIAL_CONSTANTS, rSize !== "", true, true);
 
   const isKnownLType = ["d", "p", "b", "v", "~", "f", "recall"].includes(lType);
   if (!isKnownLType) {
