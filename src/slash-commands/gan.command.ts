@@ -1,10 +1,8 @@
 import { SlashCommandBuilder } from "discord.js";
 
 import type { SlashCommand } from "../models";
-import { GameInfoService } from "../services/game-info.service";
 import { TemplateService } from "../services/template.service";
-import { fetchGanData } from "../utils/fetch-gan-data";
-import { logError } from "../utils/logger";
+import { runGanCommand } from "./shared/run-gan-command";
 
 const ganSlashCommand: SlashCommand = {
   data: new SlashCommandBuilder()
@@ -17,49 +15,20 @@ const ganSlashCommand: SlashCommand = {
         .setRequired(true),
     ),
 
-  legacyName: "gan", // For migration mapping - using the most common alias
+  legacyName: "gan", // For migration mapping - using the most common alias.
 
   async execute(interaction, _client) {
-    await interaction.deferReply();
-
-    const gameInput = interaction.options.getString("game-id", true);
-
-    // Extract game ID from argument.
-    const gameId = GameInfoService.extractGameId(gameInput);
-    if (!gameId) {
-      await interaction.editReply(
-        "Invalid game ID or URL format. Please provide a game ID number or a RetroAchievements game URL.",
-      );
-
-      return;
-    }
-
-    try {
-      const ganData = await fetchGanData(gameId);
-      if (!ganData) {
-        await interaction.editReply(
-          `Unable to get info from the game ID \`${gameId}\`... :frowning:`,
-        );
-
-        return;
-      }
-
-      const template = TemplateService.generateGanTemplate(
-        ganData.gameInfo,
-        ganData.achievementSetDate,
-        ganData.youtubeLink,
-        ganData.gameId,
-      );
-
-      await interaction.editReply({
-        content: `Here's your achievement-news post template:\n${template}`,
-      });
-    } catch (error) {
-      logError("Error in gan slash command:", { error });
-      await interaction.editReply(
-        `Unable to get info from the game ID \`${gameId}\`... :frowning:`,
-      );
-    }
+    await runGanCommand(interaction, {
+      commandName: "gan",
+      render: (ganData) => ({
+        content: `Here's your achievement-news post template:\n${TemplateService.generateGanTemplate(
+          ganData.gameInfo,
+          ganData.achievementSetDate,
+          ganData.youtubeLink,
+          ganData.gameId,
+        )}`,
+      }),
+    });
   },
 };
 
