@@ -1170,4 +1170,190 @@ describe("Util: memory-parser", () => {
       expect(result.groups[2]).toHaveLength(1);
     });
   });
+
+  // Characterization snapshots that pin the asymmetric edge-case behavior
+  // baked into the three parse paths. If any of these break, the refactor
+  // changed observable behavior.
+  describe("parseMemory characterization", () => {
+    const cases: Array<[string, ParsedRequirement]> = [
+      [
+        "f-100=0",
+        {
+          flag: "",
+          lType: "f",
+          lSize: "",
+          lMemory: "-100",
+          cmp: "=",
+          rType: "",
+          rSize: "",
+          rMemVal: "0",
+          hits: "0",
+        },
+      ],
+      [
+        "0xH1234=f-100",
+        {
+          flag: "",
+          lType: "",
+          lSize: "0xh",
+          lMemory: "1234",
+          cmp: "=",
+          rType: "f",
+          rSize: "",
+          rMemVal: "-100",
+          hits: "0",
+        },
+      ],
+      [
+        "0xH1234-5",
+        {
+          flag: "",
+          lType: "m",
+          lSize: "0xh",
+          lMemory: "0x1234-5",
+          cmp: "=",
+          rType: "v",
+          rSize: "",
+          rMemVal: "",
+          hits: "0",
+        },
+      ],
+      [
+        "K:{recall}==5",
+        {
+          flag: "k",
+          lType: "recall",
+          lSize: "",
+          lMemory: "",
+          cmp: "==",
+          rType: "v",
+          rSize: "",
+          rMemVal: "0x000005",
+          hits: "",
+        },
+      ],
+      [
+        "K:{recall}+false",
+        {
+          flag: "k",
+          lType: "recall",
+          lSize: "",
+          lMemory: "",
+          cmp: "+",
+          rType: "v",
+          rSize: "",
+          rMemVal: "false",
+          hits: "",
+        },
+      ],
+      [
+        "H1234=5",
+        {
+          flag: "",
+          lType: "v",
+          lSize: "",
+          lMemory: "0x001234",
+          cmp: "=",
+          rType: "v",
+          rSize: "",
+          rMemVal: "0x000005",
+          hits: "0",
+        },
+      ],
+      [
+        "I:0xG0045ba18+{recall}",
+        {
+          flag: "i",
+          lType: "m",
+          lSize: "0xg",
+          lMemory: "0x0045ba18",
+          cmp: "+",
+          rType: "recall",
+          rSize: "",
+          rMemVal: "",
+          hits: "0",
+        },
+      ],
+      [
+        "K:{varname}+2",
+        {
+          flag: "k",
+          lType: "variable",
+          lSize: "",
+          lMemory: "varname",
+          cmp: "+",
+          rType: "v",
+          rSize: "",
+          rMemVal: "0x000002",
+          hits: "",
+        },
+      ],
+      [
+        "K:{recall}+-100",
+        {
+          flag: "k",
+          lType: "recall",
+          lSize: "",
+          lMemory: "",
+          cmp: "+",
+          rType: "v",
+          rSize: "",
+          rMemVal: "0x000-64",
+          hits: "",
+        },
+      ],
+      [
+        "I:-100+{recall}",
+        {
+          flag: "i",
+          lType: "v",
+          lSize: "",
+          lMemory: "0x000-64",
+          cmp: "+",
+          rType: "recall",
+          rSize: "",
+          rMemVal: "",
+          hits: "0",
+        },
+      ],
+      [
+        "K:{varname}+-100",
+        {
+          flag: "k",
+          lType: "variable",
+          lSize: "",
+          lMemory: "varname",
+          cmp: "+",
+          rType: "v",
+          rSize: "",
+          rMemVal: "0x000-64",
+          hits: "",
+        },
+      ],
+      [
+        "A:{varname}",
+        {
+          flag: "a",
+          lType: "variable",
+          lSize: "",
+          lMemory: "varname",
+          cmp: "",
+          rType: "",
+          rSize: "",
+          rMemVal: "",
+          hits: "0",
+        },
+      ],
+    ];
+
+    for (const [input, expected] of cases) {
+      it(`pins ${input}`, () => {
+        // ACT
+        const result = parseMemory(input);
+
+        // ASSERT
+        expect(result.groups[0]?.[0]).toEqual(expected);
+      });
+    }
+  });
 });
