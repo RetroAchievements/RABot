@@ -24,7 +24,6 @@ describe("SlashCommand: frames", () => {
   it("is defined", () => {
     expect(framesSlashCommand).toBeDefined();
     expect(framesSlashCommand.data.name).toBe("frames");
-    expect(framesSlashCommand.legacyName).toBe("frames");
   });
 
   describe("execute", () => {

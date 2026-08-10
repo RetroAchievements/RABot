@@ -1,4 +1,4 @@
-import type { ChatInputCommandInteraction, Message, PermissionsBitField } from "discord.js";
+import type { ChatInputCommandInteraction, PermissionsBitField } from "discord.js";
 
 import { logger } from "./logger";
 
@@ -12,32 +12,6 @@ export class AdminChecker {
     }
 
     return permissions.has("Administrator");
-  }
-
-  /**
-   * Check if a user is an administrator via message context.
-   */
-  static isAdminFromMessage(message: Message): boolean {
-    // Only check admin permissions if in a guild.
-    if (!message.guild) {
-      return false;
-    }
-
-    const userId = message.author.id;
-    const member = message.guild.members.cache.get(userId);
-
-    if (!member) {
-      return false;
-    }
-
-    // Check Discord admin permissions.
-    if (this.hasAdminPermissions(member.permissions)) {
-      logger.debug("Administrator bypassing cooldown", { userId });
-
-      return true;
-    }
-
-    return false;
   }
 
   /**

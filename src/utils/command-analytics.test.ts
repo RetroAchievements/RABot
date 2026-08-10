@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createMockInteraction, createMockMessage } from "../test/mocks/discord.mock";
+import { createMockInteraction } from "../test/mocks/discord.mock";
 import { CommandAnalytics } from "./command-analytics";
 import { logger } from "./logger";
 
@@ -11,81 +11,6 @@ describe("Util: CommandAnalytics", () => {
 
     // ... spy on logger ...
     vi.spyOn(logger, "info").mockImplementation(() => {});
-  });
-
-  describe("trackLegacyCommand", () => {
-    it("is defined", () => {
-      // ASSERT
-      expect(CommandAnalytics.trackLegacyCommand).toBeDefined();
-    });
-
-    it("tracks a successful legacy command execution", () => {
-      // ARRANGE
-      const message = createMockMessage({
-        author: { id: "user123" } as any,
-        guildId: "guild456",
-        channelId: "channel789",
-      });
-      const startTime = Date.now() - 100; // ... 100ms ago ...
-
-      // ACT
-      CommandAnalytics.trackLegacyCommand(message, "testcmd", startTime, true);
-
-      // ASSERT
-      expect(logger.info).toHaveBeenCalledWith(
-        {
-          event: "command_executed",
-          commandName: "testcmd",
-          userId: "user123",
-          guildId: "guild456",
-          channelId: "channel789",
-          executionTime: expect.any(Number),
-          success: true,
-          errorType: undefined,
-          isSlashCommand: false,
-        },
-        "Command succeeded: !testcmd",
-      );
-    });
-
-    it("tracks a failed legacy command execution with error", () => {
-      // ARRANGE
-      const message = createMockMessage();
-      const startTime = Date.now() - 50;
-      const error = new Error("Test error");
-
-      // ACT
-      CommandAnalytics.trackLegacyCommand(message, "failcmd", startTime, false, error);
-
-      // ASSERT
-      expect(logger.info).toHaveBeenCalledWith(
-        expect.objectContaining({
-          success: false,
-          errorType: "Error",
-          isSlashCommand: false,
-        }),
-        "Command failed: !failcmd",
-      );
-    });
-
-    it("handles commands in DMs (no guild)", () => {
-      // ARRANGE
-      const message = createMockMessage({
-        guildId: null,
-      });
-      const startTime = Date.now();
-
-      // ACT
-      CommandAnalytics.trackLegacyCommand(message, "dmcmd", startTime, true);
-
-      // ASSERT
-      expect(logger.info).toHaveBeenCalledWith(
-        expect.objectContaining({
-          guildId: null,
-        }),
-        expect.any(String),
-      );
-    });
   });
 
   describe("trackSlashCommand", () => {
@@ -118,9 +43,44 @@ describe("Util: CommandAnalytics", () => {
           executionTime: expect.any(Number),
           success: true,
           errorType: undefined,
-          isSlashCommand: true,
         },
         "Command succeeded: /testslash",
+      );
+    });
+
+    it("tracks a failed command execution with error", () => {
+      // ARRANGE
+      const interaction = createMockInteraction({ commandName: "failcmd" });
+      const startTime = Date.now() - 50;
+      const error = new Error("Test error");
+
+      // ACT
+      CommandAnalytics.trackSlashCommand(interaction, startTime, false, error);
+
+      // ASSERT
+      expect(logger.info).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          errorType: "Error",
+        }),
+        "Command failed: /failcmd",
+      );
+    });
+
+    it("handles commands in DMs (no guild)", () => {
+      // ARRANGE
+      const interaction = createMockInteraction({ guildId: null });
+      const startTime = Date.now();
+
+      // ACT
+      CommandAnalytics.trackSlashCommand(interaction, startTime, true);
+
+      // ASSERT
+      expect(logger.info).toHaveBeenCalledWith(
+        expect.objectContaining({
+          guildId: null,
+        }),
+        expect.any(String),
       );
     });
 
@@ -161,15 +121,25 @@ describe("Util: CommandAnalytics", () => {
 
     it("tracks command counts correctly", () => {
       // ARRANGE
-      const message1 = createMockMessage({ author: { id: "user1" } as any });
-      const message2 = createMockMessage({ author: { id: "user2" } as any });
+      const user1Ping = createMockInteraction({
+        commandName: "ping",
+        user: { id: "user1" } as any,
+      });
+      const user2Ping = createMockInteraction({
+        commandName: "ping",
+        user: { id: "user2" } as any,
+      });
+      const user1Status = createMockInteraction({
+        commandName: "status",
+        user: { id: "user1" } as any,
+      });
       const startTime = Date.now();
 
       // ... execute commands ...
-      CommandAnalytics.trackLegacyCommand(message1, "ping", startTime, true);
-      CommandAnalytics.trackLegacyCommand(message1, "ping", startTime, true);
-      CommandAnalytics.trackLegacyCommand(message2, "ping", startTime, true);
-      CommandAnalytics.trackLegacyCommand(message1, "status", startTime, true);
+      CommandAnalytics.trackSlashCommand(user1Ping, startTime, true);
+      CommandAnalytics.trackSlashCommand(user1Ping, startTime, true);
+      CommandAnalytics.trackSlashCommand(user2Ping, startTime, true);
+      CommandAnalytics.trackSlashCommand(user1Status, startTime, true);
 
       // ACT
       const stats = CommandAnalytics.getStatistics();
@@ -184,21 +154,21 @@ describe("Util: CommandAnalytics", () => {
 
     it("tracks top users correctly", () => {
       // ARRANGE
-      const user1Messages = createMockMessage({ author: { id: "user1" } as any });
-      const user2Messages = createMockMessage({ author: { id: "user2" } as any });
-      const user3Messages = createMockMessage({ author: { id: "user3" } as any });
+      const user1 = createMockInteraction({ commandName: "cmd", user: { id: "user1" } as any });
+      const user2 = createMockInteraction({ commandName: "cmd", user: { id: "user2" } as any });
+      const user3 = createMockInteraction({ commandName: "cmd", user: { id: "user3" } as any });
       const startTime = Date.now();
 
       // ... user1 executes 5 commands ...
       for (let i = 0; i < 5; i++) {
-        CommandAnalytics.trackLegacyCommand(user1Messages, "cmd", startTime, true);
+        CommandAnalytics.trackSlashCommand(user1, startTime, true);
       }
       // ... user2 executes 3 commands ...
       for (let i = 0; i < 3; i++) {
-        CommandAnalytics.trackLegacyCommand(user2Messages, "cmd", startTime, true);
+        CommandAnalytics.trackSlashCommand(user2, startTime, true);
       }
       // ... user3 executes 1 command ...
-      CommandAnalytics.trackLegacyCommand(user3Messages, "cmd", startTime, true);
+      CommandAnalytics.trackSlashCommand(user3, startTime, true);
 
       // ACT
       const stats = CommandAnalytics.getStatistics();
@@ -213,21 +183,21 @@ describe("Util: CommandAnalytics", () => {
 
     it("tracks top guilds correctly", () => {
       // ARRANGE
-      const guild1Message = createMockMessage({ guildId: "guild1" });
-      const guild2Message = createMockMessage({ guildId: "guild2" });
-      const dmMessage = createMockMessage({ guildId: null });
+      const guild1 = createMockInteraction({ commandName: "cmd", guildId: "guild1" });
+      const guild2 = createMockInteraction({ commandName: "cmd", guildId: "guild2" });
+      const dm = createMockInteraction({ commandName: "cmd", guildId: null });
       const startTime = Date.now();
 
       // ... guild1 has 4 commands ...
       for (let i = 0; i < 4; i++) {
-        CommandAnalytics.trackLegacyCommand(guild1Message, "cmd", startTime, true);
+        CommandAnalytics.trackSlashCommand(guild1, startTime, true);
       }
       // ... guild2 has 2 commands ...
       for (let i = 0; i < 2; i++) {
-        CommandAnalytics.trackLegacyCommand(guild2Message, "cmd", startTime, true);
+        CommandAnalytics.trackSlashCommand(guild2, startTime, true);
       }
       // ... DM command should not appear in guild stats ...
-      CommandAnalytics.trackLegacyCommand(dmMessage, "cmd", startTime, true);
+      CommandAnalytics.trackSlashCommand(dm, startTime, true);
 
       // ACT
       const stats = CommandAnalytics.getStatistics();
@@ -245,13 +215,14 @@ describe("Util: CommandAnalytics", () => {
 
       // ... create 15 users ...
       for (let i = 1; i <= 15; i++) {
-        const message = createMockMessage({
-          author: { id: `user${i}` } as any,
+        const interaction = createMockInteraction({
+          commandName: "cmd",
+          user: { id: `user${i}` } as any,
           guildId: `guild${i}`,
         });
         // ... each user executes i commands ...
         for (let j = 0; j < i; j++) {
-          CommandAnalytics.trackLegacyCommand(message, "cmd", startTime, true);
+          CommandAnalytics.trackSlashCommand(interaction, startTime, true);
         }
       }
 
@@ -277,9 +248,9 @@ describe("Util: CommandAnalytics", () => {
 
     it("clears all analytics data", () => {
       // ARRANGE
-      const message = createMockMessage();
+      const interaction = createMockInteraction({ commandName: "test" });
       const startTime = Date.now();
-      CommandAnalytics.trackLegacyCommand(message, "test", startTime, true);
+      CommandAnalytics.trackSlashCommand(interaction, startTime, true);
 
       // ... verify data was tracked ...
       let stats = CommandAnalytics.getStatistics();

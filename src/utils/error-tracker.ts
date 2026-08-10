@@ -1,4 +1,4 @@
-import type { CommandInteraction, Message } from "discord.js";
+import type { CommandInteraction } from "discord.js";
 
 import { type LogContext, logError } from "./logger";
 
@@ -11,27 +11,6 @@ export interface ErrorContext extends LogContext {
 }
 
 export class ErrorTracker {
-  static trackMessageError(
-    error: Error | unknown,
-    message: Message,
-    commandName?: string,
-    additionalContext?: Partial<ErrorContext>,
-  ): void {
-    const context: ErrorContext = {
-      userId: message.author.id,
-      guildId: message.guildId,
-      channelId: message.channelId,
-      commandName: commandName || "unknown",
-      messageId: message.id,
-      userAction: "message_command",
-      errorType: error instanceof Error ? error.name : "UnknownError",
-      stackTrace: error instanceof Error ? error.stack : undefined,
-      ...additionalContext,
-    };
-
-    logError(error, context);
-  }
-
   static trackInteractionError(
     error: Error | unknown,
     interaction: CommandInteraction,

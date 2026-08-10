@@ -6,8 +6,6 @@ import { DadjokeService } from "../services/dadjoke.service";
 const dadjokeSlashCommand: SlashCommand = {
   data: new SlashCommandBuilder().setName("dadjoke").setDescription("Get a random dad joke"),
 
-  legacyName: "dadjoke", // For migration mapping.
-
   cooldown: 3, // 3 seconds cooldown.
 
   async execute(interaction, _client) {

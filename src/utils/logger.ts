@@ -190,22 +190,4 @@ export function logApiCall(
   );
 }
 
-export function logMigrationNotice(
-  legacyCommand: string,
-  slashCommand: string,
-  userId: string,
-  guildId?: string | null,
-): void {
-  logger.info(
-    {
-      legacyCommand,
-      slashCommand,
-      userId,
-      guildId,
-      event: "migration_notice",
-    },
-    "Migration notice shown",
-  );
-}
-
 export default logger;
