@@ -21,9 +21,7 @@ export async function loadSlashCommands(): Promise<Collection<string, SlashComma
 
       if ("data" in slashCommand && "execute" in slashCommand) {
         commands.set(slashCommand.data.name, slashCommand);
-        logger.debug(
-          `Loaded slash command: /${slashCommand.data.name}${slashCommand.legacyName ? ` (legacy: ${slashCommand.legacyName})` : ""}`,
-        );
+        logger.debug(`Loaded slash command: /${slashCommand.data.name}`);
       } else {
         logger.warn(
           `The slash command at ${filePath} is missing required "data" or "execute" property.`,

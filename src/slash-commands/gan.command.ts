@@ -15,8 +15,6 @@ const ganSlashCommand: SlashCommand = {
         .setRequired(true),
     ),
 
-  legacyName: "gan", // For migration mapping - using the most common alias.
-
   async execute(interaction, _client) {
     await runGanCommand(interaction, {
       commandName: "gan",

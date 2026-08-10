@@ -9,8 +9,6 @@ const statusCommand: SlashCommand = {
     .setName("status")
     .setDescription("Display bot status and statistics"),
 
-  legacyName: "status",
-
   async execute(interaction) {
     const client = interaction.client as BotClient;
     const uptime = process.uptime();
@@ -77,7 +75,7 @@ const statusCommand: SlashCommand = {
         },
         {
           name: "📝 Commands",
-          value: client.commands.size.toString(),
+          value: client.slashCommands.size.toString(),
           inline: true,
         },
         {
@@ -88,11 +86,6 @@ const statusCommand: SlashCommand = {
         {
           name: "📚 Library",
           value: `Discord.js v14`,
-          inline: true,
-        },
-        {
-          name: "🎮 Prefix",
-          value: `\`${client.commandPrefix}\``,
           inline: true,
         },
       ])

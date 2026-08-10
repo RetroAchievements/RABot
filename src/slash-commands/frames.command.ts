@@ -16,8 +16,6 @@ const framesSlashCommand: SlashCommand = {
         .setRequired(true),
     ),
 
-  legacyName: "frames", // For migration mapping
-
   async execute(interaction, _client) {
     const input = interaction.options.getString("input", true);
     const result = FramesService.processInput(input);

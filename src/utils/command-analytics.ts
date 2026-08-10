@@ -1,4 +1,4 @@
-import type { CommandInteraction, Message } from "discord.js";
+import type { CommandInteraction } from "discord.js";
 
 import { logger } from "./logger";
 
@@ -10,7 +10,6 @@ export interface CommandMetrics {
   executionTime: number;
   success: boolean;
   errorType?: string;
-  isSlashCommand: boolean;
 }
 
 // Uses in-memory storage so analytics don't persist across restarts.
@@ -19,30 +18,6 @@ export class CommandAnalytics {
   private static commandMetrics = new Map<string, number>();
   private static userCommandCounts = new Map<string, Map<string, number>>();
   private static guildCommandCounts = new Map<string, Map<string, number>>();
-
-  static trackLegacyCommand(
-    message: Message,
-    commandName: string,
-    startTime: number,
-    success: boolean,
-    error?: Error,
-  ): void {
-    const executionTime = Date.now() - startTime;
-
-    const metrics: CommandMetrics = {
-      commandName,
-      userId: message.author.id,
-      guildId: message.guildId,
-      channelId: message.channelId,
-      executionTime,
-      success,
-      errorType: error?.name,
-      isSlashCommand: false,
-    };
-
-    this.logMetrics(metrics);
-    this.updateCounters(metrics);
-  }
 
   static trackSlashCommand(
     interaction: CommandInteraction,
@@ -60,7 +35,6 @@ export class CommandAnalytics {
       executionTime,
       success,
       errorType: error?.name,
-      isSlashCommand: true,
     };
 
     this.logMetrics(metrics);
@@ -73,7 +47,7 @@ export class CommandAnalytics {
         event: "command_executed",
         ...metrics,
       },
-      `Command ${metrics.success ? "succeeded" : "failed"}: ${metrics.isSlashCommand ? "/" : "!"}${metrics.commandName}`,
+      `Command ${metrics.success ? "succeeded" : "failed"}: /${metrics.commandName}`,
     );
   }
 

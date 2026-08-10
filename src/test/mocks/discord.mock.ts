@@ -193,9 +193,7 @@ export function createMockClient(overrides?: Partial<BotClient>): BotClient {
     ws: {
       ping: 42,
     },
-    commands: new Collection(),
     slashCommands: new Collection(),
-    commandPrefix: "!",
     cooldowns: new Collection(),
     ...overrides,
   } as unknown as BotClient;

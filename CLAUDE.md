@@ -1,6 +1,6 @@
 # Project Overview
 
-RABot is the official RetroAchievements Discord bot, built with Bun runtime, TypeScript, Discord.js v14, and Drizzle ORM with SQLite. The bot is transitioning from legacy prefix commands (!) to modern slash commands (/) while maintaining backward compatibility.
+RABot is the official RetroAchievements Discord bot, built with Bun runtime, TypeScript, Discord.js v14, and Drizzle ORM with SQLite. The bot is slash-command only.
 
 ## Development Commands
 
@@ -31,30 +31,25 @@ bun run start           # Production mode
 
 ## Architecture & Key Patterns
 
-### Dual Command System
+### Command System
 
-The bot supports both legacy prefix commands and modern slash commands during the migration period:
+All commands live in `src/slash-commands/*.command.ts`:
 
-1. **Legacy Commands** (`src/commands/*.command.ts`)
-   - Use the `Command` interface
-   - Accessed via prefix (default: `!`)
-   - May show migration notices when linked to slash command replacements
-   - Example: `!gan 14402`
+- Use the `SlashCommand` interface
+- Built with Discord.js SlashCommandBuilder
+- Support autocomplete, better validation, ephemeral responses
+- Example: `/gan game-id:14402`
 
-2. **Slash Commands** (`src/slash-commands/*.command.ts`)
-   - Use the `SlashCommand` interface
-   - Built with Discord.js SlashCommandBuilder
-   - Support autocomplete, better validation, ephemeral responses
-   - Example: `/gan game-id:14402`
+The legacy `!` prefix system was removed. Discord revoked the bot's Message Content privileged intent, so `message.content` is empty in guilds and prefix dispatch is impossible.
 
-### Migration System
+### Privileged Intents
 
-When users use legacy commands that are linked to slash equivalents via `legacyName`:
+The bot holds **no privileged intents** and cannot get them back without a Discord approval request. Its gateway intents are `Guilds`, `GuildMessages`, and `GuildMessagePolls`.
 
-- A temporary migration notice appears (15 seconds)
-- The legacy command still executes
-- `!poll` currently keeps running without a migration notice
-- The mapping is configured via the `legacyName` property in slash commands
+This is a hard constraint, not a preference. Adding an unapproved privileged intent to the client makes Discord reject the connection with close code 4014, so the bot fails to log in at all. Two consequences to design around:
+
+- **No message content.** Anything reading `message.content` in a guild gets an empty string. The lone `MessageCreate` listener exists only for auto-publishing, which reads message metadata.
+- **No member enumeration.** `guild.members.fetch()` with no arguments, `role.members`, and the guild member cache are all unavailable. Fetching a single member by ID and `guild.members.search()` still work, since those are plain REST calls.
 
 ### Database Architecture
 
@@ -65,7 +60,6 @@ When users use legacy commands that are linked to slash equivalents via `legacyN
 
 ### Command Registration
 
-- Legacy commands auto-loaded from `src/commands/`
 - Slash commands auto-loaded from `src/slash-commands/`
 - Slash commands must be deployed via `bun run deploy-commands`
 
@@ -77,7 +71,7 @@ When users use legacy commands that are linked to slash equivalents via `legacyN
 - **UwcHistoryService**: Retrieves and formats previous UWC poll history for auto-detection
 - **AutoPublishService**: Automatically publishes messages in configured announcement channels
 - **GameInfoService**, **TemplateService**, and **YouTubeService**: Power GAN command data fetching and formatting
-- **AchievementUnlocksService** and **ConnectApiService**: Support events and memory parsing features
+- **ConnectApiService**: Supports memory parsing features
 - **GithubReleaseService**: Fetches release information for `/status`
 
 ### Environment Variables
@@ -90,18 +84,16 @@ Required at startup:
 
 Feature-specific and optional configuration:
 
-- `LEGACY_COMMAND_PREFIX`: Prefix for legacy commands (default: `!`)
-- `RA_CONNECT_API_KEY`: RetroAchievements Connect API key required for `!mem` achievement ID/URL lookups and code notes
+- `RA_CONNECT_API_KEY`: RetroAchievements Connect API key required for `/mem` achievement ID/URL lookups and code notes
 - `RA_CONNECT_API_USER`: RetroAchievements Connect API username (default: `RABot`)
 - `YOUTUBE_API_KEY`: For longplay searches in gan commands (optional, but recommended)
 - `MAIN_GUILD_ID`: Discord guild ID for the main RetroAchievements server (optional, but recommended for production guild authorization)
 - `WORKSHOP_GUILD_ID`: Discord guild ID for the RetroAchievements Workshop server (required for Workshop-only features)
 - `CHEAT_INVESTIGATION_CATEGORY_ID`: Category ID for RACheats team restrictions
-- `GAMBLER_ROLE_ID`: Discord role ID managed by `/events gambler` (required for Gambler role commands)
 - `UWC_VOTING_TAG_ID`: Forum tag ID for active UWC polls (optional)
 - `UWC_VOTE_CONCLUDED_TAG_ID`: Forum tag ID for completed UWC polls (optional)
 - `UWC_FORUM_CHANNEL_ID`: Forum channel ID for UWC auto-detection feature (optional)
-- `DEV_CHANNELS`: Comma-separated channel IDs where `!mem` may show code notes (optional)
+- `DEV_CHANNELS`: Comma-separated channel IDs where `/mem` may show code notes (optional)
 - `AUTO_PUBLISH_CHANNEL_IDS`: Comma-separated list of announcement channel IDs to auto-publish from (optional)
 - `NODE_ENV`: Set to "production" in production (default: "development")
 - `LOG_LEVEL`: Logging level - trace, debug, info, warn, error, fatal (default: "debug" in dev, "info" in prod)
@@ -112,7 +104,7 @@ Feature-specific and optional configuration:
 
 - Use `MessageFlags.Ephemeral` instead of `ephemeral: true`
 - Autocomplete handlers in main interaction event
-- Proper intent configuration for message content access
+- No privileged intents (see the Privileged Intents section above)
 
 ### UWC Auto-Detection Feature
 
@@ -139,13 +131,11 @@ The bot can automatically publish messages in Discord announcement channels:
 
 ### Adding New Commands
 
-1. **Slash commands preferred** for new features
-2. Create in `src/slash-commands/[name].command.ts`
-3. Export default with `SlashCommand` interface
-4. Set `legacyName` if replacing a prefix command
-5. Add guild restrictions using `requireGuild()` utility if needed
-6. Run `bun run deploy-commands` after adding
-7. **Update README.md** - Add the new command to both the slash commands and legacy commands lists (if applicable)
+1. Create in `src/slash-commands/[name].command.ts`
+2. Export default with `SlashCommand` interface
+3. Add guild restrictions using `requireGuild()` utility if needed
+4. Run `bun run deploy-commands` after adding
+5. **Update README.md** - Add the new command to the slash commands list
 
 ### Guild Restrictions
 
@@ -200,12 +190,10 @@ The bot uses a small custom structured JSON logger with the following features:
    - `logger.info()`, `logger.error()`, etc. for standard logging
    - `logError()` - Log errors with context
    - `logCommandExecution()` - Log command executions
-   - `logMigrationNotice()` - Log migration notices
    - `logDatabaseQuery()` - Log database operations
    - `logApiCall()` - Log external API calls
 
 2. **Error Tracking** (`src/utils/error-tracker.ts`)
-   - `ErrorTracker.trackMessageError()` - Track errors from message commands
    - `ErrorTracker.trackInteractionError()` - Track errors from slash commands
    - `ErrorTracker.formatUserError()` - Format errors for user display with error IDs
 

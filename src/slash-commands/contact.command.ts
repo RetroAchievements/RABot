@@ -8,8 +8,6 @@ const contactSlashCommand: SlashCommand = {
     .setName("contact")
     .setDescription("How to contact the RetroAchievements staff"),
 
-  legacyName: "contact", // For migration mapping
-
   async execute(interaction, _client) {
     const embed = buildContactEmbed();
 

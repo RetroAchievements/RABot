@@ -1,98 +1,9 @@
-import type { ChatInputCommandInteraction, Message } from "discord.js";
+import type { ChatInputCommandInteraction } from "discord.js";
 import { describe, expect, it } from "vitest";
 
 import { AdminChecker } from "./admin-checker";
 
 describe("Util: AdminChecker", () => {
-  describe("isAdminFromMessage", () => {
-    it("is defined", () => {
-      // ASSERT
-      expect(AdminChecker.isAdminFromMessage).toBeDefined();
-    });
-
-    it("given a user with Discord Administrator permissions, returns true", () => {
-      // ARRANGE
-      const mockMessage = {
-        author: { id: "user123" },
-        guild: {
-          members: {
-            cache: {
-              get: () => ({
-                permissions: {
-                  has: (permission: string) => permission === "Administrator",
-                },
-              }),
-            },
-          },
-        },
-      } as unknown as Message;
-
-      // ACT
-      const isAdmin = AdminChecker.isAdminFromMessage(mockMessage);
-
-      // ASSERT
-      expect(isAdmin).toBe(true);
-    });
-
-    it("given a regular user without admin permissions, returns false", () => {
-      // ARRANGE
-      const mockMessage = {
-        author: { id: "user123" },
-        guild: {
-          members: {
-            cache: {
-              get: () => ({
-                permissions: {
-                  has: () => false,
-                },
-              }),
-            },
-          },
-        },
-      } as unknown as Message;
-
-      // ACT
-      const isAdmin = AdminChecker.isAdminFromMessage(mockMessage);
-
-      // ASSERT
-      expect(isAdmin).toBe(false);
-    });
-
-    it("given a user not in guild, returns false", () => {
-      // ARRANGE
-      const mockMessage = {
-        author: { id: "user123" },
-        guild: null,
-      } as unknown as Message;
-
-      // ACT
-      const isAdmin = AdminChecker.isAdminFromMessage(mockMessage);
-
-      // ASSERT
-      expect(isAdmin).toBe(false);
-    });
-
-    it("given a user not found in guild cache, returns false", () => {
-      // ARRANGE
-      const mockMessage = {
-        author: { id: "user123" },
-        guild: {
-          members: {
-            cache: {
-              get: () => null,
-            },
-          },
-        },
-      } as unknown as Message;
-
-      // ACT
-      const isAdmin = AdminChecker.isAdminFromMessage(mockMessage);
-
-      // ASSERT
-      expect(isAdmin).toBe(false);
-    });
-  });
-
   describe("isAdminFromInteraction", () => {
     it("is defined", () => {
       // ASSERT

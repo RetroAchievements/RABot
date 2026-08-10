@@ -60,8 +60,6 @@ const tpollSlashCommand: SlashCommand = {
       option.setName("option10").setDescription("Tenth option").setRequired(false),
     ),
 
-  legacyName: "tpoll", // For migration mapping
-
   async execute(interaction, client) {
     await interaction.deferReply();
 

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createMockInteraction, createMockMessage } from "../test/mocks/discord.mock";
+import { createMockInteraction } from "../test/mocks/discord.mock";
 import { ErrorTracker } from "./error-tracker";
 import * as logger from "./logger";
 
@@ -8,102 +8,6 @@ describe("Util: ErrorTracker", () => {
   beforeEach(() => {
     // ... spy on logger functions ...
     vi.spyOn(logger, "logError").mockImplementation(() => {});
-  });
-
-  describe("trackMessageError", () => {
-    it("is defined", () => {
-      // ASSERT
-      expect(ErrorTracker.trackMessageError).toBeDefined();
-    });
-
-    it("tracks an error with full message context", () => {
-      // ARRANGE
-      const error = new Error("Test error");
-      const message = createMockMessage({
-        id: "msg123",
-        author: { id: "user456" } as any,
-        guildId: "guild789",
-        channelId: "channel012",
-      });
-
-      // ACT
-      ErrorTracker.trackMessageError(error, message, "testcommand");
-
-      // ASSERT
-      expect(logger.logError).toHaveBeenCalledWith(error, {
-        userId: "user456",
-        guildId: "guild789",
-        channelId: "channel012",
-        commandName: "testcommand",
-        messageId: "msg123",
-        userAction: "message_command",
-        errorType: "Error",
-        stackTrace: error.stack,
-      });
-    });
-
-    it("handles errors in DMs (no guild)", () => {
-      // ARRANGE
-      const error = new Error("DM error");
-      const message = createMockMessage({
-        guildId: null,
-      });
-
-      // ACT
-      ErrorTracker.trackMessageError(error, message);
-
-      // ASSERT
-      expect(logger.logError).toHaveBeenCalledWith(error, {
-        userId: message.author.id,
-        guildId: null,
-        channelId: message.channelId,
-        commandName: "unknown",
-        messageId: message.id,
-        userAction: "message_command",
-        errorType: "Error",
-        stackTrace: error.stack,
-      });
-    });
-
-    it("includes additional context when provided", () => {
-      // ARRANGE
-      const error = new Error("Test error");
-      const message = createMockMessage();
-      const additionalContext = {
-        errorCode: "ERR_001",
-        additionalData: { key: "value" },
-      };
-
-      // ACT
-      ErrorTracker.trackMessageError(error, message, "test", additionalContext);
-
-      // ASSERT
-      expect(logger.logError).toHaveBeenCalledWith(
-        error,
-        expect.objectContaining({
-          errorCode: "ERR_001",
-          additionalData: { key: "value" },
-        }),
-      );
-    });
-
-    it("handles non-Error objects", () => {
-      // ARRANGE
-      const error = "String error";
-      const message = createMockMessage();
-
-      // ACT
-      ErrorTracker.trackMessageError(error, message);
-
-      // ASSERT
-      expect(logger.logError).toHaveBeenCalledWith(
-        error,
-        expect.objectContaining({
-          errorType: "UnknownError",
-          stackTrace: undefined,
-        }),
-      );
-    });
   });
 
   describe("trackInteractionError", () => {

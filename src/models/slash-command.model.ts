@@ -15,8 +15,5 @@ export interface SlashCommand {
 
   execute: (interaction: ChatInputCommandInteraction, client: Client) => Promise<void>;
 
-  // Links this slash command to its legacy equivalent for migration notices.
-  legacyName?: string;
-
   cooldown?: number;
 }

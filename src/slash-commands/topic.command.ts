@@ -7,8 +7,6 @@ const topicSlashCommand: SlashCommand = {
     .setName("topic")
     .setDescription("Display the current channel topic"),
 
-  legacyName: "topic", // For migration mapping
-
   async execute(interaction, _client) {
     // Check if channel has a topic property
     const channel = interaction.channel;

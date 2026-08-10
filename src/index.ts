@@ -1,11 +1,9 @@
 import { Client, Collection, Events, GatewayIntentBits, MessageFlags } from "discord.js";
 import figlet from "figlet";
 
-import { loadCommands } from "./commands";
-import { LEGACY_COMMAND_PREFIX } from "./config/constants";
-import { handleMessage } from "./handlers/message.handler";
 import { loadSlashCommands } from "./handlers/slash-command.handler";
-import type { BotClient, Command, SlashCommand } from "./models";
+import type { BotClient, SlashCommand } from "./models";
+import { AutoPublishService } from "./services/auto-publish.service";
 import { AdminChecker } from "./utils/admin-checker";
 import { CommandAnalytics } from "./utils/command-analytics";
 import { CooldownManager } from "./utils/cooldown-manager";
@@ -41,21 +39,21 @@ function validateEnvironment(): void {
 // Validate environment before starting.
 validateEnvironment();
 
+// The bot holds no privileged intents. Adding one that is not approved in the
+// Discord developer portal makes the gateway reject the connection outright
+// (close code 4014), so the bot fails to log in at all. Any feature needing
+// message content or guild member enumeration is off the table.
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMessagePolls,
   ],
 }) as BotClient;
 
 // Initialize command collections.
-client.commands = new Collection<string, Command>();
 client.slashCommands = new Collection<string, SlashCommand>();
 client.cooldowns = new Collection<string, Collection<string, number>>();
-client.commandPrefix = LEGACY_COMMAND_PREFIX;
 
 // Display startup banner.
 console.log(figlet.textSync("RABot", { font: "Big" }));
@@ -64,10 +62,8 @@ console.log("🚀 Starting up...\n");
 
 client.once(Events.ClientReady, async (readyClient) => {
   // Load commands.
-  client.commands = await loadCommands();
   client.slashCommands = await loadSlashCommands();
 
-  logger.info(`📦 Loaded ${client.commands.size} prefix commands`);
   logger.info(`🗲 Loaded ${client.slashCommands.size} slash commands`);
 
   // Check for any UWC polls that may have ended while the bot was offline.
@@ -82,7 +78,7 @@ client.once(Events.ClientReady, async (readyClient) => {
   if (client.slashCommands.size > 0) {
     logger.debug("Slash commands loaded:");
     for (const [_name, cmd] of client.slashCommands) {
-      logger.debug(`- /${cmd.data.name}${cmd.legacyName ? ` (legacy: !${cmd.legacyName})` : ""}`);
+      logger.debug(`- /${cmd.data.name}`);
     }
   }
 
@@ -96,7 +92,6 @@ client.once(Events.ClientReady, async (readyClient) => {
   }
 
   logger.info(`✅ Ready! Logged in as ${readyClient.user.tag}`);
-  logger.info(`🎮 Legacy command prefix: ${client.commandPrefix}`);
   logger.info(
     `📊 Serving ${readyClient.guilds.cache.size} guild${readyClient.guilds.cache.size !== 1 ? "s" : ""}`,
   );
@@ -114,9 +109,12 @@ client.once(Events.ClientReady, async (readyClient) => {
   }, 600000); // 10 minutes.
 });
 
-// Handle messages.
+// Auto-publish is the only reason the bot listens for messages. It reads
+// message metadata rather than content, so it works without any privileged intent.
 client.on(Events.MessageCreate, async (message) => {
-  await handleMessage(message, client);
+  if (message.author.bot) return;
+
+  await AutoPublishService.handleMessage(message);
 });
 
 // Handle message updates (for poll completion).

@@ -53,19 +53,17 @@ Then edit `.env` with your configuration:
 
 - `DISCORD_TOKEN` - Your bot's token from Discord Developer Portal
 - `DISCORD_APPLICATION_ID` - Your bot's application ID from Discord Developer Portal
-- `LEGACY_COMMAND_PREFIX` - Command prefix for legacy commands (default: `!`)
 - `RA_WEB_API_KEY` - Your RetroAchievements Web API key
-- `RA_CONNECT_API_KEY` - RetroAchievements Connect API key required for `!mem` achievement ID/URL lookups and code notes
+- `RA_CONNECT_API_KEY` - RetroAchievements Connect API key required for `/mem` achievement ID/URL lookups and code notes
 - `RA_CONNECT_API_USER` - RetroAchievements Connect API username (default: `RABot`)
 - `YOUTUBE_API_KEY` - Your YouTube Data API v3 key (optional, for `/gan` longplay searches)
 - `MAIN_GUILD_ID` - Discord guild ID for the main RetroAchievements server (optional, but recommended for production guild authorization)
 - `WORKSHOP_GUILD_ID` - Discord guild ID for the RetroAchievements Workshop server (required for Workshop-only features)
-- `GAMBLER_ROLE_ID` - Discord role ID managed by `/events gambler` (required for Gambler role commands)
 - `CHEAT_INVESTIGATION_CATEGORY_ID` - Category ID required for RACheats `/pingteam ping` restrictions
 - `UWC_VOTING_TAG_ID` - Forum tag ID for active UWC polls (optional)
 - `UWC_VOTE_CONCLUDED_TAG_ID` - Forum tag ID for completed UWC polls (optional)
 - `UWC_FORUM_CHANNEL_ID` - Forum channel ID for UWC auto-detection (optional)
-- `DEV_CHANNELS` - Comma-separated channel IDs where `!mem` may show code notes (optional)
+- `DEV_CHANNELS` - Comma-separated channel IDs where `/mem` may show code notes (optional)
 - `AUTO_PUBLISH_CHANNEL_IDS` - Comma-separated list of announcement channel IDs to auto-publish from (optional)
 - `NODE_ENV` - Environment mode: `development` or `production` (default: `development`)
 - `LOG_LEVEL` - Logging level: `trace`, `debug`, `info`, `warn`, `error`, `fatal` (default: `debug` in dev, `info` in prod)
@@ -130,11 +128,9 @@ For production deployments, the bot is automatically deployed via Forge when cha
 
 ## Commands
 
-### 🆕 Migration Notice
+RABot is slash-command only. The legacy `!` prefix commands were removed because Discord revoked the bot's Message Content privileged intent, which made reading prefixed messages impossible.
 
-RABot is transitioning to slash commands. When you use a linked legacy prefix command (for example, `!gan`), you'll see a migration notice encouraging you to use the modern slash command version (for example, `/gan`). The legacy command will still work during the transition period.
-
-### Slash Commands (Recommended)
+### Slash Commands
 
 - `/topic` - Display the current channel topic
 - `/contact` - Show contact information for various RA teams
@@ -150,36 +146,19 @@ RABot is transitioning to slash commands. When you use a linked legacy prefix co
   - `/pingteam create <name>` - Create a new team
 - `/uwc` - Create an Unwelcome Concept poll (Workshop server only, requires UWC role or admin, auto-manages forum tags)
   - **Auto-detection**: When a new UWC thread is created in the configured forum channel with format `12345: Achievement Title (Game Name)`, the bot automatically posts links to previous discussions for that achievement
-- `/events gambler` - Manage the Gambler role (server only)
-  - `/events gambler reset` - Remove the Gambler role from all users
-  - `/events gambler award <user>` - Manually award the Gambler role
-  - `/events gambler award-all <ach1> <ach2> <ach3> [ach4]` - Award the role to users who unlocked at least 3 listed achievements
 - `/dadjoke` - Get a random dad joke
 - `/frames <input>` - Convert between time and frames at different frame rates
-
-### Legacy Prefix Commands
-
-The bot still supports the following legacy prefix commands (all prefixed with `!` by default):
-
-- `!topic` - Display the current channel topic
-- `!rules [number|coc]` - Display server rules (`!rule`, `!rule2`, and `!rulecoc` aliases are also supported)
-- `!contact` - Show contact information for various RA teams
-- `!poll` - Create a simple poll
-- `!tpoll` - Create a timed poll
-- `!gan <game_id>` - Generate achievement news template
-- `!mem <achievement_id|achievement_url|memaddr>` - Parse MemAddr strings and show achievement logic
-- `!dadjoke` - Get a random dad joke
-- `!frames <time|frames> [fps]` - Convert between time and frames at different frame rates
+- `/rules [rule]` - Display the server rules, a single rule, or the Code of Conduct link
+- `/mem <input>` - Parse a MemAddr string and show achievement logic (accepts an achievement ID, URL, or raw MemAddr)
 
 ## Project Structure
 
 ```
 src/
-├── commands/        # Legacy prefix commands (*.command.ts files)
 ├── slash-commands/  # Modern slash commands (*.command.ts files)
 ├── config/          # Configuration and constants
 ├── database/        # Database setup and schemas
-├── handlers/        # Message and event handlers
+├── handlers/        # Event handlers
 ├── models/          # TypeScript interfaces and types
 ├── services/        # Business logic services
 ├── test/            # Shared test database and mocks
